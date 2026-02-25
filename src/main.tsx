@@ -11,7 +11,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ConfigProvider } from 'antd';
 import './index.css';
-import App from './App.tsx';
+import { AppWithAuth } from './AppWithAuth.tsx';
 import { FeatureFlagProvider } from './contexts/FeatureFlagContext';
 import { theme } from './theme';
 
@@ -19,7 +19,7 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <FeatureFlagProvider>
       <ConfigProvider theme={theme}>
-        <App />
+        <AppWithAuth />
       </ConfigProvider>
     </FeatureFlagProvider>
   </StrictMode>,

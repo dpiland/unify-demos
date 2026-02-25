@@ -15,7 +15,8 @@
  */
 
 import Rox from 'rox-browser';
-import type { RoxSetupOptions } from './types';
+import type { RoxSetupOptions} from './types';
+import type { User } from './users';
 
 /**
  * Feature Flag Definitions
@@ -214,4 +215,44 @@ export function getFlagType(key: FlagKey): 'boolean' | 'string' | 'number' {
   }
 
   return 'boolean';
+}
+
+/**
+ * Set Custom Properties from User Object
+ *
+ * This function sets all custom properties based on a user object.
+ * Call this when a user logs in or switches profiles.
+ *
+ * @param user - User object with properties to set
+ *
+ * EXAMPLE:
+ * ```typescript
+ * const user = loadCurrentUser();
+ * if (user) {
+ *   setUserProperties(user);
+ * }
+ * ```
+ */
+export function setUserProperties(user: User): void {
+  // Set boolean properties
+  Object.entries(user.properties.booleans).forEach(([key, value]) => {
+    Rox.setCustomBooleanProperty(key, value);
+  });
+
+  // Set string properties
+  Object.entries(user.properties.strings).forEach(([key, value]) => {
+    Rox.setCustomStringProperty(key, value);
+  });
+
+  // Set number properties
+  Object.entries(user.properties.numbers).forEach(([key, value]) => {
+    Rox.setCustomNumberProperty(key, value);
+  });
+
+  console.log('🔧 User properties set for:', user.name);
+  console.log('   Properties:', {
+    booleans: user.properties.booleans,
+    strings: user.properties.strings,
+    numbers: user.properties.numbers,
+  });
 }
