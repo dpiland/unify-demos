@@ -46,6 +46,9 @@ This serves as a **starting point** for building custom demos that showcase Clou
 - **`src/contexts/FeatureFlagContext.tsx`** - React context provider
 - **`src/theme/`** - Ant Design theme customization
 - **`src/main.tsx`** - App entry point, initializes flags
+- **`src/lib/users.ts`** - User management and personas for demos
+- **`src/AppWithAuth.tsx`** - Authentication wrapper for user selection
+- **`src/components/LoginPage.tsx`** - User persona selector UI
 
 ## How Feature Flags Work Here
 
@@ -172,6 +175,165 @@ Rox.setCustomNumberProperty('accountBalance', () => {
 ```
 
 These properties become powerful when combined with CloudBees Unify's targeting UI, allowing you to create sophisticated rollout strategies without code changes.
+
+## User Authentication System
+
+The demo includes a **fake user authentication system** that allows users to select different personas, making demos interactive and showcasing feature flag targeting capabilities.
+
+### How It Works
+
+1. **LoginPage** displays 4 user personas to choose from
+2. User selects a persona by clicking "Continue as [Name]"
+3. **User properties are automatically set** via `setUserProperties(user)`
+4. User is saved to localStorage for persistence
+5. **AppWithAuth wrapper** shows login page or main app
+6. User can switch personas or logout via dropdown menu
+
+### Default User Personas
+
+The system includes 4 personas in `src/lib/users.ts`:
+
+**1. Alex Standard** - Regular user
+```typescript
+properties: {
+  booleans: { isPremiumCustomer: false, isBetaTester: false, isNewUser: false },
+  strings: { accountType: 'basic', userTier: 'standard', region: 'us-east' },
+  numbers: { accountAge: 12, usageLevel: 5 }
+}
+```
+
+**2. Jordan Premium** - Premium customer
+```typescript
+properties: {
+  booleans: { isPremiumCustomer: true, isBetaTester: false, isNewUser: false },
+  strings: { accountType: 'premium', userTier: 'premium', region: 'us-west' },
+  numbers: { accountAge: 36, usageLevel: 25 }
+}
+```
+
+**3. Sam Beta** - Beta tester
+```typescript
+properties: {
+  booleans: { isPremiumCustomer: false, isBetaTester: true, isNewUser: false },
+  strings: { accountType: 'basic', userTier: 'beta', region: 'us-west' },
+  numbers: { accountAge: 24, usageLevel: 15 }
+}
+```
+
+**4. Taylor New** - New user
+```typescript
+properties: {
+  booleans: { isPremiumCustomer: false, isBetaTester: false, isNewUser: true },
+  strings: { accountType: 'basic', userTier: 'new', region: 'us-east' },
+  numbers: { accountAge: 1, usageLevel: 2 }
+}
+```
+
+### Customizing User Personas
+
+When building industry-specific demos, customize the users in `src/lib/users.ts`:
+
+**Example: Banking Demo**
+```typescript
+{
+  id: 'high-net-worth',
+  name: 'Victoria Platinum',
+  email: 'victoria.platinum@example.com',
+  description: 'High net worth customer with premium banking services',
+  properties: {
+    booleans: {
+      isPremiumCustomer: true,
+      hasInvestmentAccount: true,
+      isBetaTester: false,
+      hasMobileApp: true,
+    },
+    strings: {
+      accountType: 'platinum',
+      customerSegment: 'high-value',
+      region: 'us-west',
+      userId: 'hnw-001',
+    },
+    numbers: {
+      accountBalance: 250000,
+      creditScore: 820,
+      customerTenureMonths: 84,
+      monthlyTransactionCount: 65,
+    },
+  },
+}
+```
+
+**Example: E-commerce Demo**
+```typescript
+{
+  id: 'vip-shopper',
+  name: 'Marcus VIP',
+  email: 'marcus.vip@example.com',
+  description: 'VIP loyalty member with exclusive perks',
+  properties: {
+    booleans: {
+      isVIPMember: true,
+      hasRewardsMembership: true,
+      isInfluencer: false,
+    },
+    strings: {
+      membershipTier: 'vip',
+      preferredCategory: 'electronics',
+      shippingRegion: 'us-west',
+      userId: 'vip-789',
+    },
+    numbers: {
+      lifetimeSpend: 15000,
+      loyaltyPoints: 5000,
+      memberSince: 36, // months
+      averageOrderValue: 250,
+    },
+  },
+}
+```
+
+### Key Functions
+
+**`setUserProperties(user)`** - in `src/lib/featureFlags.ts`
+- Sets all Rox custom properties from user object
+- Called automatically when user logs in or switches
+- Enables targeting rules in CloudBees Unify
+
+**`saveCurrentUser(user)`** - in `src/lib/users.ts`
+- Saves user to localStorage for persistence
+
+**`loadCurrentUser()`** - in `src/lib/users.ts`
+- Loads user from localStorage on page load
+
+**`clearCurrentUser()`** - in `src/lib/users.ts`
+- Removes user from localStorage (logout)
+
+### Targeting Examples with User Properties
+
+```
+Show premium dashboard IF:
+  isPremiumCustomer == true
+
+Enable beta features IF:
+  isBetaTester == true OR userTier == "beta"
+
+Show onboarding flow IF:
+  isNewUser == true AND accountAge < 3
+
+Target high-value customers IF:
+  accountBalance > 100000 AND customerTenureMonths > 24
+
+Regional rollout IF:
+  region == "us-west"
+```
+
+### Benefits for Demos
+
+✅ **Interactive** - Users can switch personas and see features change
+✅ **No real auth** - Simple click-to-login, no passwords
+✅ **Showcases targeting** - Demonstrates CloudBees segmentation
+✅ **Customizable** - Easy to add industry-specific personas
+✅ **Persistent** - User selection saved in localStorage
 
 ## Customization Workflow
 
