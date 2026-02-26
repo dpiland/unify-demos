@@ -7,7 +7,7 @@
  */
 
 import { Card, Row, Col, Typography, Button, Space, Tag } from 'antd';
-import { UserOutlined, CrownOutlined, ExperimentOutlined, SmileOutlined } from '@ant-design/icons';
+import { UserOutlined, CrownOutlined, RocketOutlined, TeamOutlined } from '@ant-design/icons';
 import { DEFAULT_USERS, type User } from '../lib/users';
 
 const { Title, Text, Paragraph } = Typography;
@@ -17,31 +17,30 @@ interface LoginPageProps {
 }
 
 /**
- * Get icon for user type
+ * Get icon for airline passenger type
  */
 function getUserIcon(userId: string) {
   const iconProps = { style: { fontSize: 32 } };
 
   switch (userId) {
-    case 'premium-user':
+    case 'business-passenger':
+      return <RocketOutlined {...iconProps} style={{ ...iconProps.style, color: '#722ed1' }} />;
+    case 'elite-flyer':
       return <CrownOutlined {...iconProps} style={{ ...iconProps.style, color: '#faad14' }} />;
-    case 'beta-tester':
-      return <ExperimentOutlined {...iconProps} style={{ ...iconProps.style, color: '#722ed1' }} />;
-    case 'new-user':
-      return <SmileOutlined {...iconProps} style={{ ...iconProps.style, color: '#52c41a' }} />;
-    default:
+    case 'airline-staff':
+      return <TeamOutlined {...iconProps} style={{ ...iconProps.style, color: '#52c41a' }} />;
+    default: // economy-traveler
       return <UserOutlined {...iconProps} style={{ ...iconProps.style, color: '#1890ff' }} />;
   }
 }
 
 /**
- * Get color for user tier tag
+ * Get color for membership tier tag
  */
 function getTierColor(tier: string): string {
   const colorMap: Record<string, string> = {
-    premium: 'gold',
-    beta: 'purple',
-    new: 'green',
+    platinum: 'purple',
+    employee: 'green',
     standard: 'blue',
   };
   return colorMap[tier] || 'default';
@@ -52,7 +51,7 @@ export function LoginPage({ onSelectUser }: LoginPageProps) {
     <div
       style={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: 'linear-gradient(135deg, #1890ff 0%, #096dd9 100%)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -62,10 +61,10 @@ export function LoginPage({ onSelectUser }: LoginPageProps) {
       <div style={{ maxWidth: 1200, width: '100%' }}>
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
           <Title level={1} style={{ color: '#fff', marginBottom: 8 }}>
-            Demo User Selector
+            Select Your Passenger Profile
           </Title>
           <Text style={{ fontSize: 16, color: 'rgba(255, 255, 255, 0.85)' }}>
-            Choose a user persona to see how features change based on targeting rules
+            Choose a passenger persona to experience personalized airline features
           </Text>
         </div>
 
@@ -137,16 +136,16 @@ export function LoginPage({ onSelectUser }: LoginPageProps) {
                       }}
                     >
                       <div style={{ marginBottom: 4 }}>
-                        <Text strong>Account Type:</Text>{' '}
-                        <Text type="secondary">{user.properties.strings.accountType}</Text>
+                        <Text strong>Cabin Class:</Text>{' '}
+                        <Text type="secondary">{user.properties.strings.cabinClass}</Text>
                       </div>
                       <div style={{ marginBottom: 4 }}>
-                        <Text strong>Region:</Text>{' '}
-                        <Text type="secondary">{user.properties.strings.region}</Text>
+                        <Text strong>Home Airport:</Text>{' '}
+                        <Text type="secondary">{user.properties.strings.homeAirport}</Text>
                       </div>
                       <div>
-                        <Text strong>Account Age:</Text>{' '}
-                        <Text type="secondary">{user.properties.numbers.accountAge} months</Text>
+                        <Text strong>FF Miles:</Text>{' '}
+                        <Text type="secondary">{user.properties.numbers.frequentFlyerMiles.toLocaleString()}</Text>
                       </div>
                     </div>
                   </div>
@@ -177,9 +176,9 @@ export function LoginPage({ onSelectUser }: LoginPageProps) {
           }}
         >
           <Text style={{ color: 'rgba(255, 255, 255, 0.85)', fontSize: 13 }}>
-            💡 <strong>Tip:</strong> Each user has different properties that can be used to target
-            feature flags in CloudBees Unify. Switch between users to see how features change
-            dynamically.
+            ✈️ <strong>Tip:</strong> Each passenger has unique properties (cabin class, loyalty
+            tier, miles) that enable personalized feature targeting in CloudBees Unify. Switch
+            between passengers to see how the portal adapts.
           </Text>
         </div>
       </div>

@@ -19,93 +19,333 @@ import type { RoxSetupOptions} from './types';
 import type { User } from './users';
 
 /**
- * Feature Flag Definitions
+ * Feature Flag Definitions - Airline Passenger Portal
  *
- * These are GENERIC EXAMPLES showing the three types of feature flags.
- * Customize these for your specific use case (retail, fintech, healthcare, etc.)
+ * These flags control features in the airline passenger booking portal.
+ * They demonstrate how CloudBees Feature Management enables personalized
+ * travel experiences based on passenger tier, booking class, and loyalty status.
  */
 export const flags = {
+  // ============================================
+  // BOOLEAN FLAGS - Feature Toggles
+  // ============================================
+
   /**
-   * EXAMPLE 1: Boolean Flag - Simple On/Off Toggle
+   * Enable Seat Selection
    *
-   * 📖 USE CASE: Enable/disable entire features or UI elements
-   * 💡 PATTERN: if (enabled) { show feature } else { hide feature }
+   * 📖 USE CASE: Interactive seat map for flight seat selection
+   * 💡 PATTERN: Toggle visibility of seat selection interface
    *
-   * REAL-WORLD EXAMPLES:
-   * - Toggle promotional banners
-   * - Enable beta feature access
-   * - Show/hide new UI sections
-   * - Control maintenance mode
-   * - Enable experimental functionality
+   * AIRLINE SCENARIO:
+   * - Progressive rollout of new seat selection UI
+   * - Test interactive seat maps before general availability
+   * - Enable for specific routes or aircraft types
    *
    * HOW TO USE:
    * ```typescript
-   * const showBanner = useFeatureFlag('showWelcomeBanner');
-   * return showBanner ? <Banner /> : null;
+   * const enableSeatSelection = useFeatureFlag('enableSeatSelection');
+   * return enableSeatSelection ? <SeatSelector /> : null;
    * ```
    *
    * IN CLOUDBEES UI:
    * - Create as Boolean flag
-   * - Set default value (true/false)
-   * - Target specific users/groups if needed
+   * - Default: false (rollout gradually)
+   * - Target rules: Enable for premium members first, then all users
    */
-  showWelcomeBanner: new Rox.Flag(),
+  enableSeatSelection: new Rox.Flag(),
 
   /**
-   * EXAMPLE 2: String Flag - A/B Testing Variants
+   * Enable Lounge Access
    *
-   * 📖 USE CASE: Test different versions of a feature (A/B/C testing)
-   * 💡 PATTERN: switch (variant) { case 'A': ... case 'B': ... }
+   * 📖 USE CASE: Airport lounge information and amenities
+   * 💡 PATTERN: Show/hide lounge access section based on eligibility
    *
-   * REAL-WORLD EXAMPLES:
-   * - Button styles/colors (primary, success, warning)
-   * - Layout variations (grid, list, card)
-   * - Content variations (short, long, with-image)
-   * - Pricing tiers (basic, premium, enterprise)
-   * - Checkout flows (standard, express, one-click)
+   * AIRLINE SCENARIO:
+   * - Display lounge details only to eligible passengers
+   * - Combine flag with user property: hasLoungeAccess
+   * - Test lounge benefit visibility for upsell opportunities
    *
    * HOW TO USE:
    * ```typescript
-   * const variant = useFeatureFlagString('buttonVariant');
-   * return <Button type={variant}>Click Me</Button>;
+   * const enableLoungeAccess = useFeatureFlag('enableLoungeAccess');
+   * const hasAccess = user.properties.booleans.hasLoungeAccess;
+   * return (enableLoungeAccess && hasAccess) ? <LoungeAccessCard /> : null;
+   * ```
+   *
+   * IN CLOUDBEES UI:
+   * - Create as Boolean flag
+   * - Default: false
+   * - Target rule: hasLoungeAccess == true (business, elite, staff)
+   */
+  enableLoungeAccess: new Rox.Flag(),
+
+  /**
+   * Enable Priority Boarding
+   *
+   * 📖 USE CASE: Priority services including boarding, security, baggage
+   * 💡 PATTERN: Display premium service benefits for eligible passengers
+   *
+   * AIRLINE SCENARIO:
+   * - Show priority boarding groups and fast-track security
+   * - Test visibility of premium services for conversion
+   * - Enable for business class and elite frequent flyers
+   *
+   * HOW TO USE:
+   * ```typescript
+   * const enablePriorityBoarding = useFeatureFlag('enablePriorityBoarding');
+   * const hasPriority = user.properties.booleans.hasPriorityBoarding;
+   * return (enablePriorityBoarding && hasPriority) ? <PriorityServicesCard /> : null;
+   * ```
+   *
+   * IN CLOUDBEES UI:
+   * - Create as Boolean flag
+   * - Default: false
+   * - Target rule: hasPriorityBoarding == true (business class, elite status)
+   */
+  enablePriorityBoarding: new Rox.Flag(),
+
+  /**
+   * Show Flight Alerts
+   *
+   * 📖 USE CASE: Real-time flight status notifications and updates
+   * 💡 PATTERN: Toggle notification banner visibility
+   *
+   * AIRLINE SCENARIO:
+   * - Display gate changes, delays, boarding announcements
+   * - Test different notification styles
+   * - Disable during off-peak hours to reduce noise
+   *
+   * HOW TO USE:
+   * ```typescript
+   * const showFlightAlerts = useFeatureFlag('showFlightAlerts');
+   * return showFlightAlerts ? <Alert message="Flight Update" /> : null;
+   * ```
+   *
+   * IN CLOUDBEES UI:
+   * - Create as Boolean flag
+   * - Default: true (important for all passengers)
+   * - Can disable temporarily for system maintenance
+   */
+  showFlightAlerts: new Rox.Flag(),
+
+  /**
+   * Enable Mobile Check-in
+   *
+   * 📖 USE CASE: Mobile check-in and digital boarding pass features
+   * 💡 PATTERN: Toggle mobile-first check-in capabilities
+   *
+   * AIRLINE SCENARIO:
+   * - Gradual rollout of mobile check-in features
+   * - Test digital boarding pass adoption
+   * - Enable for specific routes or flight types
+   *
+   * HOW TO USE:
+   * ```typescript
+   * const enableMobileCheckin = useFeatureFlag('enableMobileCheckin');
+   * return enableMobileCheckin ? <MobileCheckinCard /> : null;
+   * ```
+   *
+   * IN CLOUDBEES UI:
+   * - Create as Boolean flag
+   * - Default: true (mobile-first strategy)
+   * - Can target by device type or user preferences
+   */
+  enableMobileCheckin: new Rox.Flag(),
+
+  // ============================================
+  // STRING FLAGS - A/B Testing & Variants
+  // ============================================
+
+  /**
+   * Dashboard Layout
+   *
+   * 📖 USE CASE: Test different dashboard layout variants
+   * 💡 PATTERN: Switch between layout styles for UX optimization
+   *
+   * VARIANTS:
+   * - 'classic': Traditional airline layout with sidebar navigation
+   * - 'modern': Card-based responsive design (default, recommended)
+   * - 'compact': Dense information display for power users
+   *
+   * AIRLINE SCENARIO:
+   * - A/B test which layout drives more bookings
+   * - Modern layout optimized for mobile, classic for desktop
+   * - Compact layout for frequent flyers who want efficiency
+   *
+   * HOW TO USE:
+   * ```typescript
+   * const layout = useFeatureFlagString('dashboardLayout');
+   * switch (layout) {
+   *   case 'classic': return <ClassicLayout />;
+   *   case 'modern': return <ModernLayout />;
+   *   case 'compact': return <CompactLayout />;
+   * }
    * ```
    *
    * IN CLOUDBEES UI:
    * - Create as String flag
-   * - Define variants: 'default', 'primary', 'success'
-   * - Set percentages for A/B testing (e.g., 33% each)
-   * - Target different variants to different audiences
+   * - Variants: 'classic', 'modern', 'compact'
+   * - Default: 'modern'
+   * - A/B test: 33% each or 50% modern, 25% classic, 25% compact
    */
-  buttonVariant: new Rox.RoxString('default', ['default', 'primary', 'success']),
+  dashboardLayout: new Rox.RoxString('modern', ['classic', 'modern', 'compact']),
 
   /**
-   * EXAMPLE 3: Number Flag - Numeric Configuration
+   * Flight Display Mode
    *
-   * 📖 USE CASE: Control numeric values like limits, sizes, intervals
-   * 💡 PATTERN: const size = getNumberFlag(); <Component size={size} />
+   * 📖 USE CASE: Control how upcoming flights are displayed
+   * 💡 PATTERN: Test different visualization styles for flight information
    *
-   * REAL-WORLD EXAMPLES:
-   * - Page size (5, 10, 20, 50 items)
-   * - Refresh intervals (10s, 30s, 60s)
-   * - Max items to display
-   * - Timeouts and delays
-   * - Cache durations
-   * - Rate limits
+   * VARIANTS:
+   * - 'timeline': Visual timeline with departure/arrival markers (default)
+   * - 'card': Individual flight cards with detailed info
+   * - 'list': Compact list view with maximum information density
+   *
+   * AIRLINE SCENARIO:
+   * - Test which display mode improves engagement
+   * - Timeline is visual and intuitive for casual travelers
+   * - List view preferred by business travelers for efficiency
+   * - Card view balances detail and visual appeal
    *
    * HOW TO USE:
    * ```typescript
-   * const itemCount = useFeatureFlagNumber('itemsToDisplay');
-   * const items = data.slice(0, itemCount);
-   * return <List items={items} />;
+   * const displayMode = useFeatureFlagString('flightDisplayMode');
+   * {displayMode === 'timeline' && <FlightTimeline />}
+   * {displayMode === 'card' && <FlightCards />}
+   * {displayMode === 'list' && <FlightList />}
+   * ```
+   *
+   * IN CLOUDBEES UI:
+   * - Create as String flag
+   * - Variants: 'timeline', 'card', 'list'
+   * - Default: 'timeline'
+   * - Target rules: 'list' for isPremiumMember == true
+   */
+  flightDisplayMode: new Rox.RoxString('timeline', ['timeline', 'card', 'list']),
+
+  /**
+   * Upgrade Prompt Style
+   *
+   * 📖 USE CASE: A/B test different upgrade offer presentation styles
+   * 💡 PATTERN: Optimize conversion rates for cabin upgrades
+   *
+   * VARIANTS:
+   * - 'subtle': Small banner at bottom of flight card
+   * - 'prominent': Large card with benefits highlighted (default)
+   * - 'modal': Full-screen modal with interactive comparison
+   *
+   * AIRLINE SCENARIO:
+   * - Test which presentation style drives more upgrade purchases
+   * - Subtle for low-pressure approach
+   * - Prominent for clear value proposition
+   * - Modal for detailed comparison (highest conversion potential)
+   *
+   * HOW TO USE:
+   * ```typescript
+   * const upgradeStyle = useFeatureFlagString('upgradePromptStyle');
+   * return <UpgradeOfferCard style={upgradeStyle} />;
+   * ```
+   *
+   * IN CLOUDBEES UI:
+   * - Create as String flag
+   * - Variants: 'subtle', 'prominent', 'modal'
+   * - Default: 'prominent'
+   * - A/B test: 50% prominent vs 50% modal (exclude business class)
+   * - Target rule: isBusinessClass == false
+   */
+  upgradePromptStyle: new Rox.RoxString('prominent', ['subtle', 'prominent', 'modal']),
+
+  // ============================================
+  // NUMBER FLAGS - Numeric Configuration
+  // ============================================
+
+  /**
+   * Recent Bookings to Show
+   *
+   * 📖 USE CASE: Control how many flight bookings to display
+   * 💡 PATTERN: Balance information density vs. page performance
+   *
+   * OPTIONS: 2, 3, 5, 8 bookings
+   *
+   * AIRLINE SCENARIO:
+   * - Show 2-3 for casual travelers (cleaner interface)
+   * - Show 5-8 for business travelers (need to see more trips)
+   * - Test optimal number for engagement without overwhelming
+   *
+   * HOW TO USE:
+   * ```typescript
+   * const bookingCount = useFeatureFlagNumber('recentBookingsToShow');
+   * const visibleFlights = allFlights.slice(0, bookingCount);
+   * return <FlightList flights={visibleFlights} />;
    * ```
    *
    * IN CLOUDBEES UI:
    * - Create as Number flag
-   * - Define numeric options: 5, 10, 20, 50
-   * - Set default value (e.g., 10)
-   * - Gradually roll out higher values to test performance
+   * - Options: 2, 3, 5, 8
+   * - Default: 3
+   * - Target rules: 5 for isPremiumMember == true, 2 for isNewUser == true
    */
-  itemsToDisplay: new Rox.RoxNumber(10, [5, 10, 20, 50]),
+  recentBookingsToShow: new Rox.RoxNumber(3, [2, 3, 5, 8]),
+
+  /**
+   * Flight Status Refresh Interval
+   *
+   * 📖 USE CASE: Flight status update frequency in seconds
+   * 💡 PATTERN: Balance real-time accuracy vs. API load and battery usage
+   *
+   * OPTIONS: 30, 60, 120, 300 seconds (0.5min, 1min, 2min, 5min)
+   *
+   * AIRLINE SCENARIO:
+   * - 30s for active travelers near departure time
+   * - 60s for general use (balanced)
+   * - 120s+ for longer wait times or battery saving
+   *
+   * HOW TO USE:
+   * ```typescript
+   * const refreshInterval = useFeatureFlagNumber('flightStatusRefreshInterval');
+   * useEffect(() => {
+   *   const timer = setInterval(() => fetchFlightStatus(), refreshInterval * 1000);
+   *   return () => clearInterval(timer);
+   * }, [refreshInterval]);
+   * ```
+   *
+   * IN CLOUDBEES UI:
+   * - Create as Number flag
+   * - Options: 30, 60, 120, 300
+   * - Default: 60 (1 minute)
+   * - Can increase interval during off-peak hours to reduce load
+   */
+  flightStatusRefreshInterval: new Rox.RoxNumber(60, [30, 60, 120, 300]),
+
+  /**
+   * Loyalty Points Multiplier
+   *
+   * 📖 USE CASE: Bonus loyalty points for promotions
+   * 💡 PATTERN: Test promotional campaigns impact on loyalty program
+   *
+   * OPTIONS: 1, 1.5, 2, 3 (1x, 1.5x, 2x, 3x points)
+   *
+   * AIRLINE SCENARIO:
+   * - 1x = standard earning (no promotion)
+   * - 1.5x = moderate promotion (weekend special)
+   * - 2x = strong promotion (double points campaign)
+   * - 3x = mega promotion (holiday special, new route launch)
+   *
+   * HOW TO USE:
+   * ```typescript
+   * const multiplier = useFeatureFlagNumber('loyaltyPointsMultiplier');
+   * const earnedPoints = basePoints * multiplier;
+   * return <Text>Earn {earnedPoints} points {multiplier > 1 && `(${multiplier}x bonus!)`}</Text>;
+   * ```
+   *
+   * IN CLOUDBEES UI:
+   * - Create as Number flag
+   * - Options: 1, 1.5, 2, 3
+   * - Default: 1 (no promotion)
+   * - Enable 2x-3x for promotional periods
+   * - Can target specific routes or membership tiers
+   */
+  loyaltyPointsMultiplier: new Rox.RoxNumber(1, [1, 1.5, 2, 3]),
 };
 
 /**
@@ -163,10 +403,18 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
 
     // Log current flag states in development (helpful for debugging)
     if (import.meta.env.DEV) {
-      console.log('🏴 Current flag states:', {
-        showWelcomeBanner: flags.showWelcomeBanner.isEnabled(),
-        buttonVariant: flags.buttonVariant.getValue(),
-        itemsToDisplay: flags.itemsToDisplay.getValue(),
+      console.log('✈️  Current airline flag states:', {
+        enableSeatSelection: flags.enableSeatSelection.isEnabled(),
+        enableLoungeAccess: flags.enableLoungeAccess.isEnabled(),
+        enablePriorityBoarding: flags.enablePriorityBoarding.isEnabled(),
+        showFlightAlerts: flags.showFlightAlerts.isEnabled(),
+        enableMobileCheckin: flags.enableMobileCheckin.isEnabled(),
+        dashboardLayout: flags.dashboardLayout.getValue(),
+        flightDisplayMode: flags.flightDisplayMode.getValue(),
+        upgradePromptStyle: flags.upgradePromptStyle.getValue(),
+        recentBookingsToShow: flags.recentBookingsToShow.getValue(),
+        flightStatusRefreshInterval: flags.flightStatusRefreshInterval.getValue(),
+        loyaltyPointsMultiplier: flags.loyaltyPointsMultiplier.getValue(),
       });
     }
   } catch (error) {

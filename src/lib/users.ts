@@ -33,101 +33,142 @@ export interface User {
 }
 
 /**
- * Default Demo Users
+ * Default Airline Passenger Personas
  *
- * These users represent common personas for demonstrations.
- * Customize these for your specific demo use case.
+ * These users represent different types of airline passengers for demonstrations.
+ * Each persona has unique properties that enable targeted feature flag rules.
+ *
+ * TARGETING USE CASES:
+ * - Economy passengers see standard features + upgrade offers
+ * - Business passengers get lounge access and priority services
+ * - Elite frequent flyers get all premium features
+ * - Staff members have employee-specific features and restrictions
  */
 export const DEFAULT_USERS: User[] = [
   {
-    id: 'standard-user',
-    name: 'Alex Standard',
-    email: 'alex.standard@example.com',
-    description: 'Regular user with standard features',
+    id: 'economy-traveler',
+    name: 'Emma Economy',
+    email: 'emma.economy@example.com',
+    description: 'Leisure traveler with economy class ticket and no loyalty status',
     properties: {
       booleans: {
-        isPremiumCustomer: false,
-        isBetaTester: false,
-        isNewUser: false,
+        hasLoungeAccess: false,
+        isPremiumMember: false,
+        isBusinessClass: false,
+        hasCheckedIn: false,
+        hasPriorityBoarding: false,
+        isFrequentFlyer: false,
       },
       strings: {
-        accountType: 'basic',
-        userTier: 'standard',
+        membershipTier: 'standard',
+        cabinClass: 'economy',
+        bookingType: 'leisure',
+        homeAirport: 'JFK',
         region: 'us-east',
-        userId: 'standard-user',
+        userId: 'economy-001',
       },
       numbers: {
-        accountAge: 12, // months
-        usageLevel: 5, // low usage
+        frequentFlyerMiles: 2500,
+        totalFlights: 4,
+        membershipYears: 0,
+        averageSpend: 350,
+        currentBookings: 1,
       },
     },
   },
   {
-    id: 'premium-user',
-    name: 'Jordan Premium',
-    email: 'jordan.premium@example.com',
-    description: 'Premium customer with access to advanced features',
+    id: 'business-passenger',
+    name: 'Bryan Business',
+    email: 'bryan.business@example.com',
+    description: 'Corporate traveler with business class ticket and lounge access',
     properties: {
       booleans: {
-        isPremiumCustomer: true,
-        isBetaTester: false,
-        isNewUser: false,
+        hasLoungeAccess: true,
+        isPremiumMember: false,
+        isBusinessClass: true,
+        hasCheckedIn: true,
+        hasPriorityBoarding: true,
+        isFrequentFlyer: false,
       },
       strings: {
-        accountType: 'premium',
-        userTier: 'premium',
+        membershipTier: 'standard',
+        cabinClass: 'business',
+        bookingType: 'corporate',
+        homeAirport: 'LAX',
         region: 'us-west',
-        userId: 'premium-user',
+        userId: 'business-001',
       },
       numbers: {
-        accountAge: 36, // months
-        usageLevel: 25, // high usage
+        frequentFlyerMiles: 15000,
+        totalFlights: 18,
+        membershipYears: 2,
+        averageSpend: 1800,
+        currentBookings: 2,
       },
     },
   },
   {
-    id: 'beta-tester',
-    name: 'Sam Beta',
-    email: 'sam.beta@example.com',
-    description: 'Beta tester with access to experimental features',
+    id: 'elite-flyer',
+    name: 'Olivia Elite',
+    email: 'olivia.elite@example.com',
+    description: 'Elite frequent flyer with top-tier status and exclusive benefits',
     properties: {
       booleans: {
-        isPremiumCustomer: false,
-        isBetaTester: true,
-        isNewUser: false,
+        hasLoungeAccess: true,
+        isPremiumMember: true,
+        isBusinessClass: false, // Flies economy but gets upgrades
+        hasCheckedIn: true,
+        hasPriorityBoarding: true,
+        isFrequentFlyer: true,
       },
       strings: {
-        accountType: 'basic',
-        userTier: 'beta',
+        membershipTier: 'platinum',
+        cabinClass: 'economy-plus',
+        bookingType: 'leisure',
+        homeAirport: 'SFO',
         region: 'us-west',
-        userId: 'beta-tester',
+        userId: 'elite-001',
       },
       numbers: {
-        accountAge: 24, // months
-        usageLevel: 15, // medium usage
+        frequentFlyerMiles: 185000,
+        totalFlights: 127,
+        membershipYears: 8,
+        averageSpend: 2400,
+        currentBookings: 3,
       },
     },
   },
   {
-    id: 'new-user',
-    name: 'Taylor New',
-    email: 'taylor.new@example.com',
-    description: 'New user just getting started',
+    id: 'airline-staff',
+    name: 'Alex Staff',
+    email: 'alex.staff@airlineco.com',
+    description: 'Airline employee traveling on staff benefits',
     properties: {
       booleans: {
-        isPremiumCustomer: false,
-        isBetaTester: false,
-        isNewUser: true,
+        hasLoungeAccess: true,
+        isPremiumMember: false,
+        isBusinessClass: false,
+        hasCheckedIn: false,
+        hasPriorityBoarding: false,
+        isFrequentFlyer: false,
+        isStaffMember: true, // Special property for staff
       },
       strings: {
-        accountType: 'basic',
-        userTier: 'new',
-        region: 'us-east',
-        userId: 'new-user',
+        membershipTier: 'employee',
+        cabinClass: 'standby',
+        bookingType: 'employee',
+        homeAirport: 'ORD',
+        region: 'us-central',
+        userId: 'staff-001',
+        employeeDepartment: 'operations',
       },
       numbers: {
-        accountAge: 1, // months
-        usageLevel: 2, // very low usage
+        frequentFlyerMiles: 0, // Staff don't earn miles on employee travel
+        totalFlights: 52,
+        membershipYears: 5,
+        averageSpend: 0, // Employee tickets
+        currentBookings: 1,
+        employeeId: 10423,
       },
     },
   },
