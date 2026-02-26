@@ -19,93 +19,309 @@ import type { RoxSetupOptions} from './types';
 import type { User } from './users';
 
 /**
- * Feature Flag Definitions
+ * Feature Flag Definitions - EliteShop E-commerce
  *
- * These are GENERIC EXAMPLES showing the three types of feature flags.
- * Customize these for your specific use case (retail, fintech, healthcare, etc.)
+ * This e-commerce application uses 11 feature flags to control various
+ * aspects of the shopping experience, enabling safe rollouts, A/B testing,
+ * and personalized experiences based on user segmentation.
  */
 export const flags = {
-  /**
-   * EXAMPLE 1: Boolean Flag - Simple On/Off Toggle
-   *
-   * 📖 USE CASE: Enable/disable entire features or UI elements
-   * 💡 PATTERN: if (enabled) { show feature } else { hide feature }
-   *
-   * REAL-WORLD EXAMPLES:
-   * - Toggle promotional banners
-   * - Enable beta feature access
-   * - Show/hide new UI sections
-   * - Control maintenance mode
-   * - Enable experimental functionality
-   *
-   * HOW TO USE:
-   * ```typescript
-   * const showBanner = useFeatureFlag('showWelcomeBanner');
-   * return showBanner ? <Banner /> : null;
-   * ```
-   *
-   * IN CLOUDBEES UI:
-   * - Create as Boolean flag
-   * - Set default value (true/false)
-   * - Target specific users/groups if needed
-   */
-  showWelcomeBanner: new Rox.Flag(),
+  // =================================================================
+  // BOOLEAN FLAGS (5) - Enable/Disable Features
+  // =================================================================
 
   /**
-   * EXAMPLE 2: String Flag - A/B Testing Variants
+   * 1. Show Promotional Banner
    *
-   * 📖 USE CASE: Test different versions of a feature (A/B/C testing)
-   * 💡 PATTERN: switch (variant) { case 'A': ... case 'B': ... }
+   * 📖 USE CASE: Toggle promotional banner for seasonal sales or marketing campaigns
+   * 💡 PATTERN: if (enabled) { show banner } else { hide banner }
    *
-   * REAL-WORLD EXAMPLES:
-   * - Button styles/colors (primary, success, warning)
-   * - Layout variations (grid, list, card)
-   * - Content variations (short, long, with-image)
-   * - Pricing tiers (basic, premium, enterprise)
-   * - Checkout flows (standard, express, one-click)
+   * BUSINESS VALUE:
+   * - Launch flash sales instantly without code deploy
+   * - Test impact of promotional messaging on conversion
+   * - Target campaigns to specific regions or user segments
    *
    * HOW TO USE:
    * ```typescript
-   * const variant = useFeatureFlagString('buttonVariant');
-   * return <Button type={variant}>Click Me</Button>;
+   * const showBanner = useFeatureFlag('showPromoBanner');
+   * return showBanner ? <PromoBanner /> : null;
    * ```
    *
-   * IN CLOUDBEES UI:
-   * - Create as String flag
-   * - Define variants: 'default', 'primary', 'success'
-   * - Set percentages for A/B testing (e.g., 33% each)
-   * - Target different variants to different audiences
+   * TARGETING EXAMPLES:
+   * - Enable for all users during Black Friday
+   * - Enable for new users only (isNewUser == true)
+   * - Disable for premium customers who converted already
    */
-  buttonVariant: new Rox.RoxString('default', ['default', 'primary', 'success']),
+  showPromoBanner: new Rox.Flag(),
 
   /**
-   * EXAMPLE 3: Number Flag - Numeric Configuration
+   * 2. Enable Express Checkout
    *
-   * 📖 USE CASE: Control numeric values like limits, sizes, intervals
-   * 💡 PATTERN: const size = getNumberFlag(); <Component size={size} />
+   * 📖 USE CASE: One-click express checkout for premium/loyal customers
+   * 💡 PATTERN: Conditional rendering of express checkout button
    *
-   * REAL-WORLD EXAMPLES:
-   * - Page size (5, 10, 20, 50 items)
-   * - Refresh intervals (10s, 30s, 60s)
-   * - Max items to display
-   * - Timeouts and delays
-   * - Cache durations
-   * - Rate limits
+   * BUSINESS VALUE:
+   * - Reduce friction for high-value customers
+   * - Test impact on conversion rate and cart abandonment
+   * - Reward loyalty with premium experience
    *
    * HOW TO USE:
    * ```typescript
-   * const itemCount = useFeatureFlagNumber('itemsToDisplay');
-   * const items = data.slice(0, itemCount);
-   * return <List items={items} />;
+   * const hasExpress = useFeatureFlag('enableExpressCheckout');
+   * return hasExpress ? <ExpressCheckoutButton /> : null;
    * ```
    *
-   * IN CLOUDBEES UI:
-   * - Create as Number flag
-   * - Define numeric options: 5, 10, 20, 50
-   * - Set default value (e.g., 10)
-   * - Gradually roll out higher values to test performance
+   * TARGETING EXAMPLES:
+   * - Enable IF isPremiumCustomer == true
+   * - Enable IF lifetimeSpend > 5000
+   * - Enable IF memberSince > 12 (months)
    */
-  itemsToDisplay: new Rox.RoxNumber(10, [5, 10, 20, 50]),
+  enableExpressCheckout: new Rox.Flag(),
+
+  /**
+   * 3. Enable Product Recommendations
+   *
+   * 📖 USE CASE: Show AI-powered personalized product suggestions
+   * 💡 PATTERN: Conditional rendering of recommendations carousel
+   *
+   * BUSINESS VALUE:
+   * - Increase average order value (AOV)
+   * - A/B test recommendation algorithm effectiveness
+   * - Gradually roll out to measure performance impact
+   *
+   * HOW TO USE:
+   * ```typescript
+   * const showRecs = useFeatureFlag('enableRecommendations');
+   * return showRecs ? <ProductRecommendations /> : null;
+   * ```
+   *
+   * TARGETING EXAMPLES:
+   * - Enable for 50% of users (A/B test)
+   * - Enable for users with >3 previous purchases
+   * - Disable for new users (focus on browse experience)
+   */
+  enableRecommendations: new Rox.Flag(),
+
+  /**
+   * 4. Show Loyalty Program
+   *
+   * 📖 USE CASE: Display loyalty points, rewards, and tier status
+   * 💡 PATTERN: Conditional rendering of loyalty card component
+   *
+   * BUSINESS VALUE:
+   * - Soft launch to premium members before full rollout
+   * - Increase customer retention and repeat purchases
+   * - Test loyalty program mechanics with select cohorts
+   *
+   * HOW TO USE:
+   * ```typescript
+   * const showLoyalty = useFeatureFlag('showLoyaltyProgram');
+   * return showLoyalty ? <LoyaltyCard /> : null;
+   * ```
+   *
+   * TARGETING EXAMPLES:
+   * - Enable IF isPremiumCustomer == true AND memberSince > 12
+   * - Enable for region == "us-west" (regional rollout)
+   * - Enable for beta testers first (isBetaTester == true)
+   */
+  showLoyaltyProgram: new Rox.Flag(),
+
+  /**
+   * 5. Enable Wishlist Feature
+   *
+   * 📖 USE CASE: Allow users to save products to wishlist/favorites
+   * 💡 PATTERN: Conditional rendering of wishlist heart icon
+   *
+   * BUSINESS VALUE:
+   * - Beta test feature before general availability
+   * - Increase user engagement and return visits
+   * - Test impact on conversion (wishlist → purchase)
+   *
+   * HOW TO USE:
+   * ```typescript
+   * const hasWishlist = useFeatureFlag('enableWishlist');
+   * return hasWishlist ? <WishlistButton /> : null;
+   * ```
+   *
+   * TARGETING EXAMPLES:
+   * - Enable for isBetaTester == true (beta test)
+   * - Enable for region == "us-west" then expand
+   * - Enable for users with accountAge > 6 months
+   */
+  enableWishlist: new Rox.Flag(),
+
+  // =================================================================
+  // STRING FLAGS (3) - A/B Test Variants
+  // =================================================================
+
+  /**
+   * 6. Product Display Mode
+   *
+   * 📖 USE CASE: A/B test different product layout styles
+   * 💡 PATTERN: switch (mode) { case 'grid': ... case 'list': ... }
+   *
+   * BUSINESS VALUE:
+   * - Test which layout drives more engagement and clicks
+   * - Optimize for different device types (mobile vs desktop)
+   * - Personalize based on user preference/behavior
+   *
+   * VARIANTS:
+   * - 'grid': Cards in responsive grid (default, visual)
+   * - 'list': Row-based list view (detailed, scannable)
+   * - 'compact': Dense grid with smaller cards (more products visible)
+   *
+   * HOW TO USE:
+   * ```typescript
+   * const displayMode = useFeatureFlagString('productDisplayMode');
+   * <ProductGrid displayMode={displayMode} />
+   * ```
+   *
+   * TARGETING EXAMPLES:
+   * - Split traffic: 33% grid, 33% list, 33% compact
+   * - Mobile users get 'compact', desktop gets 'grid'
+   * - Premium users get 'grid' (larger images)
+   */
+  productDisplayMode: new Rox.RoxString('grid', ['grid', 'list', 'compact']),
+
+  /**
+   * 7. Checkout Flow Variant
+   *
+   * 📖 USE CASE: Test different checkout user experiences
+   * 💡 PATTERN: Conditional rendering based on variant string
+   *
+   * BUSINESS VALUE:
+   * - Optimize checkout conversion rate
+   * - Test multi-step vs single-page checkout
+   * - Personalize flow based on user tier
+   *
+   * VARIANTS:
+   * - 'standard': Traditional multi-step checkout (default)
+   * - 'express': Streamlined one-click for returning customers
+   * - 'single-page': All checkout fields on one page
+   *
+   * HOW TO USE:
+   * ```typescript
+   * const checkoutFlow = useFeatureFlagString('checkoutFlowVariant');
+   * <CheckoutButton variant={checkoutFlow} />
+   * ```
+   *
+   * TARGETING EXAMPLES:
+   * - Premium users get 'express' flow
+   * - New users get 'single-page' (simpler)
+   * - A/B test 'standard' vs 'single-page' for conversion
+   */
+  checkoutFlowVariant: new Rox.RoxString('standard', ['standard', 'express', 'single-page']),
+
+  /**
+   * 8. Promotional Banner Theme
+   *
+   * 📖 USE CASE: A/B test different banner color schemes
+   * 💡 PATTERN: Apply different styling based on theme string
+   *
+   * BUSINESS VALUE:
+   * - Test which color scheme gets more clicks
+   * - Optimize promotional banner effectiveness
+   * - Match seasonal themes (red for holidays, etc.)
+   *
+   * VARIANTS:
+   * - 'blue': Professional blue (default, trust)
+   * - 'red': Urgent red (urgency, sales)
+   * - 'gradient': Modern gradient (eye-catching, premium)
+   *
+   * HOW TO USE:
+   * ```typescript
+   * const theme = useFeatureFlagString('promoBannerTheme');
+   * <PromoBanner theme={theme} />
+   * ```
+   *
+   * TARGETING EXAMPLES:
+   * - Split traffic evenly across all 3 themes
+   * - Use 'red' during flash sales for urgency
+   * - Use 'gradient' for premium customers
+   */
+  promoBannerTheme: new Rox.RoxString('blue', ['blue', 'red', 'gradient']),
+
+  // =================================================================
+  // NUMBER FLAGS (3) - Numeric Configuration
+  // =================================================================
+
+  /**
+   * 9. Products Per Page
+   *
+   * 📖 USE CASE: Control pagination size for product listings
+   * 💡 PATTERN: Slice products array based on flag value
+   *
+   * BUSINESS VALUE:
+   * - Test optimal page size for user experience
+   * - Balance performance vs. content visibility
+   * - Personalize based on user tier or device
+   *
+   * OPTIONS: [12, 24, 36, 48]
+   *
+   * HOW TO USE:
+   * ```typescript
+   * const pageSize = useFeatureFlagNumber('productsPerPage');
+   * const displayedProducts = products.slice(0, pageSize);
+   * ```
+   *
+   * TARGETING EXAMPLES:
+   * - Premium users see 48 products (more choices)
+   * - Standard users see 24 products (balanced)
+   * - Mobile users see 12 products (faster load)
+   */
+  productsPerPage: new Rox.RoxNumber(24, [12, 24, 36, 48]),
+
+  /**
+   * 10. Cart Countdown Timer
+   *
+   * 📖 USE CASE: Abandoned cart urgency timer in minutes
+   * 💡 PATTERN: Display countdown with configurable duration
+   *
+   * BUSINESS VALUE:
+   * - Create urgency to reduce cart abandonment
+   * - Test optimal timer duration for conversion
+   * - Personalize pressure based on user tier
+   *
+   * OPTIONS: [5, 10, 15, 30] minutes
+   *
+   * HOW TO USE:
+   * ```typescript
+   * const timerMinutes = useFeatureFlagNumber('cartCountdownTimer');
+   * <CartTimer minutes={timerMinutes} />
+   * ```
+   *
+   * TARGETING EXAMPLES:
+   * - New users: 10 minutes (more urgency)
+   * - Premium users: 30 minutes (less pressure)
+   * - A/B test 15 vs 30 minutes for optimal conversion
+   */
+  cartCountdownTimer: new Rox.RoxNumber(15, [5, 10, 15, 30]),
+
+  /**
+   * 11. Free Shipping Threshold
+   *
+   * 📖 USE CASE: Minimum order value for free shipping (in dollars)
+   * 💡 PATTERN: Calculate shipping based on threshold
+   *
+   * BUSINESS VALUE:
+   * - Increase average order value (AOV)
+   * - Test different thresholds for revenue optimization
+   * - Incentivize new customers with lower threshold
+   *
+   * OPTIONS: [35, 50, 75, 100] dollars
+   *
+   * HOW TO USE:
+   * ```typescript
+   * const threshold = useFeatureFlagNumber('freeShippingThreshold');
+   * const shipping = cartTotal >= threshold ? 0 : 10;
+   * ```
+   *
+   * TARGETING EXAMPLES:
+   * - New users: $35 threshold (encourage first purchase)
+   * - Standard users: $50 threshold (default)
+   * - Test $50 vs $75 for AOV impact
+   */
+  freeShippingThreshold: new Rox.RoxNumber(50, [35, 50, 75, 100]),
 };
 
 /**
@@ -163,10 +379,23 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
 
     // Log current flag states in development (helpful for debugging)
     if (import.meta.env.DEV) {
-      console.log('🏴 Current flag states:', {
-        showWelcomeBanner: flags.showWelcomeBanner.isEnabled(),
-        buttonVariant: flags.buttonVariant.getValue(),
-        itemsToDisplay: flags.itemsToDisplay.getValue(),
+      console.log('🏴 Current flag states (EliteShop):');
+      console.log('  Boolean Flags:', {
+        showPromoBanner: flags.showPromoBanner.isEnabled(),
+        enableExpressCheckout: flags.enableExpressCheckout.isEnabled(),
+        enableRecommendations: flags.enableRecommendations.isEnabled(),
+        showLoyaltyProgram: flags.showLoyaltyProgram.isEnabled(),
+        enableWishlist: flags.enableWishlist.isEnabled(),
+      });
+      console.log('  String Flags:', {
+        productDisplayMode: flags.productDisplayMode.getValue(),
+        checkoutFlowVariant: flags.checkoutFlowVariant.getValue(),
+        promoBannerTheme: flags.promoBannerTheme.getValue(),
+      });
+      console.log('  Number Flags:', {
+        productsPerPage: flags.productsPerPage.getValue(),
+        cartCountdownTimer: flags.cartCountdownTimer.getValue(),
+        freeShippingThreshold: flags.freeShippingThreshold.getValue(),
       });
     }
   } catch (error) {
