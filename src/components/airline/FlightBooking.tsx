@@ -1,28 +1,35 @@
 /**
  * FlightBooking Component
  *
- * Complete flight search and booking interface.
- * Allows passengers to search for flights and make new bookings.
+ * Complete flight search and booking interface with Trip Summary view.
+ * When a flight is selected, transitions to a Delta-style Trip Summary
+ * showing flight details, upgrade offers, seat selection, and pricing.
  *
- * USAGE:
- * ```tsx
- * <FlightBooking onBookFlight={(flight) => console.log('Booked:', flight)} />
- * ```
+ * FLOW:
+ * 1. Search for flights
+ * 2. Select a flight + cabin class
+ * 3. Trip Summary view (similar to Delta's checkout flow)
+ * 4. Continue to Review & Pay
  */
 
 import { useState } from 'react';
-import { Button, Card, Col, DatePicker, Divider, Form, InputNumber, Radio, Row, Select, Space, Tag, Typography, message } from 'antd';
+import { Button, Card, Col, DatePicker, Divider, Form, InputNumber, Radio, Row, Select, Space, Steps, Tag, Typography, message } from 'antd';
 import {
+  ArrowLeftOutlined,
   ArrowRightOutlined,
+  CheckCircleOutlined,
+  CrownOutlined,
+  EnvironmentOutlined,
+  RetweetOutlined,
   SearchOutlined,
   SwapOutlined,
   CalendarOutlined,
   UserOutlined,
-  RetweetOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { useCart } from '../../contexts/CartContext';
 
-const { Text, Title } = Typography;
+const { Text, Title, Paragraph } = Typography;
 const { Option } = Select;
 
 /**
@@ -76,6 +83,8 @@ const AIRPORTS = [
   { code: 'DEN', city: 'Denver', name: 'Denver International' },
   { code: 'ATL', city: 'Atlanta', name: 'Hartsfield-Jackson Atlanta International' },
   { code: 'RDU', city: 'Raleigh-Durham', name: 'Raleigh-Durham International' },
+  { code: 'OGG', city: 'Maui', name: 'Kahului Airport' },
+  { code: 'HNL', city: 'Honolulu', name: 'Daniel K. Inouye International' },
 ];
 
 /**
@@ -85,8 +94,8 @@ function generateSearchResults(origin: string, destination: string, date: string
   const flights: SearchResult[] = [
     {
       id: 'search-001',
-      flightNumber: 'SK 2001',
-      airline: 'SkyTravel',
+      flightNumber: 'HA2001',
+      airline: 'HiveAir',
       departure: {
         airport: AIRPORTS.find(a => a.code === origin)?.name || 'Airport',
         code: origin,
@@ -106,8 +115,8 @@ function generateSearchResults(origin: string, destination: string, date: string
     },
     {
       id: 'search-002',
-      flightNumber: 'SK 2002',
-      airline: 'SkyTravel',
+      flightNumber: 'HA2002',
+      airline: 'HiveAir',
       departure: {
         airport: AIRPORTS.find(a => a.code === origin)?.name || 'Airport',
         code: origin,
@@ -127,8 +136,8 @@ function generateSearchResults(origin: string, destination: string, date: string
     },
     {
       id: 'search-003',
-      flightNumber: 'SK 2003',
-      airline: 'SkyTravel',
+      flightNumber: 'HA2003',
+      airline: 'HiveAir',
       departure: {
         airport: AIRPORTS.find(a => a.code === origin)?.name || 'Airport',
         code: origin,
@@ -158,10 +167,20 @@ function formatTime(isoTime: string): string {
   const date = new Date(isoTime);
   const hours = date.getHours();
   const minutes = date.getMinutes();
-  const ampm = hours >= 12 ? 'PM' : 'AM';
+  const ampm = hours >= 12 ? 'pm' : 'am';
   const displayHours = hours % 12 || 12;
   const displayMinutes = minutes.toString().padStart(2, '0');
-  return `${displayHours}:${displayMinutes} ${ampm}`;
+  return `${displayHours}:${displayMinutes}${ampm}`;
+}
+
+/**
+ * Format date for display
+ */
+function formatDate(isoTime: string): string {
+  const date = new Date(isoTime);
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return `${days[date.getDay()]}, ${months[date.getMonth()]} ${date.getDate()}`;
 }
 
 /**
@@ -174,16 +193,20 @@ export function FlightBooking({ onBookFlight, userCabinClass = 'economy' }: Flig
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [tripType, setTripType] = useState<'oneWay' | 'roundTrip'>('roundTrip');
+  const { addItem } = useCart();
+
+  // Trip Summary state
+  const [selectedFlight, setSelectedFlight] = useState<SearchResult | null>(null);
+  const [selectedCabin, setSelectedCabin] = useState<'economy' | 'business'>('economy');
+  const [passengers, setPassengers] = useState(1);
 
   // Handle flight search
   const handleSearch = async (values: any) => {
     setIsSearching(true);
     setHasSearched(false);
 
-    // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    // Outbound flights
     const outboundFlights = generateSearchResults(
       values.origin,
       values.destination,
@@ -191,8 +214,8 @@ export function FlightBooking({ onBookFlight, userCabinClass = 'economy' }: Flig
     );
 
     setSearchResults(outboundFlights);
+    setPassengers(values.passengers || 1);
 
-    // Return flights (if round trip)
     if (values.tripType === 'roundTrip' && values.returnDate) {
       const returnFlights = generateSearchResults(
         values.destination,
@@ -211,10 +234,43 @@ export function FlightBooking({ onBookFlight, userCabinClass = 'economy' }: Flig
     message.success(`Found ${flightCount} flight${flightCount > 1 ? 's' : ''}`);
   };
 
-  // Handle flight booking
-  const handleBook = (flight: SearchResult, cabinClass: 'economy' | 'business') => {
-    message.success(`Booked ${flight.flightNumber} in ${cabinClass} class!`);
-    onBookFlight?.(flight, cabinClass);
+  // Handle flight selection - transition to Trip Summary
+  const handleSelectFlight = (flight: SearchResult, cabinClass: 'economy' | 'business') => {
+    setSelectedFlight(flight);
+    setSelectedCabin(cabinClass);
+  };
+
+  // Handle "Continue to Review & Pay" from Trip Summary
+  const handleContinueToPayment = () => {
+    if (!selectedFlight) return;
+
+    const price = selectedCabin === 'economy' ? selectedFlight.price.economy : selectedFlight.price.business;
+
+    addItem({
+      id: selectedFlight.id,
+      flightNumber: selectedFlight.flightNumber,
+      origin: selectedFlight.departure.city,
+      originCode: selectedFlight.departure.code,
+      destination: selectedFlight.arrival.city,
+      destinationCode: selectedFlight.arrival.code,
+      departureTime: selectedFlight.departure.time,
+      arrivalTime: selectedFlight.arrival.time,
+      duration: selectedFlight.duration,
+      cabinClass: selectedCabin,
+      price,
+      passengers,
+    });
+
+    message.success(`${selectedFlight.flightNumber} added to your itinerary!`);
+    onBookFlight?.(selectedFlight, selectedCabin);
+
+    // Reset to search
+    setSelectedFlight(null);
+  };
+
+  // Handle "Start Over"
+  const handleStartOver = () => {
+    setSelectedFlight(null);
   };
 
   // Swap origin and destination
@@ -227,6 +283,344 @@ export function FlightBooking({ onBookFlight, userCabinClass = 'economy' }: Flig
     });
   };
 
+  // ============================================
+  // TRIP SUMMARY VIEW
+  // ============================================
+  if (selectedFlight) {
+    const basePrice = selectedCabin === 'economy' ? selectedFlight.price.economy : selectedFlight.price.business;
+    const flightTotal = basePrice * passengers;
+    const taxesAndFees = Math.round(flightTotal * 0.08 * 100) / 100;
+    const amountDue = flightTotal + taxesAndFees;
+    const upgradePrice = 150;
+    const seatsLeft = selectedCabin === 'economy' ? selectedFlight.availableSeats.economy : selectedFlight.availableSeats.business;
+    const cabinLabel = selectedCabin === 'economy' ? 'Main Classic' : 'HiveAir One';
+
+    return (
+      <div>
+        {/* Progress Stepper */}
+        <div style={{ background: '#fff', borderRadius: 8, padding: '20px 24px', marginBottom: 24 }}>
+          <Steps
+            current={1}
+            size="small"
+            items={[
+              {
+                title: <Button type="link" onClick={handleStartOver} style={{ padding: 0, color: '#0069ff' }}>Start Over</Button>,
+              },
+              {
+                title: <Text strong>Trip Summary</Text>,
+              },
+              {
+                title: 'Review & Pay',
+              },
+              {
+                title: 'Confirmation',
+              },
+            ]}
+          />
+        </div>
+
+        {/* Title */}
+        <Title level={2} style={{ marginBottom: 24, color: '#1a1a2e' }}>
+          Trip Summary
+        </Title>
+
+        <Row gutter={24}>
+          {/* LEFT COLUMN - Flight Details */}
+          <Col xs={24} lg={16}>
+            <Space direction="vertical" size="large" style={{ width: '100%' }}>
+
+              {/* Flight Itinerary Card */}
+              <Card
+                styles={{ body: { padding: 0 } }}
+                style={{ overflow: 'hidden' }}
+              >
+                {/* Flight Header Bar */}
+                <div style={{ padding: '16px 24px', borderBottom: '1px solid #f0f0f0' }}>
+                  <Row justify="space-between" align="middle">
+                    <Col>
+                      <Space size="large">
+                        <div>
+                          <Tag color="blue" style={{ marginBottom: 4 }}>
+                            {tripType === 'roundTrip' ? 'Round Trip' : 'One Way'}
+                          </Tag>
+                          <div>
+                            <Text type="secondary" style={{ fontSize: 13 }}>
+                              {selectedFlight.flightNumber}
+                            </Text>
+                          </div>
+                        </div>
+
+                        {/* Route */}
+                        <div>
+                          <Title level={4} style={{ margin: 0, letterSpacing: 1 }}>
+                            {selectedFlight.departure.code} &middot; {selectedFlight.arrival.code}
+                          </Title>
+                        </div>
+
+                        {/* Date & Time */}
+                        <div>
+                          <Text strong>{formatDate(selectedFlight.departure.time)}</Text>
+                          <br />
+                          <Text type="secondary" style={{ fontSize: 13 }}>
+                            {formatTime(selectedFlight.departure.time)} - {formatTime(selectedFlight.arrival.time)}
+                          </Text>
+                        </div>
+
+                        {/* Duration & Class */}
+                        <div>
+                          <Text type="secondary" style={{ fontSize: 13 }}>
+                            {selectedFlight.stops === 0 ? 'Nonstop' : `${selectedFlight.stops} stop`}, {selectedFlight.duration}
+                          </Text>
+                          <br />
+                          <Text strong style={{ fontSize: 13 }}>{cabinLabel}</Text>
+                        </div>
+                      </Space>
+                    </Col>
+
+                    <Col>
+                      <Button type="link" onClick={handleStartOver} style={{ color: '#0056b3', padding: 0 }}>
+                        Change Flight
+                      </Button>
+                    </Col>
+                  </Row>
+                </div>
+
+                {/* Changeable / Nonrefundable label */}
+                <div style={{ padding: '8px 24px', borderBottom: '1px solid #f0f0f0' }}>
+                  <Button type="link" style={{ padding: 0, color: '#0056b3', fontSize: 13 }}>
+                    Changeable / Nonrefundable
+                  </Button>
+                </div>
+              </Card>
+
+              {/* Upgrade Offer - Main Extra */}
+              {selectedCabin === 'economy' && (
+                <Card
+                  styles={{ body: { padding: 0 } }}
+                  style={{ overflow: 'hidden' }}
+                >
+                  <Row>
+                    {/* Image Side */}
+                    <Col xs={0} md={8}>
+                      <div
+                        style={{
+                          height: '100%',
+                          minHeight: 200,
+                          background: 'linear-gradient(135deg, #2c3e6b 0%, #1a2744 100%)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <CrownOutlined style={{ fontSize: 64, color: 'rgba(255,255,255,0.3)' }} />
+                      </div>
+                    </Col>
+
+                    {/* Content Side */}
+                    <Col xs={24} md={16}>
+                      <div style={{ padding: 24 }}>
+                        <Title level={4} style={{ marginBottom: 16 }}>
+                          Main <strong>Extra</strong>
+                        </Title>
+
+                        <Space direction="vertical" size={8} style={{ marginBottom: 20 }}>
+                          <Space>
+                            <CheckCircleOutlined style={{ color: '#0069ff' }} />
+                            <Text style={{ fontSize: 14 }}>Fully refundable and free same-day flight changes</Text>
+                          </Space>
+                          <Space>
+                            <CheckCircleOutlined style={{ color: '#0069ff' }} />
+                            <Text style={{ fontSize: 14 }}>Board before Main Classic and Main Basic</Text>
+                          </Space>
+                          <Space>
+                            <CheckCircleOutlined style={{ color: '#0069ff' }} />
+                            <Text style={{ fontSize: 14 }}>Earn even more miles and higher upgrade priority for BeeMiles members</Text>
+                          </Space>
+                        </Space>
+
+                        <Row justify="space-between" align="middle">
+                          <Col>
+                            <div>
+                              <Text style={{ fontSize: 13, verticalAlign: 'super' }}>$</Text>
+                              <Text strong style={{ fontSize: 28 }}>{upgradePrice}</Text>
+                              <Text style={{ fontSize: 13 }}>.00</Text>
+                            </div>
+                            <Text type="secondary" style={{ fontSize: 12 }}>Per Person*</Text>
+                          </Col>
+                          <Col>
+                            <Button
+                              size="large"
+                              style={{
+                                borderColor: '#0069ff',
+                                color: '#0069ff',
+                                fontWeight: 600,
+                                minWidth: 120,
+                              }}
+                            >
+                              UPGRADE
+                            </Button>
+                          </Col>
+                        </Row>
+                      </div>
+                    </Col>
+                  </Row>
+                </Card>
+              )}
+
+              {/* View Seats */}
+              <Card>
+                <Row justify="space-between" align="middle">
+                  <Col>
+                    <Space direction="vertical" size={4}>
+                      <Space>
+                        <EnvironmentOutlined style={{ fontSize: 20, color: '#0069ff' }} />
+                        <Text strong style={{ fontSize: 16 }}>View Seats</Text>
+                      </Space>
+                      <Text type="secondary">View a map of the plane and select your seats</Text>
+                    </Space>
+                  </Col>
+                  <Col>
+                    <Button
+                      size="large"
+                      style={{
+                        borderColor: '#0069ff',
+                        color: '#0069ff',
+                        fontWeight: 600,
+                        minWidth: 140,
+                      }}
+                    >
+                      SELECT SEATS
+                    </Button>
+                  </Col>
+                </Row>
+              </Card>
+            </Space>
+          </Col>
+
+          {/* RIGHT COLUMN - Trip Total */}
+          <Col xs={24} lg={8}>
+            <div style={{ position: 'sticky', top: 24 }}>
+              <Card>
+                <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                  {/* Header */}
+                  <Row justify="space-between" align="middle">
+                    <Col>
+                      <Title level={4} style={{ margin: 0 }}>Trip Total</Title>
+                    </Col>
+                    <Col>
+                      <Button type="link" style={{ padding: 0, fontSize: 12, color: '#0056b3' }}>
+                        Currency Calculator
+                      </Button>
+                    </Col>
+                  </Row>
+
+                  <Text type="secondary">{passengers} Passenger{passengers > 1 ? 's' : ''}</Text>
+
+                  <Divider style={{ margin: 0 }} />
+
+                  {/* Line Items */}
+                  <Row justify="space-between">
+                    <Col><Text>Flights</Text></Col>
+                    <Col><Text strong>${flightTotal.toFixed(2)}</Text></Col>
+                  </Row>
+
+                  <Row justify="space-between">
+                    <Col><Text>Taxes, Fees & Charges</Text></Col>
+                    <Col><Text>${taxesAndFees.toFixed(2)}</Text></Col>
+                  </Row>
+
+                  <Divider style={{ margin: 0 }} />
+
+                  {/* Amount Due */}
+                  <Row justify="space-between" align="middle">
+                    <Col>
+                      <Text strong style={{ color: '#0056b3', fontSize: 15 }}>Amount Due</Text>
+                    </Col>
+                    <Col style={{ textAlign: 'right' }}>
+                      <div>
+                        <Text strong style={{ fontSize: 13 }}>$</Text>
+                        <Text strong style={{ fontSize: 24 }}>{Math.floor(amountDue)}</Text>
+                        <Text strong style={{ fontSize: 13 }}>.{(amountDue % 1).toFixed(2).slice(2)}</Text>
+                        <Text style={{ fontSize: 12, marginLeft: 4 }}>USD</Text>
+                      </div>
+                      {seatsLeft <= 8 && (
+                        <Tag color="red" style={{ fontSize: 11, marginTop: 4 }}>
+                          {seatsLeft} left at this price
+                        </Tag>
+                      )}
+                    </Col>
+                  </Row>
+
+                  <Divider style={{ margin: 0 }} />
+
+                  {/* BeeMiles Earnings */}
+                  <div style={{ background: '#f8f9fa', borderRadius: 6, padding: 12 }}>
+                    <Text type="secondary" style={{ fontSize: 12 }}>
+                      As a BeeMiles Member, you could earn
+                    </Text>
+                    <br />
+                    <Space size="large" style={{ marginTop: 4 }}>
+                      <div>
+                        <Text strong style={{ fontSize: 16 }}>{Math.round(flightTotal * 5).toLocaleString()}</Text>
+                        <Text type="secondary" style={{ fontSize: 12, marginLeft: 4 }}>Miles</Text>
+                      </div>
+                      <div>
+                        <Text strong style={{ fontSize: 16 }}>${Math.round(flightTotal * 1.1).toLocaleString()}</Text>
+                        <Text type="secondary" style={{ fontSize: 12, marginLeft: 4 }}>MQDs</Text>
+                      </div>
+                    </Space>
+                  </div>
+
+                  {/* Amount Due (repeated at bottom like Delta) */}
+                  <Row justify="space-between" align="middle">
+                    <Col>
+                      <Text strong style={{ color: '#0056b3' }}>Amount Due</Text>
+                    </Col>
+                    <Col style={{ textAlign: 'right' }}>
+                      <div>
+                        <Text strong style={{ fontSize: 13 }}>$</Text>
+                        <Text strong style={{ fontSize: 20 }}>{Math.floor(amountDue)}</Text>
+                        <Text strong style={{ fontSize: 13 }}>.{(amountDue % 1).toFixed(2).slice(2)}</Text>
+                        <Text style={{ fontSize: 12, marginLeft: 4 }}>USD</Text>
+                      </div>
+                      {seatsLeft <= 8 && (
+                        <Tag color="red" style={{ fontSize: 11, marginTop: 4 }}>
+                          {seatsLeft} left at this price
+                        </Tag>
+                      )}
+                    </Col>
+                  </Row>
+                </Space>
+              </Card>
+
+              {/* Continue Button */}
+              <Button
+                type="primary"
+                size="large"
+                block
+                onClick={handleContinueToPayment}
+                style={{
+                  marginTop: 16,
+                  height: 52,
+                  fontSize: 16,
+                  fontWeight: 700,
+                  backgroundColor: '#C8102E',
+                  borderColor: '#C8102E',
+                  letterSpacing: 0.5,
+                }}
+              >
+                CONTINUE TO REVIEW & PAY
+              </Button>
+            </div>
+          </Col>
+        </Row>
+      </div>
+    );
+  }
+
+  // ============================================
+  // SEARCH VIEW (default)
+  // ============================================
   return (
     <div>
       {/* Search Form */}
@@ -237,7 +631,7 @@ export function FlightBooking({ onBookFlight, userCabinClass = 'economy' }: Flig
           onFinish={handleSearch}
           initialValues={{
             tripType: 'roundTrip',
-            origin: 'JFK',
+            origin: 'RDU',
             destination: 'LAX',
             departureDate: dayjs().add(7, 'day'),
             returnDate: dayjs().add(14, 'day'),
@@ -419,7 +813,6 @@ export function FlightBooking({ onBookFlight, userCabinClass = 'economy' }: Flig
 
           <Space direction="vertical" size="middle" style={{ width: '100%' }}>
             {searchResults.map(flight => {
-              // Calculate upcharge for business class
               const businessUpcharge = flight.price.business - flight.price.economy;
               const isEconomyUser = userCabinClass === 'economy';
 
@@ -490,7 +883,7 @@ export function FlightBooking({ onBookFlight, userCabinClass = 'economy' }: Flig
 
                   <Divider style={{ margin: '0 0 16px 0' }} />
 
-                  {/* Cabin Options - Horizontal Layout */}
+                  {/* Cabin Options */}
                   <Row gutter={16}>
                     {/* Economy Cabin */}
                     <Col xs={24} md={12}>
@@ -524,10 +917,10 @@ export function FlightBooking({ onBookFlight, userCabinClass = 'economy' }: Flig
                             type="primary"
                             size="large"
                             block
-                            onClick={() => handleBook(flight, 'economy')}
+                            onClick={() => handleSelectFlight(flight, 'economy')}
                             style={{ marginTop: 8 }}
                           >
-                            Select Main Cabin
+                            Select
                           </Button>
                         </Space>
                       </div>
@@ -552,7 +945,7 @@ export function FlightBooking({ onBookFlight, userCabinClass = 'economy' }: Flig
                           </Space>
 
                           <Text type="secondary" style={{ fontSize: 12 }}>
-                            {flight.availableSeats.business} seats available • Extra legroom • Priority boarding
+                            {flight.availableSeats.business} seats available
                           </Text>
 
                           <div style={{ marginTop: 8 }}>
@@ -587,14 +980,14 @@ export function FlightBooking({ onBookFlight, userCabinClass = 'economy' }: Flig
                             size="large"
                             block
                             disabled={isEconomyUser}
-                            onClick={() => handleBook(flight, 'business')}
+                            onClick={() => handleSelectFlight(flight, 'business')}
                             style={{
                               marginTop: 8,
                               background: isEconomyUser ? undefined : '#faad14',
                               borderColor: isEconomyUser ? undefined : '#faad14',
                             }}
                           >
-                            {isEconomyUser ? 'Upgrade Required' : 'Select Business Class'}
+                            {isEconomyUser ? 'Upgrade Required' : 'Select'}
                           </Button>
                         </Space>
                       </div>
@@ -607,7 +1000,7 @@ export function FlightBooking({ onBookFlight, userCabinClass = 'economy' }: Flig
         </div>
       )}
 
-      {/* Return Flights - Only for round trip */}
+      {/* Return Flights */}
       {hasSearched && tripType === 'roundTrip' && returnResults.length > 0 && (
         <div style={{ marginTop: 32 }}>
           <Divider />
@@ -618,13 +1011,11 @@ export function FlightBooking({ onBookFlight, userCabinClass = 'economy' }: Flig
 
           <Space direction="vertical" size="middle" style={{ width: '100%' }}>
             {returnResults.map(flight => {
-              // Calculate upcharge for business class
               const businessUpcharge = flight.price.business - flight.price.economy;
               const isEconomyUser = userCabinClass === 'economy';
 
               return (
                 <Card key={`return-${flight.id}`}>
-                  {/* Flight Header */}
                   <Row gutter={16} style={{ marginBottom: 16 }}>
                     <Col flex="auto">
                       <Space>
@@ -641,7 +1032,6 @@ export function FlightBooking({ onBookFlight, userCabinClass = 'economy' }: Flig
                     </Col>
                   </Row>
 
-                  {/* Flight Route */}
                   <Row align="middle" gutter={24} style={{ marginBottom: 24 }}>
                     <Col>
                       <div>
@@ -689,9 +1079,7 @@ export function FlightBooking({ onBookFlight, userCabinClass = 'economy' }: Flig
 
                   <Divider style={{ margin: '0 0 16px 0' }} />
 
-                  {/* Cabin Options - Horizontal Layout */}
                   <Row gutter={16}>
-                    {/* Economy Cabin */}
                     <Col xs={24} md={12}>
                       <div
                         style={{
@@ -703,10 +1091,7 @@ export function FlightBooking({ onBookFlight, userCabinClass = 'economy' }: Flig
                         }}
                       >
                         <Space direction="vertical" size="small" style={{ width: '100%' }}>
-                          <Space>
-                            <Text strong style={{ fontSize: 16 }}>Main Cabin</Text>
-                            {!isEconomyUser && <Tag color="blue">Included</Tag>}
-                          </Space>
+                          <Text strong style={{ fontSize: 16 }}>Main Cabin</Text>
 
                           <Text type="secondary" style={{ fontSize: 12 }}>
                             {flight.availableSeats.economy} seats available
@@ -723,16 +1108,15 @@ export function FlightBooking({ onBookFlight, userCabinClass = 'economy' }: Flig
                             type="primary"
                             size="large"
                             block
-                            onClick={() => handleBook(flight, 'economy')}
+                            onClick={() => handleSelectFlight(flight, 'economy')}
                             style={{ marginTop: 8 }}
                           >
-                            Select Main Cabin
+                            Select
                           </Button>
                         </Space>
                       </div>
                     </Col>
 
-                    {/* Business Class */}
                     <Col xs={24} md={12}>
                       <div
                         style={{
@@ -751,25 +1135,19 @@ export function FlightBooking({ onBookFlight, userCabinClass = 'economy' }: Flig
                           </Space>
 
                           <Text type="secondary" style={{ fontSize: 12 }}>
-                            {flight.availableSeats.business} seats available • Extra legroom • Priority boarding
+                            {flight.availableSeats.business} seats available
                           </Text>
 
                           <div style={{ marginTop: 8 }}>
                             {isEconomyUser ? (
                               <>
-                                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                                  <Title level={2} style={{ margin: 0, color: '#8c8c8c', textDecoration: 'line-through' }}>
-                                    ${flight.price.business}
-                                  </Title>
-                                </div>
-                                <Space>
-                                  <Text strong style={{ fontSize: 14, color: '#faad14' }}>
-                                    +${businessUpcharge} upgrade
-                                  </Text>
-                                </Space>
-                                <Text type="secondary" style={{ fontSize: 12, display: 'block' }}>
-                                  per person
+                                <Title level={2} style={{ margin: 0, color: '#8c8c8c', textDecoration: 'line-through' }}>
+                                  ${flight.price.business}
+                                </Title>
+                                <Text strong style={{ fontSize: 14, color: '#faad14' }}>
+                                  +${businessUpcharge} upgrade
                                 </Text>
+                                <Text type="secondary" style={{ fontSize: 12, display: 'block' }}>per person</Text>
                               </>
                             ) : (
                               <>
@@ -786,14 +1164,14 @@ export function FlightBooking({ onBookFlight, userCabinClass = 'economy' }: Flig
                             size="large"
                             block
                             disabled={isEconomyUser}
-                            onClick={() => handleBook(flight, 'business')}
+                            onClick={() => handleSelectFlight(flight, 'business')}
                             style={{
                               marginTop: 8,
                               background: isEconomyUser ? undefined : '#faad14',
                               borderColor: isEconomyUser ? undefined : '#faad14',
                             }}
                           >
-                            {isEconomyUser ? 'Upgrade Required' : 'Select Business Class'}
+                            {isEconomyUser ? 'Upgrade Required' : 'Select'}
                           </Button>
                         </Space>
                       </div>

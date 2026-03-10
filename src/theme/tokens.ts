@@ -8,25 +8,25 @@
 /**
  * Color Palette
  *
- * CloudBees brand colors with semantic naming.
- * Customize these to match your demo's target industry.
+ * Delta Airlines brand colors with semantic naming.
+ * Official Delta brand identity colors for authentic airline experience.
  */
 export const colors = {
-  // Primary brand colors (CloudBees blue)
+  // Primary brand colors (Delta Blue - Navy)
   primary: {
-    50: '#e6f4ff',
-    100: '#bae7ff',
-    200: '#91d5ff',
-    300: '#69c0ff',
-    400: '#40a9ff',
-    500: '#1890ff', // Primary
-    600: '#096dd9',
-    700: '#0050b3',
-    800: '#003a8c',
-    900: '#002766',
+    50: '#E6EBF0',
+    100: '#CCDBE6',
+    200: '#99B8CC',
+    300: '#6694B3',
+    400: '#337099',
+    500: '#003366', // Delta Navy (Primary Brand Color)
+    600: '#002952',
+    700: '#001F3D',
+    800: '#001429',
+    900: '#000A14',
   },
 
-  // Success colors (green)
+  // Success colors (green) - Keep for positive confirmations
   success: {
     50: '#f6ffed',
     100: '#d9f7be',
@@ -40,21 +40,63 @@ export const colors = {
     900: '#092b00',
   },
 
-  // Warning colors (orange/gold)
-  warning: {
-    50: '#fffbe6',
-    100: '#fff1b8',
-    200: '#ffe58f',
-    300: '#ffd666',
-    400: '#ffc53d',
-    500: '#faad14', // Warning
-    600: '#d48806',
-    700: '#ad6800',
-    800: '#874d00',
-    900: '#613400',
+  // Accent colors (Delta Red) - Premium features, CTAs, alerts
+  accent: {
+    50: '#FCE8E9',
+    100: '#F8D0D3',
+    200: '#F1A1A7',
+    300: '#EA737B',
+    400: '#E3444F',
+    500: '#D1232B', // Delta Red (Primary Accent Color)
+    600: '#A71C23',
+    700: '#7D151A',
+    800: '#530E12',
+    900: '#2A0709',
   },
 
-  // Error colors (red)
+  // Highlight colors (Sky Blue) - Interactive elements, status indicators
+  highlight: {
+    50: '#E6F5FF',
+    100: '#CCEBFF',
+    200: '#99D6FF',
+    300: '#66C2FF',
+    400: '#33ADFF',
+    500: '#0099FF', // Sky Blue
+    600: '#007ACC',
+    700: '#005C99',
+    800: '#003D66',
+    900: '#001F33',
+  },
+
+  // Secondary colors (Delta Gray) - Secondary text, borders
+  secondary: {
+    50: '#F5F5F5',
+    100: '#E8E8E8',
+    200: '#D1D1D1',
+    300: '#BABABA',
+    400: '#A3A3A3',
+    500: '#666666', // Delta Gray
+    600: '#525252',
+    700: '#3D3D3D',
+    800: '#292929',
+    900: '#141414',
+  },
+
+  // Warning colors (amber/orange) - Caution, alerts
+  warning: {
+    50: '#fffbeb',
+    100: '#fef3c7',
+    200: '#fde68a',
+    300: '#fcd34d',
+    400: '#fbbf24',
+    500: '#f59e0b', // Warning amber
+    600: '#d97706',
+    700: '#b45309',
+    800: '#92400e',
+    900: '#78350f',
+  },
+
+  // Error colors (red) - Errors, critical alerts
   error: {
     50: '#fff1f0',
     100: '#ffccc7',
@@ -68,7 +110,7 @@ export const colors = {
     900: '#5c0011',
   },
 
-  // Neutral colors (grays)
+  // Neutral colors (grays) - Backgrounds, dividers
   neutral: {
     50: '#fafafa',
     100: '#f5f5f5',

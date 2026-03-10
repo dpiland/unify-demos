@@ -1,7 +1,5 @@
 /**
  * App-specific styles
- *
- * Minimal styles - Ant Design handles most styling
  */
 
 /* Ensure proper layout */
@@ -16,4 +14,23 @@
 .ant-list,
 .ant-statistic {
   transition: all 0.3s ease;
+}
+
+/* Nav dropdown hover states */
+.ant-dropdown-menu-item:hover {
+  background-color: #f5f5f5;
+}
+
+/* Sidebar menu clean styling */
+.ant-menu-inline .ant-menu-item {
+  border-radius: 8px;
+}
+
+.ant-menu-inline .ant-menu-item-selected {
+  background-color: #0069ff !important;
+  color: #fff !important;
+}
+
+.ant-menu-inline .ant-menu-item-selected .anticon {
+  color: #fff !important;
 }

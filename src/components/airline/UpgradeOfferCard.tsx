@@ -1,7 +1,7 @@
 /**
  * UpgradeOfferCard Component
  *
- * Cabin upgrade promotion with 3 style variants for A/B testing:
+ * Delta cabin upgrade promotion with 3 style variants for A/B testing:
  * - 'subtle': Small banner at bottom
  * - 'prominent': Large card with benefits (default)
  * - 'modal': Full-screen modal with comparison (simplified for MVP)
@@ -10,7 +10,7 @@
  * ```tsx
  * <UpgradeOfferCard
  *   style="prominent"
- *   currentClass="economy"
+ *   currentClass="main-cabin"
  *   upgradePrice={149}
  * />
  * ```
@@ -36,13 +36,13 @@ interface UpgradeOfferCardProps {
  * UpgradeOfferCard Component
  *
  * PATTERN: A/B testing with 3 presentation variants
- * USE CASE: Optimize cabin upgrade conversion rates
+ * USE CASE: Optimize HiveAir Comfort+ and First Class upgrade conversion rates
  * CONTROLLED BY: upgradePromptStyle string flag
- * TARGET: Only shown to non-business class passengers
+ * TARGET: Only shown to Main Cabin passengers
  */
 export function UpgradeOfferCard({
   style,
-  currentClass = 'economy',
+  currentClass = 'main-cabin',
   upgradePrice = 149,
 }: UpgradeOfferCardProps) {
   // ============================================
@@ -52,20 +52,20 @@ export function UpgradeOfferCard({
     return (
       <div
         style={{
-          backgroundColor: '#fff7e6',
-          border: '1px solid #ffd591',
+          backgroundColor: '#FEF1F2',
+          border: '1px solid #FCA5A5',
           borderRadius: 6,
           padding: 12,
         }}
       >
         <Space style={{ width: '100%', justifyContent: 'space-between' }}>
           <Space>
-            <ArrowUpOutlined style={{ color: '#faad14' }} />
+            <ArrowUpOutlined style={{ color: '#D1232B' }} />
             <Text strong style={{ fontSize: 13 }}>
-              Upgrade to Business Class from ${upgradePrice}
+              Upgrade to HiveAir Comfort+ from ${upgradePrice}
             </Text>
           </Space>
-          <Button type="link" size="small">
+          <Button type="link" size="small" style={{ color: '#D1232B' }}>
             Learn More
           </Button>
         </Space>
@@ -81,7 +81,7 @@ export function UpgradeOfferCard({
     return (
       <div
         style={{
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          background: 'linear-gradient(135deg, #0069ff 0%, #001F3D 100%)',
           borderRadius: 12,
           padding: 24,
           color: '#fff',
@@ -95,7 +95,7 @@ export function UpgradeOfferCard({
               Upgrade Your Experience
             </Title>
             <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 15 }}>
-              Fly business class and enjoy premium comfort
+              Fly HiveAir Comfort+ and enjoy premium features
             </Text>
           </div>
 
@@ -107,16 +107,16 @@ export function UpgradeOfferCard({
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Text style={{ color: 'rgba(255,255,255,0.8)' }}>Current: {currentClass}</Text>
                 <Text style={{ color: '#fff' }} strong>
-                  → Business Class
+                  → HiveAir Comfort+
                 </Text>
               </div>
 
               <Space direction="vertical" size="small" style={{ width: '100%' }}>
                 {[
                   'Priority Boarding',
-                  'Extra Legroom',
-                  'Premium Meals',
-                  'Lounge Access',
+                  'Extra Legroom (up to 3")',
+                  'Premium Snacks & Beverages',
+                  'HiveAir Lounge Access',
                   'Priority Baggage',
                 ].map((benefit) => (
                   <Space key={benefit}>
@@ -145,7 +145,7 @@ export function UpgradeOfferCard({
               size="large"
               block
               icon={<ThunderboltOutlined />}
-              style={{ backgroundColor: '#fff', borderColor: '#fff', color: '#667eea' }}
+              style={{ backgroundColor: '#D1232B', borderColor: '#D1232B', color: '#fff' }}
             >
               Upgrade Now
             </Button>
@@ -164,12 +164,12 @@ export function UpgradeOfferCard({
         {/* Header */}
         <div>
           <Space>
-            <CrownOutlined style={{ fontSize: 24, color: '#faad14' }} />
+            <CrownOutlined style={{ fontSize: 24, color: '#D1232B' }} />
             <Title level={4} style={{ margin: 0 }}>
-              Upgrade to Business Class
+              Upgrade to HiveAir Comfort+
             </Title>
           </Space>
-          <Tag color="gold" style={{ marginTop: 8 }}>
+          <Tag color="red" style={{ marginTop: 8 }}>
             Limited Availability
           </Tag>
         </div>
@@ -179,7 +179,7 @@ export function UpgradeOfferCard({
         {/* Benefits grid */}
         <div>
           <Text strong style={{ marginBottom: 12, display: 'block' }}>
-            Premium Benefits Included:
+            HiveAir Comfort+ Benefits:
           </Text>
 
           <Space direction="vertical" size="small" style={{ width: '100%' }}>
@@ -189,19 +189,19 @@ export function UpgradeOfferCard({
             </Space>
             <Space>
               <CheckCircleOutlined style={{ color: '#52c41a' }} />
-              <Text>Spacious seats with extra legroom</Text>
+              <Text>Up to 3 inches of extra legroom</Text>
             </Space>
             <Space>
               <CheckCircleOutlined style={{ color: '#52c41a' }} />
-              <Text>Premium meal service and beverages</Text>
+              <Text>Premium snacks and complimentary beverages</Text>
             </Space>
             <Space>
               <CheckCircleOutlined style={{ color: '#52c41a' }} />
-              <Text>Complimentary airport lounge access</Text>
+              <Text>Dedicated overhead bin space</Text>
             </Space>
             <Space>
               <CheckCircleOutlined style={{ color: '#52c41a' }} />
-              <Text>Enhanced entertainment system</Text>
+              <Text>Enhanced entertainment options</Text>
             </Space>
           </Space>
         </div>
@@ -219,7 +219,7 @@ export function UpgradeOfferCard({
         >
           <Space direction="vertical" size="small" align="center">
             <Text type="secondary">Upgrade from {currentClass} for only</Text>
-            <Title level={2} style={{ margin: 0, color: '#1890ff' }}>
+            <Title level={2} style={{ margin: 0, color: '#0069ff' }}>
               ${upgradePrice}
             </Title>
             <Text type="secondary" style={{ fontSize: 12 }}>
@@ -234,14 +234,14 @@ export function UpgradeOfferCard({
           size="large"
           block
           icon={<ArrowUpOutlined />}
-          style={{ height: 48 }}
+          style={{ height: 48, backgroundColor: '#0069ff', borderColor: '#0069ff' }}
         >
           Upgrade My Flight
         </Button>
 
         {/* Footer */}
         <Paragraph type="secondary" style={{ fontSize: 11, textAlign: 'center', marginBottom: 0 }}>
-          Subject to availability. Upgrade offer valid for this flight only.
+          Subject to availability. Upgrade offer valid for this HiveAir flight only.
         </Paragraph>
       </Space>
     </div>

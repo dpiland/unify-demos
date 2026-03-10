@@ -176,7 +176,7 @@ export function LoginPage({ onSelectUser }: LoginPageProps) {
           }}
         >
           <Text style={{ color: 'rgba(255, 255, 255, 0.85)', fontSize: 13 }}>
-            ✈️ <strong>Tip:</strong> Each passenger has unique properties (cabin class, loyalty
+            ✈️ <strong>Tip:</strong> Each passenger has unique properties (cabin class, BeeMiles
             tier, miles) that enable personalized feature targeting in CloudBees Unify. Switch
             between passengers to see how the portal adapts.
           </Text>

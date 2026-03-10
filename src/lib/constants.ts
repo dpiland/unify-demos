@@ -30,47 +30,47 @@ export const FEATURE_FLAG_KEYS = {
 } as const;
 
 /**
- * Flag Descriptions - Airline Passenger Portal
+ * Flag Descriptions - HiveAir Airlines Passenger Portal
  *
  * Human-readable descriptions shown in UIs and documentation
- * These explain the business purpose of each flag in the airline context
+ * These explain the business purpose of each flag in the HiveAir Airlines context
  */
 export const FLAG_DESCRIPTIONS: Record<string, string> = {
   // Boolean Flags
   enableSeatSelection:
-    'Enable interactive seat selection with visual seat map. Allows passengers to choose their preferred seats with real-time availability.',
+    'Enable interactive HiveAir seat selection with visual seat map. Allows passengers to choose their preferred seats with real-time availability across Main Cabin, Comfort+, and First Class.',
 
   enableLoungeAccess:
-    'Show airport lounge access and amenities for eligible passengers. Displays lounge locations, hours, and benefits for business class and elite members.',
+    'Show HiveAir HiveAir Lounge access and amenities for eligible passengers. Displays HiveAir Lounge locations, hours, and benefits for BeeMiles members, First Class passengers, and HiveAir Lounge members.',
 
   enablePriorityBoarding:
-    'Display priority boarding and fast-track security services. Shows boarding groups, priority lanes, and expedited services for premium passengers.',
+    'Display HiveAir Priority services and boarding groups. Shows priority lanes, expedited security, and boarding zones for BeeMiles members and premium cabin passengers.',
 
   showFlightAlerts:
-    'Toggle real-time flight status alerts and notifications. Displays gate changes, delays, boarding calls, and important travel updates.',
+    'Toggle real-time HiveAir flight status alerts and notifications. Displays gate changes, delays, boarding calls, and important travel updates for HiveAir flights.',
 
   enableMobileCheckin:
-    'Enable mobile check-in and digital boarding pass features. Allows passengers to check in online and receive mobile boarding passes.',
+    'Enable HiveAir mobile check-in and digital boarding pass features. Allows passengers to check in through the FlyHiveAir app and receive mobile boarding passes.',
 
   // String Flags
   dashboardLayout:
-    'A/B test dashboard layout variants: classic (traditional sidebar), modern (card-based responsive), or compact (dense for power users). Tests which layout drives better engagement.',
+    'A/B test My Trips dashboard layout variants: classic (traditional sidebar), modern (card-based responsive), or compact (dense for BeeMiles members). Tests which layout drives better engagement.',
 
   flightDisplayMode:
-    'Control flight display format: timeline (visual journey), card (detailed individual cards), or list (compact information). Tests optimal presentation for different traveler types.',
+    'Control HiveAir flight display format: timeline (visual journey), card (detailed individual cards), or list (compact information). Tests optimal presentation for different traveler types.',
 
   upgradePromptStyle:
-    'Test upgrade offer presentation: subtle (small banner), prominent (large benefits card), or modal (full-screen comparison). Optimizes cabin upgrade conversion rates.',
+    'Test HiveAir Comfort+ and First Class upgrade offer presentation: subtle (small banner), prominent (large benefits card), or modal (full-screen comparison with BeeMiles cost). Optimizes cabin upgrade conversion rates.',
 
   // Number Flags
   recentBookingsToShow:
-    'Number of recent flight bookings to display (2-8). Controls information density - fewer for casual travelers, more for frequent flyers.',
+    'Number of upcoming HiveAir flights to display (2-8). Controls information density - fewer for leisure travelers, more for BeeMiles members with multiple bookings.',
 
   flightStatusRefreshInterval:
-    'Flight status update frequency in seconds (30-300). Balances real-time accuracy with API load and device battery usage.',
+    'HiveAir flight status update frequency in seconds (30-300). Balances real-time accuracy with API load and device battery usage.',
 
   loyaltyPointsMultiplier:
-    'Bonus loyalty points multiplier for promotions (1x-3x). Enables special campaigns like double points weekends or triple points for new routes.',
+    'Bonus BeeMiles multiplier for promotions (1x-3x). Enables special campaigns like double BeeMiles weekends, triple miles for new routes, or BeeMiles bonus accelerators.',
 };
 
 /**

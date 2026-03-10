@@ -91,8 +91,8 @@ export function SeatSelector({ cabinClass, isPremiumMember, onSelectSeat }: Seat
 
     if (isSelected) {
       return {
-        backgroundColor: '#1890ff',
-        borderColor: '#1890ff',
+        backgroundColor: '#0069ff',
+        borderColor: '#0069ff',
         color: '#fff',
       };
     }
@@ -155,8 +155,8 @@ export function SeatSelector({ cabinClass, isPremiumMember, onSelectSeat }: Seat
             style={{
               width: 20,
               height: 20,
-              backgroundColor: '#1890ff',
-              border: '1px solid #1890ff',
+              backgroundColor: '#0069ff',
+              border: '1px solid #0069ff',
             }}
           />
           <Text>Selected</Text>

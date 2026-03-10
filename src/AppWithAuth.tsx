@@ -11,6 +11,7 @@ import { UserOutlined, LogoutOutlined, SwapOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import App from './App';
 import { LoginPage } from './components/LoginPage';
+import { CartProvider } from './contexts/CartContext';
 import {
   type User,
   loadCurrentUser,
@@ -23,7 +24,7 @@ import { setUserProperties } from './lib/featureFlags';
 
 const { Text } = Typography;
 
-export function AppWithAuth() {
+function AppWithAuthInner() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -73,7 +74,7 @@ export function AppWithAuth() {
           <Text strong>{currentUser?.name}</Text>
           <br />
           <Text type="secondary" style={{ fontSize: 12 }}>
-            {currentUser?.properties.strings.userTier} • {currentUser?.properties.strings.region}
+            {currentUser?.properties.strings.membershipTier} • {currentUser?.properties.strings.homeAirport}
           </Text>
         </div>
       ),
@@ -107,7 +108,7 @@ export function AppWithAuth() {
 
   // Show loading state
   if (isLoading) {
-    return null; // or a loading spinner
+    return null;
   }
 
   // Show login page if no user
@@ -115,47 +116,47 @@ export function AppWithAuth() {
     return <LoginPage onSelectUser={handleSelectUser} />;
   }
 
-  // Show app with user menu
+  // Show app with user switcher integrated into nav
   return (
     <div style={{ position: 'relative' }}>
-      {/* User menu in top-right corner */}
+      {/* User switcher - positioned over the nav bar avatar */}
       <div
         style={{
           position: 'fixed',
-          top: 16,
+          top: 12,
           right: 16,
-          zIndex: 1000,
+          zIndex: 1001,
         }}
       >
         <Dropdown menu={{ items: userMenuItems }} trigger={['click']} placement="bottomRight">
           <Button
-            type="default"
-            size="large"
+            type="text"
+            size="small"
             style={{
-              background: '#fff',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+              color: '#fff',
+              padding: '4px 8px',
+              height: 'auto',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
             }}
           >
-            <Space>
-              <div
-                style={{
-                  width: 24,
-                  height: 24,
-                  borderRadius: '50%',
-                  background: '#1890ff',
-                  color: '#fff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 12,
-                  fontWeight: 600,
-                }}
-              >
-                {getUserInitials(currentUser.name)}
-              </div>
-              <span>{currentUser.name.split(' ')[0]}</span>
-              <UserOutlined />
-            </Space>
+            <div
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: '50%',
+                background: '#1890ff',
+                color: '#fff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 12,
+                fontWeight: 600,
+              }}
+            >
+              {getUserInitials(currentUser.name)}
+            </div>
           </Button>
         </Dropdown>
       </div>
@@ -163,5 +164,13 @@ export function AppWithAuth() {
       {/* Main app */}
       <App />
     </div>
+  );
+}
+
+export function AppWithAuth() {
+  return (
+    <CartProvider>
+      <AppWithAuthInner />
+    </CartProvider>
   );
 }

@@ -1,14 +1,14 @@
 /**
  * LoungeAccessCard Component
  *
- * Displays airport lounge information, hours, and amenities for eligible passengers.
+ * Displays HiveAir HiveAir Lounge information, hours, and amenities for eligible passengers.
  * Shows lounge-specific details based on passenger's home airport.
  *
  * USAGE:
  * ```tsx
  * <LoungeAccessCard
- *   homeAirport="JFK"
- *   membershipTier="platinum"
+ *   homeAirport="ATL"
+ *   membershipTier="diamond"
  * />
  * ```
  */
@@ -32,18 +32,21 @@ interface LoungeAccessCardProps {
 }
 
 /**
- * Get lounge information by airport code
+ * Get HiveAir HiveAir Lounge information by airport code
  */
 function getLoungeInfo(airport: string) {
   const lounges: Record<string, { name: string; terminal: string; gate: string }> = {
-    JFK: { name: 'SkyTravel Premium Lounge', terminal: 'Terminal 4', gate: 'Near Gate B12' },
-    LAX: { name: 'SkyTravel Elite Club', terminal: 'Terminal 6', gate: 'Near Gate 60' },
-    SFO: { name: 'SkyTravel Executive Lounge', terminal: 'Terminal 2', gate: 'Near Gate D8' },
-    ORD: { name: 'SkyTravel Business Center', terminal: 'Terminal 1', gate: 'Near Gate C14' },
+    ATL: { name: 'HiveAir HiveAir Lounge', terminal: 'Concourse B', gate: 'Near Gate B12' },
+    JFK: { name: 'HiveAir HiveAir Lounge', terminal: 'Terminal 4', gate: 'Near Gate B24' },
+    LAX: { name: 'HiveAir HiveAir Lounge', terminal: 'Terminal 2', gate: 'Near Gate 35' },
+    SFO: { name: 'HiveAir HiveAir Lounge', terminal: 'Terminal 1', gate: 'Near Gate D8' },
+    DTW: { name: 'HiveAir HiveAir Lounge', terminal: 'McNamara Terminal', gate: 'Concourse A' },
+    MSP: { name: 'HiveAir HiveAir Lounge', terminal: 'Concourse G', gate: 'Near Gate G7' },
+    RDU: { name: 'HiveAir HiveAir Lounge', terminal: 'Terminal 2', gate: 'Concourse C' },
   };
 
   return lounges[airport] || {
-    name: 'SkyTravel Lounge',
+    name: 'HiveAir HiveAir Lounge',
     terminal: 'Main Terminal',
     gate: 'Check airport map',
   };
@@ -53,7 +56,7 @@ function getLoungeInfo(airport: string) {
  * LoungeAccessCard Component
  *
  * PATTERN: Conditional display based on user properties
- * USE CASE: Show premium amenities to eligible passengers
+ * USE CASE: Show HiveAir HiveAir Lounge amenities to eligible passengers
  * CONTROLLED BY: enableLoungeAccess boolean flag AND hasLoungeAccess user property
  */
 export function LoungeAccessCard({ homeAirport, membershipTier }: LoungeAccessCardProps) {
@@ -67,7 +70,7 @@ export function LoungeAccessCard({ homeAirport, membershipTier }: LoungeAccessCa
           {lounge.name}
         </Title>
         <Space size="small">
-          <EnvironmentOutlined style={{ color: '#1890ff' }} />
+          <EnvironmentOutlined style={{ color: '#0069ff' }} />
           <Text type="secondary">
             {homeAirport} Airport • {lounge.terminal}
           </Text>
@@ -77,19 +80,25 @@ export function LoungeAccessCard({ homeAirport, membershipTier }: LoungeAccessCa
         </Text>
       </Space>
 
-      {/* Membership tier badge */}
+      {/* BeeMiles tier badge */}
       <div style={{ marginBottom: 16 }}>
         <Tag
           color={
-            membershipTier === 'platinum'
+            membershipTier === 'diamond'
               ? 'purple'
-              : membershipTier === 'employee'
+              : membershipTier === 'platinum'
+              ? 'gold'
+              : membershipTier === 'gold'
+              ? 'orange'
+              : membershipTier === 'silver'
+              ? 'default'
+              : membershipTier === 'hiveair-employee'
               ? 'green'
               : 'blue'
           }
           style={{ textTransform: 'capitalize' }}
         >
-          {membershipTier} Access
+          {membershipTier === 'hiveair-employee' ? 'Employee' : membershipTier} Access
         </Tag>
       </div>
 
@@ -115,20 +124,20 @@ export function LoungeAccessCard({ homeAirport, membershipTier }: LoungeAccessCa
         </Text>
         <Space direction="vertical" size="small" style={{ width: '100%' }}>
           <Space>
-            <WifiOutlined style={{ color: '#1890ff', width: 16 }} />
+            <WifiOutlined style={{ color: '#0069ff', width: 16 }} />
             <Text style={{ fontSize: 13 }}>Complimentary High-Speed WiFi</Text>
           </Space>
           <Space>
-            <CoffeeOutlined style={{ color: '#1890ff', width: 16 }} />
-            <Text style={{ fontSize: 13 }}>Premium Food & Beverages</Text>
+            <CoffeeOutlined style={{ color: '#0069ff', width: 16 }} />
+            <Text style={{ fontSize: 13 }}>Premium Snacks & Beverages</Text>
           </Space>
           <Space>
-            <LaptopOutlined style={{ color: '#1890ff', width: 16 }} />
+            <LaptopOutlined style={{ color: '#0069ff', width: 16 }} />
             <Text style={{ fontSize: 13 }}>Business Workstations</Text>
           </Space>
           <Space>
-            <ShoppingOutlined style={{ color: '#1890ff', width: 16 }} />
-            <Text style={{ fontSize: 13 }}>Shower Facilities</Text>
+            <ShoppingOutlined style={{ color: '#0069ff', width: 16 }} />
+            <Text style={{ fontSize: 13 }}>Shower Suites</Text>
           </Space>
         </Space>
       </div>
@@ -145,18 +154,18 @@ export function LoungeAccessCard({ homeAirport, membershipTier }: LoungeAccessCa
         }}
       >
         <Space direction="vertical" size="small" align="center">
-          <QrcodeOutlined style={{ fontSize: 48, color: '#1890ff' }} />
-          <Text strong>Digital Lounge Pass</Text>
+          <QrcodeOutlined style={{ fontSize: 48, color: '#0069ff' }} />
+          <Text strong>Digital HiveAir Lounge Pass</Text>
           <Text type="secondary" style={{ fontSize: 12 }}>
-            Show this at lounge entrance
+            Show this at HiveAir Lounge entrance
           </Text>
         </Space>
       </div>
 
       {/* Footer info */}
       <Paragraph type="secondary" style={{ fontSize: 11, marginTop: 16, marginBottom: 0 }}>
-        Lounge access is included with your {membershipTier} membership. Guest passes available at
-        lounge reception.
+        HiveAir Lounge access is included with your {membershipTier === 'hiveair-employee' ? 'employee benefits' : `${membershipTier} BeeMiles status`}. Guest passes available at
+        HiveAir Lounge reception.
       </Paragraph>
     </div>
   );
