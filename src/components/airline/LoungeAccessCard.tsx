@@ -70,7 +70,7 @@ export function LoungeAccessCard({ homeAirport, membershipTier }: LoungeAccessCa
           {lounge.name}
         </Title>
         <Space size="small">
-          <EnvironmentOutlined style={{ color: '#0069ff' }} />
+          <EnvironmentOutlined style={{ color: '#8fa6d6' }} />
           <Text type="secondary">
             {homeAirport} Airport • {lounge.terminal}
           </Text>
@@ -124,19 +124,19 @@ export function LoungeAccessCard({ homeAirport, membershipTier }: LoungeAccessCa
         </Text>
         <Space direction="vertical" size="small" style={{ width: '100%' }}>
           <Space>
-            <WifiOutlined style={{ color: '#0069ff', width: 16 }} />
+            <WifiOutlined style={{ color: '#8fa6d6', width: 16 }} />
             <Text style={{ fontSize: 13 }}>Complimentary High-Speed WiFi</Text>
           </Space>
           <Space>
-            <CoffeeOutlined style={{ color: '#0069ff', width: 16 }} />
+            <CoffeeOutlined style={{ color: '#8fa6d6', width: 16 }} />
             <Text style={{ fontSize: 13 }}>Premium Snacks & Beverages</Text>
           </Space>
           <Space>
-            <LaptopOutlined style={{ color: '#0069ff', width: 16 }} />
+            <LaptopOutlined style={{ color: '#8fa6d6', width: 16 }} />
             <Text style={{ fontSize: 13 }}>Business Workstations</Text>
           </Space>
           <Space>
-            <ShoppingOutlined style={{ color: '#0069ff', width: 16 }} />
+            <ShoppingOutlined style={{ color: '#8fa6d6', width: 16 }} />
             <Text style={{ fontSize: 13 }}>Shower Suites</Text>
           </Space>
         </Space>
@@ -154,7 +154,7 @@ export function LoungeAccessCard({ homeAirport, membershipTier }: LoungeAccessCa
         }}
       >
         <Space direction="vertical" size="small" align="center">
-          <QrcodeOutlined style={{ fontSize: 48, color: '#0069ff' }} />
+          <QrcodeOutlined style={{ fontSize: 48, color: '#8fa6d6' }} />
           <Text strong>Digital HiveAir Lounge Pass</Text>
           <Text type="secondary" style={{ fontSize: 12 }}>
             Show this at HiveAir Lounge entrance

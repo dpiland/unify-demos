@@ -28,6 +28,7 @@ import {
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useCart } from '../../contexts/CartContext';
+import { SeatSelector } from './SeatSelector';
 
 const { Text, Title, Paragraph } = Typography;
 const { Option } = Select;
@@ -199,6 +200,7 @@ export function FlightBooking({ onBookFlight, userCabinClass = 'economy' }: Flig
   const [selectedFlight, setSelectedFlight] = useState<SearchResult | null>(null);
   const [selectedCabin, setSelectedCabin] = useState<'economy' | 'business'>('economy');
   const [passengers, setPassengers] = useState(1);
+  const [showSeatSelector, setShowSeatSelector] = useState(false);
 
   // Handle flight search
   const handleSearch = async (values: any) => {
@@ -304,7 +306,7 @@ export function FlightBooking({ onBookFlight, userCabinClass = 'economy' }: Flig
             size="small"
             items={[
               {
-                title: <Button type="link" onClick={handleStartOver} style={{ padding: 0, color: '#0069ff' }}>Start Over</Button>,
+                title: <Button type="link" onClick={handleStartOver} style={{ padding: 0, color: '#8fa6d6' }}>Start Over</Button>,
               },
               {
                 title: <Text strong>Trip Summary</Text>,
@@ -425,15 +427,15 @@ export function FlightBooking({ onBookFlight, userCabinClass = 'economy' }: Flig
 
                         <Space direction="vertical" size={8} style={{ marginBottom: 20 }}>
                           <Space>
-                            <CheckCircleOutlined style={{ color: '#0069ff' }} />
+                            <CheckCircleOutlined style={{ color: '#8fa6d6' }} />
                             <Text style={{ fontSize: 14 }}>Fully refundable and free same-day flight changes</Text>
                           </Space>
                           <Space>
-                            <CheckCircleOutlined style={{ color: '#0069ff' }} />
+                            <CheckCircleOutlined style={{ color: '#8fa6d6' }} />
                             <Text style={{ fontSize: 14 }}>Board before Main Classic and Main Basic</Text>
                           </Space>
                           <Space>
-                            <CheckCircleOutlined style={{ color: '#0069ff' }} />
+                            <CheckCircleOutlined style={{ color: '#8fa6d6' }} />
                             <Text style={{ fontSize: 14 }}>Earn even more miles and higher upgrade priority for BeeMiles members</Text>
                           </Space>
                         </Space>
@@ -450,9 +452,13 @@ export function FlightBooking({ onBookFlight, userCabinClass = 'economy' }: Flig
                           <Col>
                             <Button
                               size="large"
+                              onClick={() => {
+                                setSelectedCabin('business');
+                                message.success('Upgraded to Main Extra! Your trip total has been updated.');
+                              }}
                               style={{
-                                borderColor: '#0069ff',
-                                color: '#0069ff',
+                                borderColor: '#8fa6d6',
+                                color: '#8fa6d6',
                                 fontWeight: 600,
                                 minWidth: 120,
                               }}
@@ -473,7 +479,7 @@ export function FlightBooking({ onBookFlight, userCabinClass = 'economy' }: Flig
                   <Col>
                     <Space direction="vertical" size={4}>
                       <Space>
-                        <EnvironmentOutlined style={{ fontSize: 20, color: '#0069ff' }} />
+                        <EnvironmentOutlined style={{ fontSize: 20, color: '#8fa6d6' }} />
                         <Text strong style={{ fontSize: 16 }}>View Seats</Text>
                       </Space>
                       <Text type="secondary">View a map of the plane and select your seats</Text>
@@ -482,17 +488,28 @@ export function FlightBooking({ onBookFlight, userCabinClass = 'economy' }: Flig
                   <Col>
                     <Button
                       size="large"
+                      onClick={() => setShowSeatSelector(!showSeatSelector)}
                       style={{
-                        borderColor: '#0069ff',
-                        color: '#0069ff',
+                        borderColor: '#8fa6d6',
+                        color: showSeatSelector ? '#fff' : '#8fa6d6',
+                        background: showSeatSelector ? '#8fa6d6' : 'transparent',
                         fontWeight: 600,
                         minWidth: 140,
                       }}
                     >
-                      SELECT SEATS
+                      {showSeatSelector ? 'HIDE SEATS' : 'SELECT SEATS'}
                     </Button>
                   </Col>
                 </Row>
+                {showSeatSelector && (
+                  <div style={{ marginTop: 16 }}>
+                    <Divider style={{ marginTop: 0 }} />
+                    <SeatSelector
+                      cabinClass={selectedCabin === 'business' ? 'comfort-plus' : 'economy'}
+                      isPremiumMember={false}
+                    />
+                  </div>
+                )}
               </Card>
             </Space>
           </Col>
@@ -604,8 +621,8 @@ export function FlightBooking({ onBookFlight, userCabinClass = 'economy' }: Flig
                   height: 52,
                   fontSize: 16,
                   fontWeight: 700,
-                  backgroundColor: '#C8102E',
-                  borderColor: '#C8102E',
+                  backgroundColor: '#0069ff',
+                  borderColor: '#0069ff',
                   letterSpacing: 0.5,
                 }}
               >

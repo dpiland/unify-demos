@@ -14,7 +14,7 @@ import { colors, typography } from './tokens';
 export const lightTheme: ThemeConfig = {
   token: {
     // Color tokens
-    colorPrimary: '#0069ff',
+    colorPrimary: '#8fa6d6',
     colorSuccess: colors.success[500],
     colorWarning: colors.warning[500],
     colorError: colors.error[500],

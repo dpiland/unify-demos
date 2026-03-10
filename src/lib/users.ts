@@ -58,6 +58,7 @@ export const DEFAULT_USERS: User[] = [
         hasCheckedIn: false,
         hasPriorityBoarding: false,
         isFrequentFlyer: false,
+        hasCreditCard: false,
       },
       strings: {
         membershipTier: 'basic',
@@ -89,6 +90,7 @@ export const DEFAULT_USERS: User[] = [
         hasCheckedIn: true,
         hasPriorityBoarding: true,
         isFrequentFlyer: true,
+        hasCreditCard: true,
       },
       strings: {
         membershipTier: 'gold',
@@ -120,6 +122,7 @@ export const DEFAULT_USERS: User[] = [
         hasCheckedIn: true,
         hasPriorityBoarding: true,
         isFrequentFlyer: true,
+        hasCreditCard: true,
       },
       strings: {
         membershipTier: 'diamond',
@@ -152,6 +155,7 @@ export const DEFAULT_USERS: User[] = [
         hasPriorityBoarding: false,
         isFrequentFlyer: true,
         isBetaTester: true,
+        hasCreditCard: false,
       },
       strings: {
         membershipTier: 'silver',
@@ -184,6 +188,7 @@ export const DEFAULT_USERS: User[] = [
         hasPriorityBoarding: false,
         isFrequentFlyer: false,
         isStaffMember: true, // Special property for staff
+        hasCreditCard: true,
       },
       strings: {
         membershipTier: 'hiveair-employee',

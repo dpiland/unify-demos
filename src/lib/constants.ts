@@ -17,6 +17,8 @@ export const FEATURE_FLAG_KEYS = {
   ENABLE_PRIORITY_BOARDING: 'enablePriorityBoarding',
   SHOW_FLIGHT_ALERTS: 'showFlightAlerts',
   ENABLE_MOBILE_CHECKIN: 'enableMobileCheckin',
+  SHOW_CREDIT_CARD_PROMO: 'showCreditCardPromo',
+  ENABLE_ST_PATRICKS_DAY: 'enableStPatricksDay',
 
   // String flags
   DASHBOARD_LAYOUT: 'dashboardLayout',
@@ -51,6 +53,12 @@ export const FLAG_DESCRIPTIONS: Record<string, string> = {
 
   enableMobileCheckin:
     'Enable HiveAir mobile check-in and digital boarding pass features. Allows passengers to check in through the FlyHiveAir app and receive mobile boarding passes.',
+
+  showCreditCardPromo:
+    'Controls credit card promotional content. Non-cardholders see sign-up benefits (20% off award travel). Existing cardholders see referral bonus offer (earn 100k BeeMiles). Uses hasCreditCard property for targeting.',
+
+  enableStPatricksDay:
+    'Festive St. Patrick\'s Day site-wide theme. Replaces brand colors with green, adds shamrock decorations and a themed banner. Enable on/around March 17th for a fun seasonal experience.',
 
   // String Flags
   dashboardLayout:
@@ -90,6 +98,8 @@ export const DEFAULT_FLAG_VALUES = {
   enablePriorityBoarding: false,   // Enable for premium passengers
   showFlightAlerts: true,          // Important for all passengers
   enableMobileCheckin: true,       // Mobile-first strategy
+  showCreditCardPromo: true,       // Show promo to everyone by default
+  enableStPatricksDay: false,      // Enable only on March 17th
 
   // String flags - Best practice defaults
   dashboardLayout: 'modern',           // Modern card-based design

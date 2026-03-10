@@ -179,9 +179,6 @@ export function FlightDealsWidget() {
                         {deal.destination}
                       </Title>
                     </Space>
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                      {deal.description}
-                    </Text>
                   </div>
 
                   {/* Route */}

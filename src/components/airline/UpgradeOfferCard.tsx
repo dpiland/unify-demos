@@ -81,7 +81,7 @@ export function UpgradeOfferCard({
     return (
       <div
         style={{
-          background: 'linear-gradient(135deg, #0069ff 0%, #001F3D 100%)',
+          background: 'linear-gradient(135deg, #8fa6d6 0%, #001F3D 100%)',
           borderRadius: 12,
           padding: 24,
           color: '#fff',
@@ -219,7 +219,7 @@ export function UpgradeOfferCard({
         >
           <Space direction="vertical" size="small" align="center">
             <Text type="secondary">Upgrade from {currentClass} for only</Text>
-            <Title level={2} style={{ margin: 0, color: '#0069ff' }}>
+            <Title level={2} style={{ margin: 0, color: '#8fa6d6' }}>
               ${upgradePrice}
             </Title>
             <Text type="secondary" style={{ fontSize: 12 }}>
@@ -234,7 +234,7 @@ export function UpgradeOfferCard({
           size="large"
           block
           icon={<ArrowUpOutlined />}
-          style={{ height: 48, backgroundColor: '#0069ff', borderColor: '#0069ff' }}
+          style={{ height: 48, backgroundColor: '#8fa6d6', borderColor: '#8fa6d6' }}
         >
           Upgrade My Flight
         </Button>

@@ -152,6 +152,24 @@ export const flags = {
    */
   enableMobileCheckin: new Rox.Flag(),
 
+  /**
+   * Show Credit Card Promotion
+   *
+   * 📖 USE CASE: Display credit card promo vs. referral bonus based on cardholder status
+   * 💡 PATTERN: Toggle between acquisition and retention messaging
+   *
+   * AIRLINE SCENARIO:
+   * - Non-cardholders see credit card sign-up benefits (20% off award travel)
+   * - Existing cardholders see referral bonus (earn 100k miles)
+   * - Controlled by hasCreditCard custom property
+   *
+   * IN CLOUDBEES UI:
+   * - Create as Boolean flag
+   * - Default: true (show promo to everyone)
+   * - Target rule: hasCreditCard == true → show referral instead
+   */
+  showCreditCardPromo: new Rox.Flag(true),
+
   // ============================================
   // STRING FLAGS - A/B Testing & Variants
   // ============================================
@@ -346,6 +364,29 @@ export const flags = {
    * - Can target specific routes or membership tiers
    */
   loyaltyPointsMultiplier: new Rox.RoxNumber(1, [1, 1.5, 2, 3]),
+
+  // ============================================
+  // SEASONAL / HOLIDAY FLAGS
+  // ============================================
+
+  /**
+   * Enable St. Patrick's Day Theme
+   *
+   * USE CASE: Festive site-wide theme override for St. Patrick's Day
+   * PATTERN: Toggle entire visual theme with a single flag
+   *
+   * AIRLINE SCENARIO:
+   * - Green color scheme replaces brand purple across nav, buttons, accents
+   * - Shamrock decorations and themed banner appear
+   * - Creates a fun, seasonal experience for passengers
+   * - Enable only on/around March 17th, disable the next day
+   *
+   * IN CLOUDBEES UI:
+   * - Create as Boolean flag
+   * - Default: false
+   * - Enable manually on March 17th or schedule via percentage rollout
+   */
+  enableStPatricksDay: new Rox.Flag(),
 };
 
 /**
@@ -409,12 +450,14 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
         enablePriorityBoarding: flags.enablePriorityBoarding.isEnabled(),
         showFlightAlerts: flags.showFlightAlerts.isEnabled(),
         enableMobileCheckin: flags.enableMobileCheckin.isEnabled(),
+        showCreditCardPromo: flags.showCreditCardPromo.isEnabled(),
         dashboardLayout: flags.dashboardLayout.getValue(),
         flightDisplayMode: flags.flightDisplayMode.getValue(),
         upgradePromptStyle: flags.upgradePromptStyle.getValue(),
         recentBookingsToShow: flags.recentBookingsToShow.getValue(),
         flightStatusRefreshInterval: flags.flightStatusRefreshInterval.getValue(),
         loyaltyPointsMultiplier: flags.loyaltyPointsMultiplier.getValue(),
+        enableStPatricksDay: flags.enableStPatricksDay.isEnabled(),
       });
     }
   } catch (error) {
