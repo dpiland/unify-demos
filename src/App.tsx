@@ -367,20 +367,24 @@ function App() {
   const showFlightAlerts = useFeatureFlag('showFlightAlerts');
   const enableMobileCheckin = useFeatureFlag('enableMobileCheckin');
   const enableStPatricksDay = useFeatureFlag('enableStPatricksDay');
+  const enableMemorialDay = useFeatureFlag('enableMemorialDay');
 
   // ============================================
-  // ST. PATRICK'S DAY THEME COLORS
-  // When the flag is enabled, all brand colors swap to festive greens
+  // SEASONAL THEME COLORS
+  // Priority: St. Patrick's Day > Memorial Day > Default
+  // When a holiday flag is enabled, all brand colors swap to festive theme
   // ============================================
   const theme = {
-    navBg: enableStPatricksDay ? '#1a7a3d' : '#806ff6',
-    navSecondaryBg: enableStPatricksDay ? '#15662f' : '#6b5ce7',
-    accent: enableStPatricksDay ? '#2ea043' : '#806ff6',
-    accentLight: enableStPatricksDay ? '#3cb371' : '#8fa6d6',
-    gold: enableStPatricksDay ? '#FFD700' : '#DAA520',
+    navBg: enableStPatricksDay ? '#1a7a3d' : enableMemorialDay ? '#1B2A4A' : '#806ff6',
+    navSecondaryBg: enableStPatricksDay ? '#15662f' : enableMemorialDay ? '#162240' : '#6b5ce7',
+    accent: enableStPatricksDay ? '#2ea043' : enableMemorialDay ? '#B22234' : '#806ff6',
+    accentLight: enableStPatricksDay ? '#3cb371' : enableMemorialDay ? '#3C5A99' : '#8fa6d6',
+    gold: enableStPatricksDay ? '#FFD700' : enableMemorialDay ? '#FFFFFF' : '#DAA520',
     heroBg: enableStPatricksDay
       ? 'linear-gradient(135deg, #1a7a3d 0%, #0d5c2a 100%)'
-      : 'linear-gradient(135deg, #806ff6 0%, #5a4cbf 100%)',
+      : enableMemorialDay
+        ? 'linear-gradient(135deg, #1B2A4A 0%, #0D1B2A 100%)'
+        : 'linear-gradient(135deg, #806ff6 0%, #5a4cbf 100%)',
   };
 
   // ============================================
@@ -2391,9 +2395,113 @@ function App() {
       )}
 
       {/* ============================================ */}
+      {/* MEMORIAL DAY BANNER (conditional) */}
+      {/* FEATURE FLAG: enableMemorialDay (Boolean) */}
+      {/* Patriotic theme with 50% military discount promo */}
+      {/* ============================================ */}
+      {enableMemorialDay && !enableStPatricksDay && (
+        <>
+          <style>{`
+            /* Override Ant Design primary colors for Memorial Day */
+            .ant-menu-inline .ant-menu-item-selected {
+              background-color: #1B2A4A !important;
+              color: #fff !important;
+            }
+            .ant-menu-inline .ant-menu-item-selected .anticon {
+              color: #fff !important;
+            }
+            .ant-btn-primary {
+              background-color: #B22234 !important;
+              border-color: #B22234 !important;
+            }
+            .ant-btn-primary:hover {
+              background-color: #8B1A29 !important;
+              border-color: #8B1A29 !important;
+            }
+            /* Patriotic tint on cards */
+            .ant-card:hover {
+              border-color: #3C5A99 !important;
+            }
+            .memorial-day-banner {
+              background: linear-gradient(90deg, #1B2A4A 0%, #2C3E6B 30%, #B22234 50%, #2C3E6B 70%, #1B2A4A 100%);
+              padding: 12px 24px;
+              text-align: center;
+              position: relative;
+              overflow: hidden;
+            }
+            .memorial-day-banner::before {
+              content: '';
+              position: absolute;
+              top: 0; left: 0; right: 0; bottom: 0;
+              background: repeating-linear-gradient(
+                120deg,
+                transparent,
+                transparent 40px,
+                rgba(255,255,255,0.03) 40px,
+                rgba(255,255,255,0.03) 80px
+              );
+            }
+            @keyframes star-pulse {
+              0%, 100% { transform: scale(1); opacity: 1; }
+              50% { transform: scale(1.15); opacity: 0.8; }
+            }
+            .memorial-star {
+              display: inline-block;
+              animation: star-pulse 2s ease-in-out infinite;
+            }
+            .memorial-star:nth-child(2) { animation-delay: 0.4s; }
+            .memorial-star:nth-child(3) { animation-delay: 0.8s; }
+            @keyframes star-fall {
+              0% { transform: translateY(-10vh) rotate(0deg); opacity: 0.5; }
+              100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+            }
+            .star-bg {
+              position: fixed;
+              top: -20px;
+              color: #3C5A99;
+              opacity: 0.1;
+              z-index: 0;
+              pointer-events: none;
+              animation: star-fall linear infinite;
+            }
+          `}</style>
+          {/* Falling star decorations */}
+          {[8, 18, 30, 42, 55, 68, 78, 90].map((left, i) => (
+            <div
+              key={`star-${i}`}
+              className="star-bg"
+              style={{
+                left: `${left}%`,
+                animationDuration: `${10 + (i * 2)}s`,
+                animationDelay: `${i * 1.8}s`,
+                fontSize: `${14 + (i % 3) * 6}px`,
+              }}
+            >
+              &#9733;
+            </div>
+          ))}
+          <div className="memorial-day-banner">
+            <Text style={{ color: '#fff', fontSize: 15, fontWeight: 600, position: 'relative', zIndex: 1 }}>
+              <span className="memorial-star" style={{ color: '#FFD700' }}>&#9733;</span>
+              {' '}Honoring Our Heroes — <span style={{ color: '#FFD700' }}>50% off</span> for all service members and their families. Use code <span style={{ background: 'rgba(255,255,255,0.2)', padding: '2px 8px', borderRadius: 4, fontFamily: 'monospace' }}>HONOR50</span>{' '}
+              <span className="memorial-star" style={{ color: '#FFD700' }}>&#9733;</span>
+              {' '}
+              <Button
+                size="small"
+                style={{ background: '#FFD700', borderColor: '#FFD700', color: '#1a1a1a', fontWeight: 600, marginLeft: 8 }}
+                onClick={() => { setActivePage('deals'); }}
+              >
+                Book Now
+              </Button>
+            </Text>
+          </div>
+        </>
+      )}
+
+      {/* ============================================ */}
       {/* PAGE CONTENT */}
       {/* ============================================ */}
-      <Content style={{ padding: '32px 24px', background: enableStPatricksDay ? '#f0f9f0' : '#f5f5f5' }}>
+      <Content style={{ padding: '32px 24px', background: enableStPatricksDay ? '#f0f9f0' : enableMemorialDay ? '#f5f8ff' : '#f5f5f5' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           {/* Page Title */}
           {activePage === 'my-hiveair' && (

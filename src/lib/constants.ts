@@ -19,6 +19,7 @@ export const FEATURE_FLAG_KEYS = {
   ENABLE_MOBILE_CHECKIN: 'enableMobileCheckin',
   SHOW_CREDIT_CARD_PROMO: 'showCreditCardPromo',
   ENABLE_ST_PATRICKS_DAY: 'enableStPatricksDay',
+  ENABLE_MEMORIAL_DAY: 'enableMemorialDay',
 
   // String flags
   DASHBOARD_LAYOUT: 'dashboardLayout',
@@ -60,6 +61,9 @@ export const FLAG_DESCRIPTIONS: Record<string, string> = {
   enableStPatricksDay:
     'Festive St. Patrick\'s Day site-wide theme. Replaces brand colors with green, adds shamrock decorations and a themed banner. Enable on/around March 17th for a fun seasonal experience.',
 
+  enableMemorialDay:
+    'Patriotic Memorial Day site-wide theme. Replaces brand colors with red/white/blue, adds star decorations and a promotional banner offering 50% off for service members and their families. Enable on/around Memorial Day weekend.',
+
   // String Flags
   dashboardLayout:
     'A/B test My Trips dashboard layout variants: classic (traditional sidebar), modern (card-based responsive), or compact (dense for BeeMiles members). Tests which layout drives better engagement.',
@@ -100,6 +104,7 @@ export const DEFAULT_FLAG_VALUES = {
   enableMobileCheckin: true,       // Mobile-first strategy
   showCreditCardPromo: true,       // Show promo to everyone by default
   enableStPatricksDay: false,      // Enable only on March 17th
+  enableMemorialDay: false,        // Enable only on Memorial Day weekend
 
   // String flags - Best practice defaults
   dashboardLayout: 'modern',           // Modern card-based design

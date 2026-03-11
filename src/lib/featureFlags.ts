@@ -387,6 +387,25 @@ export const flags = {
    * - Enable manually on March 17th or schedule via percentage rollout
    */
   enableStPatricksDay: new Rox.Flag(),
+
+  /**
+   * Enable Memorial Day Theme
+   *
+   * USE CASE: Patriotic site-wide theme for Memorial Day with military discount
+   * PATTERN: Toggle entire visual theme + promotional banner with a single flag
+   *
+   * AIRLINE SCENARIO:
+   * - Red/white/blue color scheme replaces brand purple across nav, buttons, accents
+   * - Star decorations and patriotic banner appear
+   * - Promotional banner: 50% off for service members and their families
+   * - Enable on/around Memorial Day weekend, disable after
+   *
+   * IN CLOUDBEES UI:
+   * - Create as Boolean flag
+   * - Default: false
+   * - Enable manually for Memorial Day weekend or schedule via percentage rollout
+   */
+  enableMemorialDay: new Rox.Flag(),
 };
 
 /**
@@ -458,6 +477,7 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
         flightStatusRefreshInterval: flags.flightStatusRefreshInterval.getValue(),
         loyaltyPointsMultiplier: flags.loyaltyPointsMultiplier.getValue(),
         enableStPatricksDay: flags.enableStPatricksDay.isEnabled(),
+        enableMemorialDay: flags.enableMemorialDay.isEnabled(),
       });
     }
   } catch (error) {
