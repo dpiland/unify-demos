@@ -1,14 +1,9 @@
 /**
- * User Management System
+ * User Management System - Ridgeline Outfitters
  *
  * Provides a fake user authentication system for demos.
- * Users can "log in" by selecting a persona, which sets their properties
- * for feature flag targeting.
- *
- * This allows demos to showcase:
- * - User segmentation and targeting
- * - Different user experiences based on properties
- * - A/B testing with different user types
+ * Users can "log in" by selecting an outdoor persona, which sets their
+ * properties for feature flag targeting.
  */
 
 /**
@@ -21,30 +16,26 @@ export interface User {
   avatar?: string;
   description: string;
 
-  // Properties for feature flag targeting
   properties: {
-    // Boolean properties
     booleans: Record<string, boolean>;
-    // String properties
     strings: Record<string, string>;
-    // Number properties
     numbers: Record<string, number>;
   };
 }
 
 /**
- * Default Demo Users - EliteShop Shopping Personas
+ * Default Demo Users - Outdoor Enthusiast Personas
  *
- * These users represent common e-commerce customer personas for demonstrations.
+ * These users represent common outdoor gear customer personas.
  * Each persona has different properties that enable targeted feature rollouts
  * and personalized shopping experiences.
  */
 export const DEFAULT_USERS: User[] = [
   {
     id: 'regular-shopper',
-    name: 'Casey Standard',
-    email: 'casey.standard@example.com',
-    description: 'Regular shopper browsing for everyday items',
+    name: 'Riley Dayhiker',
+    email: 'riley.dayhiker@example.com',
+    description: 'Weekend hiker shopping for everyday trail gear',
     properties: {
       booleans: {
         isPremiumCustomer: false,
@@ -59,19 +50,19 @@ export const DEFAULT_USERS: User[] = [
         userId: 'regular-shopper',
       },
       numbers: {
-        lifetimeSpend: 450, // dollars
+        lifetimeSpend: 450,
         loyaltyPoints: 100,
-        memberSince: 12, // months
-        averageOrderValue: 65,
+        memberSince: 12,
+        averageOrderValue: 85,
         cartItemCount: 3,
       },
     },
   },
   {
     id: 'vip-shopper',
-    name: 'Morgan Premium',
-    email: 'morgan.premium@example.com',
-    description: 'VIP member with premium perks and exclusive access',
+    name: 'Jordan Summit',
+    email: 'jordan.summit@example.com',
+    description: 'Backcountry expert and Pro member with premium gear access',
     properties: {
       booleans: {
         isPremiumCustomer: true,
@@ -86,19 +77,19 @@ export const DEFAULT_USERS: User[] = [
         userId: 'vip-shopper',
       },
       numbers: {
-        lifetimeSpend: 8500, // dollars
+        lifetimeSpend: 8500,
         loyaltyPoints: 2500,
-        memberSince: 36, // months
-        averageOrderValue: 185,
+        memberSince: 36,
+        averageOrderValue: 225,
         cartItemCount: 5,
       },
     },
   },
   {
     id: 'beta-tester',
-    name: 'Taylor Beta',
-    email: 'taylor.beta@example.com',
-    description: 'Beta tester helping evaluate new shopping features',
+    name: 'Sam Trailtest',
+    email: 'sam.trailtest@example.com',
+    description: 'Field tester evaluating new gear and site features',
     properties: {
       booleans: {
         isPremiumCustomer: false,
@@ -113,19 +104,19 @@ export const DEFAULT_USERS: User[] = [
         userId: 'beta-tester',
       },
       numbers: {
-        lifetimeSpend: 1200, // dollars
+        lifetimeSpend: 1200,
         loyaltyPoints: 350,
-        memberSince: 18, // months
-        averageOrderValue: 95,
+        memberSince: 18,
+        averageOrderValue: 120,
         cartItemCount: 2,
       },
     },
   },
   {
     id: 'new-shopper',
-    name: 'Alex New',
-    email: 'alex.new@example.com',
-    description: 'First-time visitor exploring the store',
+    name: 'Alex Explorer',
+    email: 'alex.explorer@example.com',
+    description: 'First-time visitor discovering outdoor gear',
     properties: {
       booleans: {
         isPremiumCustomer: false,
@@ -140,9 +131,9 @@ export const DEFAULT_USERS: User[] = [
         userId: 'new-shopper',
       },
       numbers: {
-        lifetimeSpend: 0, // dollars
+        lifetimeSpend: 0,
         loyaltyPoints: 0,
-        memberSince: 0, // months
+        memberSince: 0,
         averageOrderValue: 0,
         cartItemCount: 0,
       },

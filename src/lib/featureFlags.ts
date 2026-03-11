@@ -1,11 +1,8 @@
 /**
  * CloudBees Feature Flags SDK Integration
  *
- * This module provides a generic foundation for CloudBees Feature Management
- * demonstrations. It includes three example flags (boolean, string, number)
- * that showcase common feature flag patterns.
- *
- * 🎯 CUSTOMIZATION: Replace these generic flags with your use case-specific flags
+ * This module provides the CloudBees Feature Management foundation
+ * for the Ridgeline Outfitters outdoor gear store demo.
  *
  * HOW TO ADD NEW FLAGS:
  * 1. Add flag definition to the 'flags' object below
@@ -19,9 +16,9 @@ import type { RoxSetupOptions} from './types';
 import type { User } from './users';
 
 /**
- * Feature Flag Definitions - EliteShop E-commerce
+ * Feature Flag Definitions - Ridgeline Outfitters
  *
- * This e-commerce application uses 11 feature flags to control various
+ * This outdoor gear store uses 11 feature flags to control various
  * aspects of the shopping experience, enabling safe rollouts, A/B testing,
  * and personalized experiences based on user segmentation.
  */
@@ -33,13 +30,13 @@ export const flags = {
   /**
    * 1. Show Promotional Banner
    *
-   * 📖 USE CASE: Toggle promotional banner for seasonal sales or marketing campaigns
-   * 💡 PATTERN: if (enabled) { show banner } else { hide banner }
+   * USE CASE: Toggle seasonal outdoor campaign banner (end-of-season sale, Worn Wear events)
+   * PATTERN: if (enabled) { show banner } else { hide banner }
    *
    * BUSINESS VALUE:
-   * - Launch flash sales instantly without code deploy
-   * - Test impact of promotional messaging on conversion
-   * - Target campaigns to specific regions or user segments
+   * - Launch seasonal clearance instantly without code deploy
+   * - Test impact of outdoor campaign messaging on conversion
+   * - Target campaigns to specific regions or customer segments
    *
    * HOW TO USE:
    * ```typescript
@@ -48,22 +45,22 @@ export const flags = {
    * ```
    *
    * TARGETING EXAMPLES:
-   * - Enable for all users during Black Friday
+   * - Enable for all users during end-of-season clearance
    * - Enable for new users only (isNewUser == true)
-   * - Disable for premium customers who converted already
+   * - Disable for Pro members who already converted
    */
   showPromoBanner: new Rox.Flag(),
 
   /**
    * 2. Enable Express Checkout
    *
-   * 📖 USE CASE: One-click express checkout for premium/loyal customers
-   * 💡 PATTERN: Conditional rendering of express checkout button
+   * USE CASE: One-click express checkout for Pro members and returning outdoor enthusiasts
+   * PATTERN: Conditional rendering of express checkout button
    *
    * BUSINESS VALUE:
    * - Reduce friction for high-value customers
    * - Test impact on conversion rate and cart abandonment
-   * - Reward loyalty with premium experience
+   * - Reward loyalty with premium checkout experience
    *
    * HOW TO USE:
    * ```typescript
@@ -81,11 +78,11 @@ export const flags = {
   /**
    * 3. Enable Product Recommendations
    *
-   * 📖 USE CASE: Show AI-powered personalized product suggestions
-   * 💡 PATTERN: Conditional rendering of recommendations carousel
+   * USE CASE: Show "Complete Your Kit" personalized gear suggestions
+   * PATTERN: Conditional rendering of recommendations section
    *
    * BUSINESS VALUE:
-   * - Increase average order value (AOV)
+   * - Increase average order value by suggesting complementary gear
    * - A/B test recommendation algorithm effectiveness
    * - Gradually roll out to measure performance impact
    *
@@ -98,20 +95,20 @@ export const flags = {
    * TARGETING EXAMPLES:
    * - Enable for 50% of users (A/B test)
    * - Enable for users with >3 previous purchases
-   * - Disable for new users (focus on browse experience)
+   * - Disable for first-time visitors (focus on browse experience)
    */
   enableRecommendations: new Rox.Flag(),
 
   /**
    * 4. Show Loyalty Program
    *
-   * 📖 USE CASE: Display loyalty points, rewards, and tier status
-   * 💡 PATTERN: Conditional rendering of loyalty card component
+   * USE CASE: Display Peak Rewards loyalty points, trail credits, and tier status
+   * PATTERN: Conditional rendering of loyalty card component
    *
    * BUSINESS VALUE:
-   * - Soft launch to premium members before full rollout
-   * - Increase customer retention and repeat purchases
-   * - Test loyalty program mechanics with select cohorts
+   * - Soft launch to Pro members before full rollout
+   * - Increase customer retention and repeat gear purchases
+   * - Test loyalty mechanics with select outdoor enthusiast cohorts
    *
    * HOW TO USE:
    * ```typescript
@@ -122,20 +119,20 @@ export const flags = {
    * TARGETING EXAMPLES:
    * - Enable IF isPremiumCustomer == true AND memberSince > 12
    * - Enable for region == "us-west" (regional rollout)
-   * - Enable for beta testers first (isBetaTester == true)
+   * - Enable for field testers first (isBetaTester == true)
    */
   showLoyaltyProgram: new Rox.Flag(),
 
   /**
    * 5. Enable Wishlist Feature
    *
-   * 📖 USE CASE: Allow users to save products to wishlist/favorites
-   * 💡 PATTERN: Conditional rendering of wishlist heart icon
+   * USE CASE: Allow users to save gear to wishlist for upcoming trips
+   * PATTERN: Conditional rendering of wishlist/save icon on product cards
    *
    * BUSINESS VALUE:
    * - Beta test feature before general availability
-   * - Increase user engagement and return visits
-   * - Test impact on conversion (wishlist → purchase)
+   * - Increase engagement and return visits for trip planning
+   * - Test impact on conversion (wishlist to purchase)
    *
    * HOW TO USE:
    * ```typescript
@@ -144,9 +141,9 @@ export const flags = {
    * ```
    *
    * TARGETING EXAMPLES:
-   * - Enable for isBetaTester == true (beta test)
+   * - Enable for isBetaTester == true (field test)
    * - Enable for region == "us-west" then expand
-   * - Enable for users with accountAge > 6 months
+   * - Enable for users with memberSince > 6 months
    */
   enableWishlist: new Rox.Flag(),
 
@@ -157,42 +154,37 @@ export const flags = {
   /**
    * 6. Product Display Mode
    *
-   * 📖 USE CASE: A/B test different product layout styles
-   * 💡 PATTERN: switch (mode) { case 'grid': ... case 'list': ... }
+   * USE CASE: A/B test different gear layout styles
+   * PATTERN: switch (mode) { case 'grid': ... case 'list': ... }
    *
    * BUSINESS VALUE:
-   * - Test which layout drives more engagement and clicks
+   * - Test which layout drives more engagement and add-to-carts
    * - Optimize for different device types (mobile vs desktop)
-   * - Personalize based on user preference/behavior
+   * - Personalize based on user shopping preference
    *
    * VARIANTS:
    * - 'grid': Cards in responsive grid (default, visual)
-   * - 'list': Row-based list view (detailed, scannable)
-   * - 'compact': Dense grid with smaller cards (more products visible)
+   * - 'list': Row-based list view (detailed specs, scannable)
+   * - 'compact': Dense grid with smaller cards (browse more gear)
    *
    * HOW TO USE:
    * ```typescript
    * const displayMode = useFeatureFlagString('productDisplayMode');
    * <ProductGrid displayMode={displayMode} />
    * ```
-   *
-   * TARGETING EXAMPLES:
-   * - Split traffic: 33% grid, 33% list, 33% compact
-   * - Mobile users get 'compact', desktop gets 'grid'
-   * - Premium users get 'grid' (larger images)
    */
   productDisplayMode: new Rox.RoxString('grid', ['grid', 'list', 'compact']),
 
   /**
    * 7. Checkout Flow Variant
    *
-   * 📖 USE CASE: Test different checkout user experiences
-   * 💡 PATTERN: Conditional rendering based on variant string
+   * USE CASE: Test different checkout user experiences
+   * PATTERN: Conditional rendering based on variant string
    *
    * BUSINESS VALUE:
    * - Optimize checkout conversion rate
    * - Test multi-step vs single-page checkout
-   * - Personalize flow based on user tier
+   * - Personalize flow based on customer tier
    *
    * VARIANTS:
    * - 'standard': Traditional multi-step checkout (default)
@@ -204,42 +196,32 @@ export const flags = {
    * const checkoutFlow = useFeatureFlagString('checkoutFlowVariant');
    * <CheckoutButton variant={checkoutFlow} />
    * ```
-   *
-   * TARGETING EXAMPLES:
-   * - Premium users get 'express' flow
-   * - New users get 'single-page' (simpler)
-   * - A/B test 'standard' vs 'single-page' for conversion
    */
   checkoutFlowVariant: new Rox.RoxString('standard', ['standard', 'express', 'single-page']),
 
   /**
    * 8. Promotional Banner Theme
    *
-   * 📖 USE CASE: A/B test different banner color schemes
-   * 💡 PATTERN: Apply different styling based on theme string
+   * USE CASE: A/B test different banner themes for outdoor campaigns
+   * PATTERN: Apply different styling/messaging based on theme string
    *
    * BUSINESS VALUE:
-   * - Test which color scheme gets more clicks
+   * - Test which nature-inspired theme gets more clicks
    * - Optimize promotional banner effectiveness
-   * - Match seasonal themes (red for holidays, etc.)
+   * - Match seasonal outdoor themes
    *
    * VARIANTS:
-   * - 'blue': Professional blue (default, trust)
-   * - 'red': Urgent red (urgency, sales)
-   * - 'gradient': Modern gradient (eye-catching, premium)
+   * - 'earth': Forest/olive tones (default, end-of-season sales)
+   * - 'alpine': Deep navy/mountain theme (free shipping, new arrivals)
+   * - 'sunset': Warm amber tones (Worn Wear, trade-in programs)
    *
    * HOW TO USE:
    * ```typescript
    * const theme = useFeatureFlagString('promoBannerTheme');
    * <PromoBanner theme={theme} />
    * ```
-   *
-   * TARGETING EXAMPLES:
-   * - Split traffic evenly across all 3 themes
-   * - Use 'red' during flash sales for urgency
-   * - Use 'gradient' for premium customers
    */
-  promoBannerTheme: new Rox.RoxString('blue', ['blue', 'red', 'gradient']),
+  promoBannerTheme: new Rox.RoxString('earth', ['earth', 'alpine', 'sunset']),
 
   // =================================================================
   // NUMBER FLAGS (3) - Numeric Configuration
@@ -248,13 +230,13 @@ export const flags = {
   /**
    * 9. Products Per Page
    *
-   * 📖 USE CASE: Control pagination size for product listings
-   * 💡 PATTERN: Slice products array based on flag value
+   * USE CASE: Control pagination size for gear listings
+   * PATTERN: Slice products array based on flag value
    *
    * BUSINESS VALUE:
-   * - Test optimal page size for user experience
+   * - Test optimal page size for browsing outdoor gear
    * - Balance performance vs. content visibility
-   * - Personalize based on user tier or device
+   * - Personalize based on customer tier or device
    *
    * OPTIONS: [12, 24, 36, 48]
    *
@@ -263,24 +245,19 @@ export const flags = {
    * const pageSize = useFeatureFlagNumber('productsPerPage');
    * const displayedProducts = products.slice(0, pageSize);
    * ```
-   *
-   * TARGETING EXAMPLES:
-   * - Premium users see 48 products (more choices)
-   * - Standard users see 24 products (balanced)
-   * - Mobile users see 12 products (faster load)
    */
   productsPerPage: new Rox.RoxNumber(24, [12, 24, 36, 48]),
 
   /**
    * 10. Cart Countdown Timer
    *
-   * 📖 USE CASE: Abandoned cart urgency timer in minutes
-   * 💡 PATTERN: Display countdown with configurable duration
+   * USE CASE: Gear reservation timer to reduce cart abandonment
+   * PATTERN: Display countdown with configurable duration
    *
    * BUSINESS VALUE:
-   * - Create urgency to reduce cart abandonment
+   * - Create urgency for popular/limited outdoor gear
    * - Test optimal timer duration for conversion
-   * - Personalize pressure based on user tier
+   * - Personalize pressure based on customer tier
    *
    * OPTIONS: [5, 10, 15, 30] minutes
    *
@@ -289,22 +266,17 @@ export const flags = {
    * const timerMinutes = useFeatureFlagNumber('cartCountdownTimer');
    * <CartTimer minutes={timerMinutes} />
    * ```
-   *
-   * TARGETING EXAMPLES:
-   * - New users: 10 minutes (more urgency)
-   * - Premium users: 30 minutes (less pressure)
-   * - A/B test 15 vs 30 minutes for optimal conversion
    */
   cartCountdownTimer: new Rox.RoxNumber(15, [5, 10, 15, 30]),
 
   /**
    * 11. Free Shipping Threshold
    *
-   * 📖 USE CASE: Minimum order value for free shipping (in dollars)
-   * 💡 PATTERN: Calculate shipping based on threshold
+   * USE CASE: Minimum order value for free standard shipping on outdoor orders
+   * PATTERN: Calculate shipping based on threshold
    *
    * BUSINESS VALUE:
-   * - Increase average order value (AOV)
+   * - Increase average order value
    * - Test different thresholds for revenue optimization
    * - Incentivize new customers with lower threshold
    *
@@ -315,11 +287,6 @@ export const flags = {
    * const threshold = useFeatureFlagNumber('freeShippingThreshold');
    * const shipping = cartTotal >= threshold ? 0 : 10;
    * ```
-   *
-   * TARGETING EXAMPLES:
-   * - New users: $35 threshold (encourage first purchase)
-   * - Standard users: $50 threshold (default)
-   * - Test $50 vs $75 for AOV impact
    */
   freeShippingThreshold: new Rox.RoxNumber(50, [35, 50, 75, 100]),
 };
@@ -327,19 +294,13 @@ export const flags = {
 /**
  * Initialize CloudBees Feature Flags SDK
  *
- * ⚙️ SETUP INSTRUCTIONS:
+ * SETUP INSTRUCTIONS:
  * 1. Get your SDK key from CloudBees Unify:
- *    - Go to Feature Management → Installation
+ *    - Go to Feature Management -> Installation
  *    - Copy the SDK key for your environment
  * 2. Create .env.local file (copy from .env.example)
  * 3. Add: VITE_CLOUDBEES_SDK_KEY=your_actual_key
  * 4. Restart dev server
- *
- * This function:
- * - Retrieves SDK key from environment
- * - Registers all flag definitions with Rox
- * - Connects to CloudBees Feature Management
- * - Enables real-time flag updates (no page refresh needed!)
  *
  * @param options - Optional Rox setup configuration
  * @returns Promise that resolves when SDK is initialized
@@ -347,13 +308,12 @@ export const flags = {
 export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Promise<void> {
   const sdkKey = import.meta.env.VITE_CLOUDBEES_SDK_KEY;
 
-  // Validate SDK key
   if (!sdkKey || sdkKey === 'your_sdk_key_here') {
     console.warn(
-      '⚠️  CloudBees SDK key not configured. Feature flags will use default values.\n' +
+      'CloudBees SDK key not configured. Feature flags will use default values.\n' +
       'To connect to CloudBees Feature Management:\n' +
       '1. Copy .env.example to .env.local\n' +
-      '2. Get your SDK key from CloudBees Unify (Feature Management → Installation)\n' +
+      '2. Get your SDK key from CloudBees Unify (Feature Management -> Installation)\n' +
       '3. Add the key to .env.local as VITE_CLOUDBEES_SDK_KEY\n' +
       '4. Restart the dev server'
     );
@@ -361,25 +321,20 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
   }
 
   try {
-    // Register all flags with Rox SDK
-    // Empty string means default namespace (recommended for simplicity)
     Rox.register('', flags);
 
-    console.log('🚀 Initializing CloudBees Feature Flags...');
+    console.log('Initializing CloudBees Feature Flags...');
 
-    // Connect to CloudBees and fetch flag configurations
     await Rox.setup(sdkKey, {
-      // Only enable development mode in local dev (adds extra logging)
       developmentOnly: import.meta.env.DEV,
       ...options,
     });
 
-    console.log('✅ CloudBees Feature Flags initialized successfully');
-    console.log(`📊 Registered ${Object.keys(flags).length} feature flags`);
+    console.log('CloudBees Feature Flags initialized successfully');
+    console.log(`Registered ${Object.keys(flags).length} feature flags`);
 
-    // Log current flag states in development (helpful for debugging)
     if (import.meta.env.DEV) {
-      console.log('🏴 Current flag states (EliteShop):');
+      console.log('Current flag states (Ridgeline Outfitters):');
       console.log('  Boolean Flags:', {
         showPromoBanner: flags.showPromoBanner.isEnabled(),
         enableExpressCheckout: flags.enableExpressCheckout.isEnabled(),
@@ -399,23 +354,18 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
       });
     }
   } catch (error) {
-    console.error('❌ Failed to initialize CloudBees Feature Flags:', error);
-    console.warn('⚠️  Continuing with default flag values');
+    console.error('Failed to initialize CloudBees Feature Flags:', error);
+    console.warn('Continuing with default flag values');
   }
 }
 
 /**
  * Type-safe flag keys for use throughout the application
- *
- * This ensures you can't reference flags that don't exist
- * TypeScript will autocomplete available flag names
  */
 export type FlagKey = keyof typeof flags;
 
 /**
  * Get all flag keys as an array
- *
- * Useful for building flag management UIs or debugging
  */
 export function getAllFlagKeys(): FlagKey[] {
   return Object.keys(flags) as FlagKey[];
@@ -424,20 +374,16 @@ export function getAllFlagKeys(): FlagKey[] {
 /**
  * Get flag type (boolean, string, or number)
  *
- * Useful for building dynamic flag management UIs
- *
  * @param key - Flag key to check
  * @returns Flag type: 'boolean', 'string', or 'number'
  */
 export function getFlagType(key: FlagKey): 'boolean' | 'string' | 'number' {
   const flag = flags[key];
 
-  // Boolean flags have isEnabled() method
   if ('isEnabled' in flag && typeof flag.isEnabled === 'function') {
     return 'boolean';
   }
 
-  // String and Number flags have getValue()
   if ('getValue' in flag) {
     const value = flag.getValue();
     return typeof value === 'number' ? 'number' : 'string';
@@ -449,36 +395,25 @@ export function getFlagType(key: FlagKey): 'boolean' | 'string' | 'number' {
 /**
  * Set Custom Properties from User Object
  *
- * This function sets all custom properties based on a user object.
+ * Sets all custom properties based on a user object.
  * Call this when a user logs in or switches profiles.
  *
  * @param user - User object with properties to set
- *
- * EXAMPLE:
- * ```typescript
- * const user = loadCurrentUser();
- * if (user) {
- *   setUserProperties(user);
- * }
- * ```
  */
 export function setUserProperties(user: User): void {
-  // Set boolean properties
   Object.entries(user.properties.booleans).forEach(([key, value]) => {
     Rox.setCustomBooleanProperty(key, value);
   });
 
-  // Set string properties
   Object.entries(user.properties.strings).forEach(([key, value]) => {
     Rox.setCustomStringProperty(key, value);
   });
 
-  // Set number properties
   Object.entries(user.properties.numbers).forEach(([key, value]) => {
     Rox.setCustomNumberProperty(key, value);
   });
 
-  console.log('🔧 User properties set for:', user.name);
+  console.log('User properties set for:', user.name);
   console.log('   Properties:', {
     booleans: user.properties.booleans,
     strings: user.properties.strings,

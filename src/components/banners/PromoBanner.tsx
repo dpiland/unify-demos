@@ -1,18 +1,18 @@
 /**
- * PromoBanner Component
+ * PromoBanner Component - Ridgeline Outfitters
  *
- * Promotional banner with different color themes for A/B testing.
- * Displays marketing messages, sales, and free shipping offers.
+ * Nature-inspired promotional banner with three A/B test themes:
+ * earth (forest/olive), alpine (deep navy), sunset (warm amber).
  */
 
 import { useState } from 'react';
-import { Alert, Button, Space, Typography } from 'antd';
-import { GiftOutlined, ThunderboltOutlined, TrophyOutlined } from '@ant-design/icons';
+import { Button, Space, Typography } from 'antd';
+import { GiftOutlined, SendOutlined, SyncOutlined } from '@ant-design/icons';
 
 const { Text } = Typography;
 
 export interface PromoBannerProps {
-  theme: 'blue' | 'red' | 'gradient';
+  theme: 'earth' | 'alpine' | 'sunset';
   freeShippingThreshold?: number;
   onDismiss?: () => void;
 }
@@ -21,7 +21,7 @@ export interface PromoBannerProps {
  * PromoBanner Component
  *
  * PATTERN: String flag controls styling and appearance variants
- * USE CASE: A/B test which banner color scheme drives more clicks
+ * USE CASE: A/B test which nature-inspired banner theme drives more clicks
  * INTEGRATION:
  * - theme from promoBannerTheme string flag
  * - freeShippingThreshold from freeShippingThreshold number flag
@@ -40,159 +40,157 @@ export function PromoBanner({ theme, freeShippingThreshold = 50, onDismiss }: Pr
     return null;
   }
 
-  // ============================================
-  // THEME: BLUE - Professional, Trustworthy
-  // ============================================
-  if (theme === 'blue') {
-    return (
-      <Alert
-        message={
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
-            <Space size={8}>
-              <GiftOutlined style={{ fontSize: 20, color: '#1890ff' }} />
-              <Text strong style={{ fontSize: 16 }}>
-                Free Shipping on Orders Over ${freeShippingThreshold}!
-              </Text>
-            </Space>
-            <Button type="primary" size="large">
-              Shop Now
-            </Button>
-          </div>
-        }
-        type="info"
-        banner
-        closable
-        onClose={handleDismiss}
-        style={{ textAlign: 'center', padding: '12px 24px' }}
-      />
-    );
-  }
+  // Dismiss button shared across all themes
+  const dismissButton = (
+    <button
+      onClick={handleDismiss}
+      style={{
+        position: 'absolute',
+        right: 16,
+        top: '50%',
+        transform: 'translateY(-50%)',
+        background: 'rgba(255,255,255,0.2)',
+        border: 'none',
+        color: '#fff',
+        fontSize: 18,
+        cursor: 'pointer',
+        width: 28,
+        height: 28,
+        borderRadius: '50%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      x
+    </button>
+  );
 
   // ============================================
-  // THEME: RED - Urgent, High-Energy
+  // THEME: EARTH - Forest/olive tones
+  // End-of-season sale messaging
   // ============================================
-  if (theme === 'red') {
+  if (theme === 'earth') {
     return (
       <div
         style={{
-          background: 'linear-gradient(135deg, #ff4d4f 0%, #cf1322 100%)',
+          background: 'linear-gradient(135deg, #3d5a3e 0%, #2d4a2e 100%)',
           color: '#fff',
           padding: '16px 24px',
           textAlign: 'center',
           position: 'relative',
         }}
       >
-        <button
-          onClick={handleDismiss}
-          style={{
-            position: 'absolute',
-            right: 16,
-            top: '50%',
-            transform: 'translateY(-50%)',
-            background: 'rgba(255,255,255,0.2)',
-            border: 'none',
-            color: '#fff',
-            fontSize: 18,
-            cursor: 'pointer',
-            width: 28,
-            height: 28,
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          ×
-        </button>
-
+        {dismissButton}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
           <Space size={8}>
-            <ThunderboltOutlined style={{ fontSize: 24 }} />
-            <Text strong style={{ fontSize: 18, color: '#fff' }}>
-              FLASH SALE: 30% OFF EVERYTHING!
+            <GiftOutlined style={{ fontSize: 20 }} />
+            <Text strong style={{ fontSize: 16, color: '#fff' }}>
+              End of Season Sale &mdash; Up to 40% off select styles
             </Text>
-            <ThunderboltOutlined style={{ fontSize: 24 }} />
           </Space>
-          <Button type="default" size="large" style={{ background: '#fff', color: '#cf1322', borderColor: '#fff' }}>
-            Shop Flash Sale
+          <Button
+            size="large"
+            style={{
+              background: '#fff',
+              color: '#2d4a2e',
+              border: 'none',
+              fontWeight: 600,
+              letterSpacing: 0.5,
+              textTransform: 'uppercase',
+              fontSize: 12,
+            }}
+          >
+            Shop Sale
           </Button>
         </div>
-        <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.9)', display: 'block', marginTop: 8 }}>
-          Use code: FLASH30 at checkout. Limited time only!
-        </Text>
       </div>
     );
   }
 
   // ============================================
-  // THEME: GRADIENT - Modern, Premium
+  // THEME: ALPINE - Deep navy/mountain
+  // Free shipping + new arrivals messaging
   // ============================================
-  if (theme === 'gradient') {
+  if (theme === 'alpine') {
     return (
       <div
         style={{
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+          background: 'linear-gradient(135deg, #1a2744 0%, #0f1b33 100%)',
           color: '#fff',
-          padding: '20px 24px',
+          padding: '16px 24px',
           textAlign: 'center',
           position: 'relative',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
         }}
       >
-        <button
-          onClick={handleDismiss}
-          style={{
-            position: 'absolute',
-            right: 16,
-            top: '50%',
-            transform: 'translateY(-50%)',
-            background: 'rgba(255,255,255,0.3)',
-            border: 'none',
-            color: '#fff',
-            fontSize: 18,
-            cursor: 'pointer',
-            width: 32,
-            height: 32,
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transition: 'all 0.3s',
-          }}
-          onMouseEnter={e => {
-            e.currentTarget.style.background = 'rgba(255,255,255,0.5)';
-          }}
-          onMouseLeave={e => {
-            e.currentTarget.style.background = 'rgba(255,255,255,0.3)';
-          }}
-        >
-          ×
-        </button>
-
+        {dismissButton}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
-          <Space size={12} align="center">
-            <TrophyOutlined style={{ fontSize: 28 }} />
+          <Space size={8}>
+            <SendOutlined style={{ fontSize: 20 }} />
+            <Text strong style={{ fontSize: 16, color: '#fff' }}>
+              Free Standard Shipping on Orders Over ${freeShippingThreshold}
+            </Text>
+          </Space>
+          <Button
+            size="large"
+            style={{
+              background: '#fff',
+              color: '#1a2744',
+              border: 'none',
+              fontWeight: 600,
+              letterSpacing: 0.5,
+              textTransform: 'uppercase',
+              fontSize: 12,
+            }}
+          >
+            Shop New Arrivals
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // ============================================
+  // THEME: SUNSET - Warm amber tones
+  // Worn Wear / trade-in messaging
+  // ============================================
+  if (theme === 'sunset') {
+    return (
+      <div
+        style={{
+          background: 'linear-gradient(135deg, #c17817 0%, #a85d10 50%, #8b4513 100%)',
+          color: '#fff',
+          padding: '16px 24px',
+          textAlign: 'center',
+          position: 'relative',
+        }}
+      >
+        {dismissButton}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
+          <Space size={8}>
+            <SyncOutlined style={{ fontSize: 20 }} />
             <div style={{ textAlign: 'left' }}>
-              <Text strong style={{ fontSize: 20, color: '#fff', display: 'block', lineHeight: 1.2 }}>
-                VIP Members Get Exclusive Access
+              <Text strong style={{ fontSize: 16, color: '#fff', display: 'block', lineHeight: 1.3 }}>
+                Worn Wear &mdash; Trade In Your Used Gear for Credit
               </Text>
-              <Text style={{ fontSize: 14, color: 'rgba(255,255,255,0.95)', display: 'block' }}>
-                Early access to new products + Free shipping on all orders
+              <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.9)' }}>
+                Keep gear in play longer. Better for you, better for the planet.
               </Text>
             </div>
           </Space>
           <Button
-            type="default"
             size="large"
             style={{
               background: '#fff',
-              color: '#667eea',
-              borderColor: '#fff',
+              color: '#8b4513',
+              border: 'none',
               fontWeight: 600,
-              boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+              letterSpacing: 0.5,
+              textTransform: 'uppercase',
+              fontSize: 12,
             }}
           >
-            Join VIP Program
+            Start Trading
           </Button>
         </div>
       </div>

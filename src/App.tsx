@@ -1,38 +1,38 @@
 /**
- * EliteShop - E-commerce Application
+ * Ridgeline Outfitters - Outdoor Gear Store
  *
- * Professional e-commerce storefront powered by CloudBees Feature Management.
+ * Patagonia-inspired outdoor gear storefront powered by CloudBees Feature Management.
  * Demonstrates 11 feature flags controlling different aspects of the shopping experience:
  *
  * BOOLEAN FLAGS (5):
- * - showPromoBanner: Toggle promotional banner visibility
- * - enableExpressCheckout: One-click checkout for premium customers
- * - enableRecommendations: AI-powered product suggestions
- * - showLoyaltyProgram: Display loyalty points and rewards
- * - enableWishlist: Wishlist/favorites feature
+ * - showPromoBanner: Toggle seasonal outdoor campaign banner
+ * - enableExpressCheckout: One-click checkout for Pro members
+ * - enableRecommendations: "Complete Your Kit" gear suggestions
+ * - showLoyaltyProgram: Peak Rewards loyalty program display
+ * - enableWishlist: Gear wishlist/save-for-later feature
  *
  * STRING FLAGS (3):
  * - productDisplayMode: A/B test layouts (grid/list/compact)
  * - checkoutFlowVariant: Test checkout UX (standard/express/single-page)
- * - promoBannerTheme: A/B test banner colors (blue/red/gradient)
+ * - promoBannerTheme: A/B test banner themes (earth/alpine/sunset)
  *
  * NUMBER FLAGS (3):
  * - productsPerPage: Control pagination size (12/24/36/48)
- * - cartCountdownTimer: Abandoned cart urgency (5/10/15/30 minutes)
+ * - cartCountdownTimer: Gear reservation timer (5/10/15/30 minutes)
  * - freeShippingThreshold: Min order for free shipping ($35/$50/$75/$100)
  */
 
-import { useState } from 'react';
-import { Badge, Button, Card, Col, Input, Layout, Row, Space, Statistic, Typography } from 'antd';
+import { useState, useRef } from 'react';
+import { Badge, Button, Layout, Space, Typography } from 'antd';
 import {
   ShoppingCartOutlined,
-  ShoppingOutlined,
-  DollarOutlined,
-  TeamOutlined,
   SearchOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 import { useFeatureFlag, useFeatureFlagString, useFeatureFlagNumber } from './hooks/useFeatureFlag';
+import { HeroSection } from './components/hero/HeroSection';
 import { PromoBanner } from './components/banners/PromoBanner';
+import { EnvironmentalBanner } from './components/banners/EnvironmentalBanner';
 import { ProductGrid } from './components/products/ProductGrid';
 import { ShoppingCart } from './components/cart/ShoppingCart';
 import { ProductRecommendations } from './components/recommendations/ProductRecommendations';
@@ -43,13 +43,70 @@ import { loadCurrentUser } from './lib/users';
 import './App.css';
 
 const { Header, Content } = Layout;
-const { Title, Text } = Typography;
+const { Text } = Typography;
+
+/** Navigation mega-menu data -- mirrors Patagonia's category structure */
+const NAV_MENUS: Record<string, { title: string; links: string[] }[]> = {
+  Featured: [
+    { title: 'Web Specials', links: ['Shop All', 'Sale Jackets', 'Sale Fleece', 'Sale Baselayers'] },
+    { title: 'Featured Collections', links: ['New Arrivals', 'Best Sellers', 'Staff Picks', 'Lightweight Layers'] },
+    { title: 'Stories', links: ['Field Reports', 'Worn Wear Stories', 'Environmental Essays'] },
+  ],
+  "Men's": [
+    { title: 'Shop by Category', links: ['Jackets & Vests', 'Fleece', 'Tops', 'Baselayers', 'Hats & Accessories'] },
+    { title: 'Shop by Activity', links: ['Snow', 'Climb', 'Trail Run', 'Hike', 'Fly Fish'] },
+    { title: 'Web Specials', links: ['Shop All'] },
+    { title: 'Featured Collections', links: ['New Arrivals', 'Best Sellers', 'Lightweight Jackets'] },
+  ],
+  "Women's": [
+    { title: 'Shop by Category', links: ['Jackets & Vests', 'Fleece', 'Tops', 'Baselayers', 'Hats & Accessories'] },
+    { title: 'Shop by Activity', links: ['Snow', 'Climb', 'Trail Run', 'Hike', 'Surf'] },
+    { title: 'Web Specials', links: ['Shop All'] },
+    { title: 'Featured Collections', links: ['New Arrivals', 'Best Sellers', 'Lightweight Jackets'] },
+  ],
+  "Kids'": [
+    { title: 'Shop by Category', links: ['Jackets & Vests', 'Fleece', 'Tops', 'Baselayers', 'Accessories'] },
+    { title: 'Shop by Age', links: ['Baby (0-2)', 'Toddler (2-5)', 'Kids (5-14)'] },
+    { title: 'Featured', links: ['New Arrivals', 'Best Sellers', 'Sale'] },
+  ],
+  'Packs & Gear': [
+    { title: 'Shop by Category', links: ['Backpacks', 'Duffel Bags', 'Tote Bags', 'Waist Packs', 'Luggage'] },
+    { title: 'Shop by Use', links: ['Everyday Carry', 'Day Hiking', 'Travel', 'Climb & Alpine'] },
+    { title: 'Featured', links: ['New Arrivals', 'Best Sellers', 'Sale'] },
+  ],
+  Sports: [
+    { title: 'Shop by Sport', links: ['Snow', 'Climb', 'Trail Run', 'Hike', 'Fly Fish', 'Surf', 'Mountain Bike'] },
+    { title: 'Featured', links: ['New Arrivals', 'Best Sellers', 'Gift Guide'] },
+  ],
+  'My Profile': [
+    { title: 'My Account', links: ['Order History', 'Saved Addresses', 'Payment Methods', 'Account Settings'] },
+    { title: 'Rewards', links: ['Peak Rewards', 'My Points', 'Redeem Rewards', 'Refer a Friend'] },
+    { title: 'My Gear', links: ['Wishlist', 'Recently Viewed', 'Worn Wear Trade-Ins', 'Product Reviews'] },
+  ],
+};
+
+/** Map nav link labels to product category filters */
+const NAV_LINK_TO_CATEGORY: Record<string, string | null> = {
+  'Shop All': null,
+  'Jackets & Vests': 'Jackets & Outerwear',
+  'Fleece': 'Fleece & Midlayers',
+  'Tops': 'Baselayers & Tops',
+  'Baselayers': 'Baselayers & Tops',
+  'Backpacks': 'Packs & Gear',
+  'Duffel Bags': 'Packs & Gear',
+  'Tote Bags': 'Packs & Gear',
+  'Waist Packs': 'Packs & Gear',
+  'Luggage': 'Packs & Gear',
+  'Hats & Accessories': 'Packs & Gear',
+  'Accessories': 'Packs & Gear',
+};
 
 /**
- * EliteShop App Component
+ * Ridgeline Outfitters App Component
  *
- * Integrates all 11 feature flags to create a personalized shopping experience.
- * Each user persona sees a different experience based on their properties.
+ * Integrates all 11 feature flags to create a personalized outdoor gear
+ * shopping experience. Each user persona sees a different experience
+ * based on their properties.
  */
 function App() {
   // ============================================
@@ -66,7 +123,7 @@ function App() {
   // String Flags - A/B testing variants
   const productDisplayMode = useFeatureFlagString('productDisplayMode') as 'grid' | 'list' | 'compact';
   const checkoutFlowVariant = useFeatureFlagString('checkoutFlowVariant') as 'standard' | 'express' | 'single-page';
-  const promoBannerTheme = useFeatureFlagString('promoBannerTheme') as 'blue' | 'red' | 'gradient';
+  const promoBannerTheme = useFeatureFlagString('promoBannerTheme') as 'earth' | 'alpine' | 'sunset';
 
   // Number Flags - Numeric configuration
   const productsPerPage = useFeatureFlagNumber('productsPerPage');
@@ -77,16 +134,18 @@ function App() {
   // STATE MANAGEMENT
   // ============================================
 
-  // Load current user and their cart
   const currentUser = loadCurrentUser();
   const userId = currentUser?.id || 'new-shopper';
   const initialCart = getCartByUserId(userId);
 
-  // Cart state
   const [cartItems, setCartItems] = useState<CartItem[]>(initialCart);
   const [cartOpen, setCartOpen] = useState(false);
+  const [activeNav, setActiveNav] = useState<string | null>(null);
+  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+  const [showRewards, setShowRewards] = useState(false);
+  const productGridRef = useRef<HTMLDivElement>(null);
+  const rewardsRef = useRef<HTMLDivElement>(null);
 
-  // Cart item count for badge
   const cartItemCount = getCartItemCount(cartItems);
 
   // ============================================
@@ -95,8 +154,6 @@ function App() {
 
   const handleAddToCart = (product: typeof PRODUCTS[0]) => {
     setCartItems(prev => addToCart(prev, product));
-    // Optional: Show success message
-    console.log('Added to cart:', product.name);
   };
 
   const handleUpdateQuantity = (productId: string, quantity: number) => {
@@ -108,12 +165,38 @@ function App() {
   };
 
   // ============================================
+  // NAV HANDLERS
+  // ============================================
+
+  const handleNavClick = (link: string) => {
+    setActiveNav(null);
+
+    // Peak Rewards: scroll to the rewards section
+    if (link === 'Peak Rewards' || link === 'My Points' || link === 'Redeem Rewards') {
+      setShowRewards(true);
+      setTimeout(() => {
+        rewardsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 50);
+      return;
+    }
+
+    // Category links: filter product grid and scroll to it
+    const category = NAV_LINK_TO_CATEGORY[link];
+    if (category !== undefined) {
+      setCategoryFilter(category);
+    } else {
+      setCategoryFilter(null);
+    }
+    setTimeout(() => {
+      productGridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  };
+
+  // ============================================
   // USER-SPECIFIC DATA
   // ============================================
 
-  // Get user-specific stats (would come from API in real app)
   const userStats = {
-    activeOrders: currentUser?.properties.numbers.cartItemCount || 0,
     loyaltyPoints: currentUser?.properties.numbers.loyaltyPoints || 0,
     membershipTier: currentUser?.properties.strings.membershipTier || 'new',
   };
@@ -121,128 +204,139 @@ function App() {
   return (
     <Layout style={{ minHeight: '100vh' }}>
       {/* ============================================
-          HEADER - Store branding, search, cart icon
+          ANNOUNCEMENT BAR - Environmental messaging
+          ============================================ */}
+      <div className="announcement-bar">
+        1% for the Planet &mdash; We donate 1% of sales to environmental causes
+      </div>
+
+      {/* ============================================
+          HEADER - Brand, navigation, cart
           ============================================ */}
       <Header
         style={{
           background: '#fff',
           padding: '0 24px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          borderBottom: '1px solid #e8e5df',
           display: 'flex',
           alignItems: 'center',
           gap: 24,
+          height: 56,
+          lineHeight: '56px',
         }}
       >
-        {/* Store Logo/Brand */}
-        <Space size={12} style={{ flexShrink: 0 }}>
-          <ShoppingOutlined style={{ fontSize: 28, color: '#1890ff' }} />
-          <Title level={3} style={{ margin: 0, color: '#1890ff', whiteSpace: 'nowrap' }}>
-            EliteShop
-          </Title>
+        {/* Mountain Logo + Brand Name */}
+        <Space size={10} style={{ flexShrink: 0 }}>
+          {/* Inline mountain ridge SVG */}
+          <svg width="28" height="20" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14 0L20 12L28 20H0L8 12L14 0Z" fill="#1a1a2e"/>
+            <path d="M8 6L12 14L16 20H0L4 14L8 6Z" fill="#2d4a2e" opacity="0.7"/>
+          </svg>
+          <span
+            style={{
+              fontSize: 16,
+              fontWeight: 700,
+              letterSpacing: 3,
+              textTransform: 'uppercase',
+              color: '#1a1a2e',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Ridgeline
+          </span>
         </Space>
 
-        {/* Search Bar */}
-        <Input
-          placeholder="Search products..."
-          prefix={<SearchOutlined />}
-          size="large"
-          style={{ maxWidth: 500, flex: 1, minWidth: 200 }}
-        />
+        {/* Mega Navigation */}
+        <nav className="mega-nav">
+          {Object.keys(NAV_MENUS).map(label => (
+            <div
+              key={label}
+              className={`mega-nav-item${activeNav === label ? ' active' : ''}`}
+              onMouseEnter={() => setActiveNav(label)}
+              onMouseLeave={() => setActiveNav(null)}
+            >
+              <span className="nav-label">
+                {label === 'My Profile' && <UserOutlined style={{ marginRight: 4 }} />}
+                {label}
+              </span>
 
-        {/* Shopping Cart Icon - leaves room for user menu on the right */}
-        <div style={{ marginLeft: 'auto', flexShrink: 0 }}>
-          <Badge count={cartItemCount} showZero offset={[-5, 5]}>
+              {activeNav === label && (
+                <div className="mega-dropdown">
+                  {NAV_MENUS[label].map(column => (
+                    <div key={column.title} className="mega-dropdown-column">
+                      <h4>{column.title}</h4>
+                      <ul>
+                        {column.links.map(link => (
+                          <li key={link}>
+                            <a onClick={(e) => { e.preventDefault(); handleNavClick(link); }}>{link}</a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </nav>
+
+        {/* Search + Cart */}
+        <Space size={16} style={{ flexShrink: 0 }}>
+          <Button
+            type="text"
+            icon={<SearchOutlined style={{ fontSize: 18, color: '#1a1a2e' }} />}
+            size="small"
+          />
+          <Badge count={cartItemCount} showZero={false} offset={[-2, 4]}>
             <Button
               type="text"
-              icon={<ShoppingCartOutlined style={{ fontSize: 24 }} />}
+              icon={<ShoppingCartOutlined style={{ fontSize: 20, color: '#1a1a2e' }} />}
               onClick={() => setCartOpen(true)}
-              size="large"
-            >
-              Cart
-            </Button>
+              size="small"
+            />
           </Badge>
-        </div>
-        {/* User menu from AppWithAuth will appear after the cart */}
+        </Space>
       </Header>
 
       {/* ============================================
           MAIN CONTENT
           ============================================ */}
-      <Content style={{ padding: '24px', background: '#f0f2f5' }}>
-        <div style={{ maxWidth: 1400, margin: '0 auto' }}>
-          <Space direction="vertical" size="large" style={{ width: '100%' }}>
+      <Content style={{ background: '#faf9f7' }}>
+
+        {/* ============================================
+            HERO SECTION - Full-bleed nature imagery
+            ============================================ */}
+        <HeroSection />
+
+        {/* ============================================
+            PROMOTIONAL BANNER (Conditional)
+            PATTERN: Boolean flag controls visibility
+            FLAG: showPromoBanner
+            THEME: promoBannerTheme (string flag)
+            ============================================ */}
+        {showPromoBanner && (
+          <PromoBanner
+            theme={promoBannerTheme}
+            freeShippingThreshold={freeShippingThreshold}
+          />
+        )}
+
+        <div style={{ maxWidth: 1400, margin: '0 auto', padding: '48px 24px' }}>
+          <Space direction="vertical" size={48} style={{ width: '100%' }}>
 
             {/* ============================================
-                PROMOTIONAL BANNER (Conditional)
-                PATTERN: Boolean flag controls visibility
-                FLAG: showPromoBanner
-                THEME: promoBannerTheme (string flag)
-                ============================================ */}
-            {showPromoBanner && (
-              <PromoBanner
-                theme={promoBannerTheme}
-                freeShippingThreshold={freeShippingThreshold}
-              />
-            )}
-
-            {/* ============================================
-                STATISTICS ROW
-                ============================================ */}
-            <Row gutter={16}>
-              <Col xs={24} sm={12} lg={6}>
-                <Card>
-                  <Statistic
-                    title="Products Available"
-                    value={PRODUCTS.length}
-                    prefix={<ShoppingOutlined />}
-                  />
-                </Card>
-              </Col>
-              <Col xs={24} sm={12} lg={6}>
-                <Card>
-                  <Statistic
-                    title="Active Orders"
-                    value={userStats.activeOrders}
-                    prefix={<ShoppingCartOutlined />}
-                    valueStyle={{ color: '#1890ff' }}
-                  />
-                </Card>
-              </Col>
-              <Col xs={24} sm={12} lg={6}>
-                <Card>
-                  <Statistic
-                    title="Monthly Revenue"
-                    value={12450}
-                    prefix={<DollarOutlined />}
-                    valueStyle={{ color: '#52c41a' }}
-                    precision={0}
-                  />
-                </Card>
-              </Col>
-              <Col xs={24} sm={12} lg={6}>
-                <Card>
-                  <Statistic
-                    title="Total Members"
-                    value={2400}
-                    prefix={<TeamOutlined />}
-                    valueStyle={{ color: '#faad14' }}
-                  />
-                </Card>
-              </Col>
-            </Row>
-
-            {/* ============================================
-                LOYALTY PROGRAM CARD (Conditional)
-                PATTERN: Boolean flag controls visibility
+                LOYALTY PROGRAM CARD (Nav-triggered only)
+                PATTERN: Boolean flag + nav trigger from My Profile > Peak Rewards
                 FLAG: showLoyaltyProgram
-                TARGETING: Premium customers with tenure > 12 months
                 ============================================ */}
-            {showLoyaltyProgram && (
-              <LoyaltyCard
-                points={userStats.loyaltyPoints}
-                tierName={userStats.membershipTier}
-                onViewRewards={() => console.log('View rewards')}
-              />
+            {showRewards && (
+              <div ref={rewardsRef}>
+                <LoyaltyCard
+                  points={userStats.loyaltyPoints}
+                  tierName={userStats.membershipTier}
+                  onViewRewards={() => console.log('View rewards')}
+                />
+              </div>
             )}
 
             {/* ============================================
@@ -253,47 +347,75 @@ function App() {
                 - productsPerPage (number): pagination size
                 - enableWishlist (boolean): show wishlist button
                 ============================================ */}
-            <Card
-              title={
-                <Space size={8}>
-                  <span style={{ fontSize: 18, fontWeight: 600 }}>Featured Products</span>
-                  <Text type="secondary" style={{ fontSize: 14, fontWeight: 'normal' }}>
-                    ({PRODUCTS.length} items)
+            <div ref={productGridRef}>
+              <div className="product-section-header">
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
+                  <span className="section-header">
+                    {categoryFilter || 'Shop All Gear'}
+                  </span>
+                  <Text type="secondary" style={{ fontSize: 13 }}>
+                    {(categoryFilter
+                      ? PRODUCTS.filter(p => p.category === categoryFilter)
+                      : PRODUCTS
+                    ).length} items
                   </Text>
+                </div>
+                <Space size={8} wrap>
+                  {['All', 'Jackets & Outerwear', 'Fleece & Midlayers', 'Baselayers & Tops', 'Packs & Gear'].map(cat => {
+                    const isActive = cat === 'All' ? !categoryFilter : categoryFilter === cat;
+                    return (
+                      <Button
+                        key={cat}
+                        size="small"
+                        type={isActive ? 'primary' : 'default'}
+                        onClick={() => setCategoryFilter(cat === 'All' ? null : cat)}
+                        style={{
+                          borderRadius: 20,
+                          fontSize: 12,
+                          fontWeight: isActive ? 600 : 400,
+                          ...(isActive
+                            ? { background: '#1a1a2e', borderColor: '#1a1a2e' }
+                            : { color: '#5c574f', borderColor: '#d9d6d0' }),
+                        }}
+                      >
+                        {cat === 'All' ? 'All' : cat}
+                      </Button>
+                    );
+                  })}
                 </Space>
-              }
-              extra={
-                <Space>
-                  <Text type="secondary" style={{ fontSize: 12 }}>
-                    Display: <strong>{productDisplayMode}</strong> • {productsPerPage} per page
-                  </Text>
-                </Space>
-              }
-            >
+              </div>
               <ProductGrid
-                products={PRODUCTS}
+                products={
+                  categoryFilter
+                    ? PRODUCTS.filter(p => p.category === categoryFilter)
+                    : PRODUCTS
+                }
                 displayMode={productDisplayMode}
                 productsPerPage={productsPerPage}
                 onAddToCart={handleAddToCart}
                 showWishlist={enableWishlist}
               />
-            </Card>
+            </div>
 
             {/* ============================================
                 PRODUCT RECOMMENDATIONS (Conditional)
                 PATTERN: Boolean flag controls visibility
                 FLAG: enableRecommendations
-                USE CASE: A/B test impact on average order value
                 ============================================ */}
             {enableRecommendations && (
               <ProductRecommendations
                 products={PRODUCTS.slice(0, 6)}
-                title="Recommended For You"
+                title="Complete Your Kit"
                 onAddToCart={handleAddToCart}
               />
             )}
           </Space>
         </div>
+
+        {/* ============================================
+            ENVIRONMENTAL BANNER - Sustainability messaging
+            ============================================ */}
+        <EnvironmentalBanner />
       </Content>
 
       {/* ============================================
@@ -303,7 +425,7 @@ function App() {
           - freeShippingThreshold (number): Free shipping calculation
           - enableExpressCheckout (boolean): Show express button
           - checkoutFlowVariant (string): Checkout flow type
-          - cartCountdownTimer (number): Urgency countdown
+          - cartCountdownTimer (number): Gear reservation countdown
           ============================================ */}
       <ShoppingCart
         open={cartOpen}

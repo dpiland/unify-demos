@@ -1,14 +1,11 @@
 /**
- * Feature Flag Constants and Metadata - EliteShop E-commerce
+ * Feature Flag Constants and Metadata - Ridgeline Outfitters
  *
- * This file provides human-readable descriptions and default values
- * for all feature flags defined in featureFlags.ts
+ * Human-readable descriptions and default values for all feature flags.
  */
 
 /**
  * Feature Flag Keys (for type-safe references)
- *
- * Use these constants instead of hardcoding strings throughout your app
  */
 export const FEATURE_FLAG_KEYS = {
   // Boolean flags
@@ -32,48 +29,43 @@ export const FEATURE_FLAG_KEYS = {
 /**
  * Flag Descriptions
  *
- * Human-readable descriptions shown in UIs and documentation
- * These explain what each flag does and when to use it
+ * Human-readable descriptions for UIs and documentation.
  */
 export const FLAG_DESCRIPTIONS: Record<string, string> = {
   // Boolean flags
   showPromoBanner:
-    'Toggle promotional banner for seasonal sales and marketing campaigns. Enable for flash sales, holidays, or special promotions.',
+    'Toggle seasonal outdoor campaign banner. Enable for end-of-season clearance, Worn Wear events, or environmental action campaigns.',
   enableExpressCheckout:
-    'Enable one-click express checkout for premium customers. Reduces friction for loyal, high-value customers.',
+    'Enable one-click express checkout for Pro members. Reduces friction for experienced outdoor enthusiasts.',
   enableRecommendations:
-    'Show AI-powered personalized product recommendations. Test impact on average order value and engagement.',
+    'Show "Complete Your Kit" gear recommendations. Suggests complementary outdoor items based on browsing.',
   showLoyaltyProgram:
-    'Display loyalty points, rewards, and tier status. Soft launch to premium members before full rollout.',
+    'Display Peak Rewards loyalty program with trail credits, tier status, and redeemable rewards.',
   enableWishlist:
-    'Allow users to save products to wishlist/favorites. Beta test feature to measure engagement impact.',
+    'Enable gear wishlist/save-for-later feature. Let customers build wishlists for upcoming trips.',
 
   // String flags
   productDisplayMode:
-    'A/B test product layout styles: grid (visual cards), list (detailed rows), or compact (dense grid).',
+    'A/B test gear display layouts: grid (visual cards), list (detailed specs), or compact (browse more gear).',
   checkoutFlowVariant:
-    'Test checkout experiences: standard (multi-step), express (one-click), or single-page (all fields at once).',
+    'Test checkout experiences: standard (multi-step), express (one-click for Pro), or single-page.',
   promoBannerTheme:
-    'A/B test promotional banner color schemes: blue (professional), red (urgent), or gradient (modern).',
+    'A/B test banner themes: earth (forest/olive tones), alpine (navy/mountain), or sunset (warm amber).',
 
   // Number flags
   productsPerPage:
-    'Control pagination size: 12 (mobile-friendly), 24 (balanced), 36 (more choice), or 48 (premium).',
+    'Control gear listing page size: 12 (mobile), 24 (balanced), 36 (browse), or 48 (power shopper).',
   cartCountdownTimer:
-    'Abandoned cart urgency timer in minutes: 5 (high urgency), 10, 15 (balanced), or 30 (relaxed).',
+    'Gear reservation timer in minutes: 5 (high demand), 10, 15 (standard), or 30 (relaxed).',
   freeShippingThreshold:
-    'Minimum order value for free shipping in dollars: $35 (new users), $50 (standard), $75, or $100.',
+    'Minimum order for free standard shipping: $35 (new), $50 (standard), $75, or $100.',
 };
 
 /**
  * Default Flag Values
  *
- * Fallback values used when:
- * - CloudBees SDK is not configured
- * - Network connection fails
- * - Flag is not defined in CloudBees Unify
- *
- * These ensure the app always has valid values to work with
+ * Fallback values used when CloudBees SDK is not configured,
+ * network connection fails, or flag is not defined in CloudBees Unify.
  */
 export const DEFAULT_FLAG_VALUES = {
   // Boolean flags - false is safe default (features start disabled)
@@ -86,7 +78,7 @@ export const DEFAULT_FLAG_VALUES = {
   // String flags - first variant is default
   productDisplayMode: 'grid',
   checkoutFlowVariant: 'standard',
-  promoBannerTheme: 'blue',
+  promoBannerTheme: 'earth',
 
   // Number flags - balanced middle values as defaults
   productsPerPage: 24,

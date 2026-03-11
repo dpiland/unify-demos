@@ -98,7 +98,7 @@ export function CartSummary({
           <Title level={4} style={{ margin: 0 }}>
             Total:
           </Title>
-          <Title level={3} style={{ margin: 0, color: '#1890ff' }}>
+          <Title level={3} style={{ margin: 0, color: '#1e3a5f' }}>
             ${total.toFixed(2)}
           </Title>
         </div>

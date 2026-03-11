@@ -5,7 +5,7 @@
  * Adapts layout based on display mode (grid, list, compact).
  */
 
-import { Badge, Button, Card, Rate, Space, Tag, Typography } from 'antd';
+import { Badge, Button, Card, Rate, Space, Typography } from 'antd';
 import { ShoppingCartOutlined, HeartOutlined } from '@ant-design/icons';
 import type { Product } from '../../lib/data/products';
 
@@ -50,7 +50,7 @@ export function ProductCard({ product, displayMode, onAddToCart, showWishlist = 
           <Badge.Ribbon
             text={badge === 'sale' ? `${discountPercent}% OFF` : badge?.toUpperCase()}
             color={
-              badge === 'sale' ? 'red' : badge === 'new' ? 'green' : badge === 'bestseller' ? 'gold' : 'blue'
+              badge === 'sale' ? '#b91c1c' : badge === 'new' ? '#2d4a2e' : badge === 'bestseller' ? '#b8860b' : '#1a2744'
             }
             style={{ display: badge ? 'block' : 'none' }}
           >
@@ -67,7 +67,7 @@ export function ProductCard({ product, displayMode, onAddToCart, showWishlist = 
           <div style={{ marginBottom: 8 }}>
             <Space direction="vertical" size={0}>
               <Space size={4}>
-                <Text strong style={{ fontSize: 16, color: salePrice ? '#ff4d4f' : '#000' }}>
+                <Text strong style={{ fontSize: 16, color: salePrice ? '#b91c1c' : '#000' }}>
                   ${displayPrice}
                 </Text>
                 {salePrice && (
@@ -116,7 +116,7 @@ export function ProductCard({ product, displayMode, onAddToCart, showWishlist = 
           <Badge.Ribbon
             text={badge === 'sale' ? `${discountPercent}% OFF` : badge?.toUpperCase()}
             color={
-              badge === 'sale' ? 'red' : badge === 'new' ? 'green' : badge === 'bestseller' ? 'gold' : 'blue'
+              badge === 'sale' ? '#b91c1c' : badge === 'new' ? '#2d4a2e' : badge === 'bestseller' ? '#b8860b' : '#1a2744'
             }
             style={{ display: badge ? 'block' : 'none' }}
           >
@@ -144,7 +144,7 @@ export function ProductCard({ product, displayMode, onAddToCart, showWishlist = 
 
             <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <Space size={8}>
-                <Text strong style={{ fontSize: 24, color: salePrice ? '#ff4d4f' : '#000' }}>
+                <Text strong style={{ fontSize: 24, color: salePrice ? '#b91c1c' : '#000' }}>
                   ${displayPrice}
                 </Text>
                 {salePrice && (
@@ -214,7 +214,7 @@ export function ProductCard({ product, displayMode, onAddToCart, showWishlist = 
 
         <div style={{ marginBottom: 12 }}>
           <Space size={8}>
-            <Text strong style={{ fontSize: 20, color: salePrice ? '#ff4d4f' : '#000' }}>
+            <Text strong style={{ fontSize: 20, color: salePrice ? '#b91c1c' : '#000' }}>
               ${displayPrice}
             </Text>
             {salePrice && (

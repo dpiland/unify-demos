@@ -26,7 +26,7 @@ export interface ProductRecommendationsProps {
  */
 export function ProductRecommendations({
   products,
-  title = 'Recommended For You',
+  title = 'Complete Your Kit',
   onAddToCart,
 }: ProductRecommendationsProps) {
   if (products.length === 0) {
@@ -39,7 +39,7 @@ export function ProductRecommendations({
         <Space size={8}>
           <span>{title}</span>
           <Text type="secondary" style={{ fontSize: 14, fontWeight: 'normal' }}>
-            Based on your browsing history
+            Gear that pairs with your selections
           </Text>
         </Space>
       }
@@ -111,12 +111,12 @@ export function ProductRecommendations({
                       borderRadius: 4,
                       background:
                         product.badge === 'sale'
-                          ? '#ff4d4f'
+                          ? '#b91c1c'
                           : product.badge === 'new'
-                          ? '#52c41a'
+                          ? '#2d4a2e'
                           : product.badge === 'bestseller'
-                          ? '#faad14'
-                          : '#1890ff',
+                          ? '#b8860b'
+                          : '#1a2744',
                       color: '#fff',
                       fontSize: 11,
                       fontWeight: 600,
@@ -153,7 +153,7 @@ export function ProductRecommendations({
                       strong
                       style={{
                         fontSize: 18,
-                        color: product.salePrice ? '#ff4d4f' : '#000',
+                        color: product.salePrice ? '#b91c1c' : '#000',
                       }}
                     >
                       ${product.salePrice || product.price}

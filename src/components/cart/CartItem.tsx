@@ -77,7 +77,7 @@ export function CartItem({ item, onUpdateQuantity, onRemove }: CartItemProps) {
 
         <Space direction="vertical" size={4} style={{ width: '100%' }}>
           <Space size={8}>
-            <Text strong style={{ fontSize: 16, color: salePrice ? '#ff4d4f' : '#000' }}>
+            <Text strong style={{ fontSize: 16, color: salePrice ? '#b91c1c' : '#000' }}>
               ${displayPrice}
             </Text>
             {salePrice && (

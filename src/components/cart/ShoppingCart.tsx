@@ -13,7 +13,7 @@ import { CartSummary } from './CartSummary';
 import type { CartItem as CartItemType, Cart } from '../../lib/data/cart';
 import { calculateCart } from '../../lib/data/cart';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 export interface ShoppingCartProps {
   open: boolean;
@@ -178,8 +178,8 @@ export function ShoppingCart({
                   onClick={() => handleCheckout('express')}
                   block
                   style={{
-                    background: '#52c41a',
-                    borderColor: '#52c41a',
+                    background: '#2d4a2e',
+                    borderColor: '#2d4a2e',
                     fontWeight: 600,
                   }}
                 >
