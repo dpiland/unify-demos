@@ -153,22 +153,29 @@ export const flags = {
   enableMobileCheckin: new Rox.Flag(),
 
   /**
-   * Show Credit Card Promotion
+   * Credit Card Promotion Variant
    *
-   * 📖 USE CASE: Display credit card promo vs. referral bonus based on cardholder status
-   * 💡 PATTERN: Toggle between acquisition and retention messaging
+   * 📖 USE CASE: A/B test credit card promo variants — sign-up offer vs. referral bonus
+   * 💡 PATTERN: Server-side variant selection for acquisition vs. retention messaging
+   *
+   * VARIANTS:
+   * - 'off': No credit card promo shown
+   * - 'signup': Sign-up promo for non-cardholders (20% off award travel)
+   * - 'referral': Referral bonus for existing cardholders (earn 100k BeeMiles)
    *
    * AIRLINE SCENARIO:
-   * - Non-cardholders see credit card sign-up benefits (20% off award travel)
-   * - Existing cardholders see referral bonus (earn 100k miles)
-   * - Controlled by hasCreditCard custom property
+   * - Non-cardholders see credit card sign-up benefits
+   * - Existing cardholders see referral bonus offer
+   * - CloudBees controls which variant each user segment sees
    *
    * IN CLOUDBEES UI:
-   * - Create as Boolean flag
-   * - Default: true (show promo to everyone)
-   * - Target rule: hasCreditCard == true → show referral instead
+   * - Create as String flag
+   * - Variants: 'off', 'signup', 'referral'
+   * - Default: 'signup'
+   * - Target rule: hasCreditCard == true → 'referral'
+   * - Can A/B test different variants per segment
    */
-  showCreditCardPromo: new Rox.Flag(true),
+  showCreditCardPromo: new Rox.RoxString('signup', ['off', 'signup', 'referral']),
 
   // ============================================
   // STRING FLAGS - A/B Testing & Variants
@@ -469,7 +476,7 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
         enablePriorityBoarding: flags.enablePriorityBoarding.isEnabled(),
         showFlightAlerts: flags.showFlightAlerts.isEnabled(),
         enableMobileCheckin: flags.enableMobileCheckin.isEnabled(),
-        showCreditCardPromo: flags.showCreditCardPromo.isEnabled(),
+        showCreditCardPromo: flags.showCreditCardPromo.getValue(),
         dashboardLayout: flags.dashboardLayout.getValue(),
         flightDisplayMode: flags.flightDisplayMode.getValue(),
         upgradePromptStyle: flags.upgradePromptStyle.getValue(),

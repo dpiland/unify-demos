@@ -56,7 +56,7 @@ export const FLAG_DESCRIPTIONS: Record<string, string> = {
     'Enable HiveAir mobile check-in and digital boarding pass features. Allows passengers to check in through the FlyHiveAir app and receive mobile boarding passes.',
 
   showCreditCardPromo:
-    'Controls credit card promotional content. Non-cardholders see sign-up benefits (20% off award travel). Existing cardholders see referral bonus offer (earn 100k BeeMiles). Uses hasCreditCard property for targeting.',
+    'Credit card promo variant. "signup" shows sign-up benefits (20% off award travel) for non-cardholders. "referral" shows referral bonus (earn 100k BeeMiles) for existing cardholders. "off" hides the promo entirely. Use CloudBees targeting rules with hasCreditCard property to assign variants.',
 
   enableStPatricksDay:
     'Festive St. Patrick\'s Day site-wide theme. Replaces brand colors with green, adds shamrock decorations and a themed banner. Enable on/around March 17th for a fun seasonal experience.',
@@ -102,7 +102,7 @@ export const DEFAULT_FLAG_VALUES = {
   enablePriorityBoarding: false,   // Enable for premium passengers
   showFlightAlerts: true,          // Important for all passengers
   enableMobileCheckin: true,       // Mobile-first strategy
-  showCreditCardPromo: true,       // Show promo to everyone by default
+  showCreditCardPromo: 'signup',   // Sign-up promo by default
   enableStPatricksDay: false,      // Enable only on March 17th
   enableMemorialDay: false,        // Enable only on Memorial Day weekend
 

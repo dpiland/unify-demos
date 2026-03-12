@@ -351,6 +351,7 @@ const CANCELLED_FLIGHTS: Flight[] = [
  */
 function App() {
   const currentUser = loadCurrentUser();
+  const hasCreditCard = currentUser?.properties.booleans.hasCreditCard ?? false;
   const [activePage, setActivePage] = useState('my-hiveair');
   const [bookSubPage, setBookSubPage] = useState<'flights' | 'hotels' | 'cars'>('flights');
   const [travelInfoSubPage, setTravelInfoSubPage] = useState<'baggage' | 'travel-req' | 'airport-maps'>('baggage');
@@ -1083,20 +1084,28 @@ function App() {
   // ============================================
   // CREDIT CARD PROMO (shared across book pages)
   //
-  // FEATURE FLAG: showCreditCardPromo (Boolean)
-  // CUSTOM PROPERTY: hasCreditCard (Boolean)
+  // FEATURE FLAG: showCreditCardPromo (String)
+  // VARIANTS: 'off' | 'signup' | 'referral'
   //
-  // Non-cardholders → Sign-up promo (20% off award travel)
-  // Existing cardholders → Referral bonus (earn 100k miles)
+  // 'signup'   → Sign-up promo for non-cardholders (20% off award travel)
+  // 'referral' → Referral bonus for existing cardholders (earn 100k miles)
+  // 'off'      → No promo shown
   //
   // IN CLOUDBEES UI:
-  // - Flag controls overall visibility of the promo module
-  // - hasCreditCard property determines which variant to show
+  // - Create as String flag with 3 variants
+  // - Target rule: hasCreditCard == true → 'referral'
+  // - Target rule: hasCreditCard == false → 'signup'
+  // - Default: 'signup'
+  //
+  // CLIENT-SIDE FALLBACK:
+  // When the flag returns the default 'signup', we check hasCreditCard
+  // locally so the correct variant displays even without CloudBees rules.
+  // CloudBees targeting rules will override this when configured.
   // ============================================
-  const showCreditCardPromo = useFeatureFlag('showCreditCardPromo');
-  const hasCreditCard = currentUser?.properties.booleans.hasCreditCard ?? false;
+  const rawPromoVariant = useFeatureFlagString('showCreditCardPromo');
+  const creditCardPromoVariant = rawPromoVariant === 'signup' && hasCreditCard ? 'referral' : rawPromoVariant;
 
-  const creditCardPromo = showCreditCardPromo ? (
+  const creditCardPromo = creditCardPromoVariant !== 'off' ? (
     <Card
       style={{
         borderRadius: 12,
@@ -1120,7 +1129,7 @@ function App() {
           />
         </Col>
         <Col xs={24} md={14}>
-          {hasCreditCard ? (
+          {creditCardPromoVariant === 'referral' ? (
             /* ---- REFERRAL BONUS (existing cardholders) ---- */
             <Space direction="vertical" size="middle">
               <Tag color="#DAA520" style={{ fontWeight: 600, fontSize: 12 }}>Card Member Exclusive</Tag>
