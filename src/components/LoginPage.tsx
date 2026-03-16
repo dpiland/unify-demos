@@ -23,14 +23,14 @@ function getUserIcon(userId: string) {
   const iconProps = { style: { fontSize: 32 } };
 
   switch (userId) {
-    case 'premium-user':
+    case 'premier-customer':
       return <CrownOutlined {...iconProps} style={{ ...iconProps.style, color: '#faad14' }} />;
-    case 'beta-tester':
+    case 'beta-banker':
       return <ExperimentOutlined {...iconProps} style={{ ...iconProps.style, color: '#722ed1' }} />;
-    case 'new-user':
+    case 'new-member':
       return <SmileOutlined {...iconProps} style={{ ...iconProps.style, color: '#52c41a' }} />;
     default:
-      return <UserOutlined {...iconProps} style={{ ...iconProps.style, color: '#1890ff' }} />;
+      return <UserOutlined {...iconProps} style={{ ...iconProps.style, color: '#1a3c5e' }} />;
   }
 }
 
@@ -39,7 +39,7 @@ function getUserIcon(userId: string) {
  */
 function getTierColor(tier: string): string {
   const colorMap: Record<string, string> = {
-    premium: 'gold',
+    premier: 'gold',
     beta: 'purple',
     new: 'green',
     standard: 'blue',
@@ -52,7 +52,7 @@ export function LoginPage({ onSelectUser }: LoginPageProps) {
     <div
       style={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: 'linear-gradient(135deg, #1a3c5e 0%, #0a1826 100%)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -62,10 +62,10 @@ export function LoginPage({ onSelectUser }: LoginPageProps) {
       <div style={{ maxWidth: 1200, width: '100%' }}>
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
           <Title level={1} style={{ color: '#fff', marginBottom: 8 }}>
-            Demo User Selector
+            Horizon Bank
           </Title>
           <Text style={{ fontSize: 16, color: 'rgba(255, 255, 255, 0.85)' }}>
-            Choose a user persona to see how features change based on targeting rules
+            Select an account profile to continue
           </Text>
         </div>
 
@@ -145,8 +145,8 @@ export function LoginPage({ onSelectUser }: LoginPageProps) {
                         <Text type="secondary">{user.properties.strings.region}</Text>
                       </div>
                       <div>
-                        <Text strong>Account Age:</Text>{' '}
-                        <Text type="secondary">{user.properties.numbers.accountAge} months</Text>
+                        <Text strong>Member Since:</Text>{' '}
+                        <Text type="secondary">{user.properties.numbers.customerTenureMonths} months</Text>
                       </div>
                     </div>
                   </div>
@@ -177,9 +177,8 @@ export function LoginPage({ onSelectUser }: LoginPageProps) {
           }}
         >
           <Text style={{ color: 'rgba(255, 255, 255, 0.85)', fontSize: 13 }}>
-            💡 <strong>Tip:</strong> Each user has different properties that can be used to target
-            feature flags in CloudBees Unify. Switch between users to see how features change
-            dynamically.
+            Each customer profile has different account attributes used for personalized banking
+            features. Switch between profiles to see how the experience changes.
           </Text>
         </div>
       </div>

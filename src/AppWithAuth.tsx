@@ -142,7 +142,7 @@ export function AppWithAuth() {
                   width: 24,
                   height: 24,
                   borderRadius: '50%',
-                  background: '#1890ff',
+                  background: '#1a3c5e',
                   color: '#fff',
                   display: 'flex',
                   alignItems: 'center',

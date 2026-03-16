@@ -19,93 +19,64 @@ import type { RoxSetupOptions} from './types';
 import type { User } from './users';
 
 /**
- * Feature Flag Definitions
+ * Feature Flag Definitions - Horizon Bank
  *
- * These are GENERIC EXAMPLES showing the three types of feature flags.
- * Customize these for your specific use case (retail, fintech, healthcare, etc.)
+ * These flags control key banking features and allow real-time configuration
+ * via CloudBees Feature Management.
  */
 export const flags = {
   /**
-   * EXAMPLE 1: Boolean Flag - Simple On/Off Toggle
+   * Boolean Flag - Enable Instant Transfers
    *
-   * 📖 USE CASE: Enable/disable entire features or UI elements
-   * 💡 PATTERN: if (enabled) { show feature } else { hide feature }
+   * PATTERN: Conditional rendering + button styling
+   * USE CASE: Roll out instant transfer capability to eligible customers.
+   * When enabled, the "Transfer Money" button becomes "Instant Transfer"
+   * with a lightning icon and success styling.
+   * When disabled, standard 1-3 business day transfers are shown.
    *
-   * REAL-WORLD EXAMPLES:
-   * - Toggle promotional banners
-   * - Enable beta feature access
-   * - Show/hide new UI sections
-   * - Control maintenance mode
-   * - Enable experimental functionality
-   *
-   * HOW TO USE:
-   * ```typescript
-   * const showBanner = useFeatureFlag('showWelcomeBanner');
-   * return showBanner ? <Banner /> : null;
-   * ```
-   *
-   * IN CLOUDBEES UI:
-   * - Create as Boolean flag
-   * - Set default value (true/false)
-   * - Target specific users/groups if needed
+   * TARGETING EXAMPLE:
+   *   Enable IF isPremiumCustomer == true AND accountBalance > 10000
    */
-  showWelcomeBanner: new Rox.Flag(),
+  enableInstantTransfers: new Rox.Flag(),
 
   /**
-   * EXAMPLE 2: String Flag - A/B Testing Variants
+   * Boolean Flag - Show Investment Portfolio
    *
-   * 📖 USE CASE: Test different versions of a feature (A/B/C testing)
-   * 💡 PATTERN: switch (variant) { case 'A': ... case 'B': ... }
+   * PATTERN: Conditional rendering of entire section
+   * USE CASE: Show or hide the investment portfolio section.
+   * Useful for progressive rollout to premium customers or
+   * enabling investment features by region.
    *
-   * REAL-WORLD EXAMPLES:
-   * - Button styles/colors (primary, success, warning)
-   * - Layout variations (grid, list, card)
-   * - Content variations (short, long, with-image)
-   * - Pricing tiers (basic, premium, enterprise)
-   * - Checkout flows (standard, express, one-click)
-   *
-   * HOW TO USE:
-   * ```typescript
-   * const variant = useFeatureFlagString('buttonVariant');
-   * return <Button type={variant}>Click Me</Button>;
-   * ```
-   *
-   * IN CLOUDBEES UI:
-   * - Create as String flag
-   * - Define variants: 'default', 'primary', 'success'
-   * - Set percentages for A/B testing (e.g., 33% each)
-   * - Target different variants to different audiences
+   * TARGETING EXAMPLE:
+   *   Show IF hasInvestmentAccount == true OR userTier == "premier"
    */
-  buttonVariant: new Rox.RoxString('default', ['default', 'primary', 'success']),
+  showInvestmentPortfolio: new Rox.Flag(),
 
   /**
-   * EXAMPLE 3: Number Flag - Numeric Configuration
+   * String Flag - Dashboard Layout Variant
    *
-   * 📖 USE CASE: Control numeric values like limits, sizes, intervals
-   * 💡 PATTERN: const size = getNumberFlag(); <Component size={size} />
+   * PATTERN: Layout switching based on flag value
+   * USE CASE: A/B test different dashboard arrangements.
+   * - 'classic': Traditional 4-column stats, full-width sections
+   * - 'modern': Larger account overview card with 2x2 stats grid
+   * - 'compact': Tight single-column layout with condensed cards
    *
-   * REAL-WORLD EXAMPLES:
-   * - Page size (5, 10, 20, 50 items)
-   * - Refresh intervals (10s, 30s, 60s)
-   * - Max items to display
-   * - Timeouts and delays
-   * - Cache durations
-   * - Rate limits
-   *
-   * HOW TO USE:
-   * ```typescript
-   * const itemCount = useFeatureFlagNumber('itemsToDisplay');
-   * const items = data.slice(0, itemCount);
-   * return <List items={items} />;
-   * ```
-   *
-   * IN CLOUDBEES UI:
-   * - Create as Number flag
-   * - Define numeric options: 5, 10, 20, 50
-   * - Set default value (e.g., 10)
-   * - Gradually roll out higher values to test performance
+   * TARGETING EXAMPLE:
+   *   Set "modern" for 50% of new users, "classic" for existing users
    */
-  itemsToDisplay: new Rox.RoxNumber(10, [5, 10, 20, 50]),
+  dashboardLayout: new Rox.RoxString('classic', ['classic', 'modern', 'compact']),
+
+  /**
+   * Number Flag - Recent Transactions to Show
+   *
+   * PATTERN: Data slicing based on numeric value
+   * USE CASE: Control how many transactions appear on the dashboard.
+   * Lower values improve load time, higher values reduce pagination needs.
+   *
+   * TARGETING EXAMPLE:
+   *   Show 50 for premier customers, 10 for standard, 5 for new users
+   */
+  recentTransactionsToShow: new Rox.RoxNumber(10, [5, 10, 25, 50]),
 };
 
 /**
@@ -163,10 +134,11 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
 
     // Log current flag states in development (helpful for debugging)
     if (import.meta.env.DEV) {
-      console.log('🏴 Current flag states:', {
-        showWelcomeBanner: flags.showWelcomeBanner.isEnabled(),
-        buttonVariant: flags.buttonVariant.getValue(),
-        itemsToDisplay: flags.itemsToDisplay.getValue(),
+      console.log('Current flag states:', {
+        enableInstantTransfers: flags.enableInstantTransfers.isEnabled(),
+        showInvestmentPortfolio: flags.showInvestmentPortfolio.isEnabled(),
+        dashboardLayout: flags.dashboardLayout.getValue(),
+        recentTransactionsToShow: flags.recentTransactionsToShow.getValue(),
       });
     }
   } catch (error) {
