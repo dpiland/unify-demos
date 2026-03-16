@@ -12,18 +12,18 @@
  * Customize these to match your demo's target industry.
  */
 export const colors = {
-  // Primary brand colors (CloudBees blue)
+  // Primary brand colors (Horizon Bank navy)
   primary: {
-    50: '#e6f4ff',
-    100: '#bae7ff',
-    200: '#91d5ff',
-    300: '#69c0ff',
-    400: '#40a9ff',
-    500: '#1890ff', // Primary
-    600: '#096dd9',
-    700: '#0050b3',
-    800: '#003a8c',
-    900: '#002766',
+    50: '#e8edf4',
+    100: '#c5d1e3',
+    200: '#9eb3d0',
+    300: '#7795bd',
+    400: '#5a7eaf',
+    500: '#1a3c5e', // Primary - banking navy
+    600: '#163350',
+    700: '#122a42',
+    800: '#0e2134',
+    900: '#0a1826',
   },
 
   // Success colors (green)

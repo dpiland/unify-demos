@@ -33,101 +33,113 @@ export interface User {
 }
 
 /**
- * Default Demo Users
+ * Horizon Bank User Personas
  *
- * These users represent common personas for demonstrations.
- * Customize these for your specific demo use case.
+ * These represent different banking customer segments for demonstrations.
+ * Each persona has properties that can be used for feature flag targeting.
  */
 export const DEFAULT_USERS: User[] = [
   {
-    id: 'standard-user',
-    name: 'Alex Standard',
-    email: 'alex.standard@example.com',
-    description: 'Regular user with standard features',
+    id: 'standard-checking',
+    name: 'Sarah Everyday',
+    email: 'sarah.everyday@horizonbank.com',
+    description: 'Standard checking account holder with everyday banking needs',
     properties: {
       booleans: {
         isPremiumCustomer: false,
         isBetaTester: false,
         isNewUser: false,
+        hasInvestmentAccount: false,
       },
       strings: {
-        accountType: 'basic',
+        accountType: 'checking',
         userTier: 'standard',
         region: 'us-east',
-        userId: 'standard-user',
+        userId: 'standard-checking',
       },
       numbers: {
-        accountAge: 12, // months
-        usageLevel: 5, // low usage
+        accountBalance: 4250,
+        customerTenureMonths: 18,
+        creditScore: 710,
+        monthlyTransactions: 35,
       },
     },
   },
   {
-    id: 'premium-user',
-    name: 'Jordan Premium',
-    email: 'jordan.premium@example.com',
-    description: 'Premium customer with access to advanced features',
+    id: 'premier-customer',
+    name: 'Marcus Premier',
+    email: 'marcus.premier@horizonbank.com',
+    description: 'Premier banking customer with investment accounts and high balances',
     properties: {
       booleans: {
         isPremiumCustomer: true,
         isBetaTester: false,
         isNewUser: false,
+        hasInvestmentAccount: true,
       },
       strings: {
-        accountType: 'premium',
-        userTier: 'premium',
+        accountType: 'premier',
+        userTier: 'premier',
         region: 'us-west',
-        userId: 'premium-user',
+        userId: 'premier-customer',
       },
       numbers: {
-        accountAge: 36, // months
-        usageLevel: 25, // high usage
+        accountBalance: 187500,
+        customerTenureMonths: 72,
+        creditScore: 805,
+        monthlyTransactions: 85,
       },
     },
   },
   {
-    id: 'beta-tester',
-    name: 'Sam Beta',
-    email: 'sam.beta@example.com',
-    description: 'Beta tester with access to experimental features',
+    id: 'beta-banker',
+    name: 'Dev Tester',
+    email: 'dev.tester@horizonbank.com',
+    description: 'Internal beta tester with access to experimental banking features',
     properties: {
       booleans: {
         isPremiumCustomer: false,
         isBetaTester: true,
         isNewUser: false,
+        hasInvestmentAccount: true,
       },
       strings: {
-        accountType: 'basic',
+        accountType: 'checking',
         userTier: 'beta',
         region: 'us-west',
-        userId: 'beta-tester',
+        userId: 'beta-banker',
       },
       numbers: {
-        accountAge: 24, // months
-        usageLevel: 15, // medium usage
+        accountBalance: 12800,
+        customerTenureMonths: 30,
+        creditScore: 745,
+        monthlyTransactions: 50,
       },
     },
   },
   {
-    id: 'new-user',
-    name: 'Taylor New',
-    email: 'taylor.new@example.com',
-    description: 'New user just getting started',
+    id: 'new-member',
+    name: 'Priya Newmember',
+    email: 'priya.new@horizonbank.com',
+    description: 'New customer who recently opened a checking account',
     properties: {
       booleans: {
         isPremiumCustomer: false,
         isBetaTester: false,
         isNewUser: true,
+        hasInvestmentAccount: false,
       },
       strings: {
-        accountType: 'basic',
+        accountType: 'checking',
         userTier: 'new',
         region: 'us-east',
-        userId: 'new-user',
+        userId: 'new-member',
       },
       numbers: {
-        accountAge: 1, // months
-        usageLevel: 2, // very low usage
+        accountBalance: 1500,
+        customerTenureMonths: 2,
+        creditScore: 680,
+        monthlyTransactions: 12,
       },
     },
   },
