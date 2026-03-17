@@ -1,420 +1,255 @@
 /**
- * Main Application - Airline Passenger Portal
+ * Main Application - MedConnect Provider Portal
  *
- * A professional airline passenger booking portal that uses CloudBees Feature Management
- * to deliver personalized travel experiences based on passenger tier, booking class,
- * and loyalty status.
+ * A professional healthcare provider dashboard that uses CloudBees Feature Management
+ * to deliver role-based clinical features for physicians, nurses, and residents.
  *
  * FEATURE FLAGS IN USE:
- * - Boolean: enableSeatSelection, enableLoungeAccess, enablePriorityBoarding, showFlightAlerts, enableMobileCheckin
- * - String: dashboardLayout, flightDisplayMode, upgradePromptStyle
- * - Number: recentBookingsToShow, flightStatusRefreshInterval, loyaltyPointsMultiplier
+ * - Boolean: enableTelemedicine, showPatientInsights, enableCarePlans, showClinicalAlerts, enablePrescriptions, enableAIClinicalSummary
+ * - String: clinicalWorkflow, patientChartView, appointmentViewMode
+ * - Number: patientsPerPage, maxConcurrentTelehealthSessions, riskScoreThreshold
  *
  * USER TARGETING:
- * - Economy passengers: Standard features + upgrade offers
- * - Business passengers: Lounge access + priority boarding
- * - Elite members: All premium features
- * - Staff: Employee-specific features
+ * - Primary care physicians: Full clinical toolset
+ * - Specialists/Surgeons: Admin access + advanced features
+ * - Nurse practitioners: Prescribing + telemedicine, no admin
+ * - Residents: Restricted access (no prescribing, no telemedicine)
  */
 
-import { Alert, Badge, Button, Card, Col, Layout, List, Row, Space, Statistic, Tabs, Tag, Typography } from 'antd';
+import { useState } from 'react';
+import { Alert, Card, Col, Layout, List, Row, Space, Statistic, Steps, Table, Tabs, Tag, Typography } from 'antd';
 import {
-  ArrowUpOutlined,
-  ClockCircleOutlined,
-  CoffeeOutlined,
-  CrownOutlined,
-  GlobalOutlined,
-  HistoryOutlined,
-  InfoCircleOutlined,
-  RocketOutlined,
-  SearchOutlined,
+  CalendarOutlined,
+  CheckCircleOutlined,
+  ExperimentOutlined,
+  FileTextOutlined,
+  HeartOutlined,
+  MedicineBoxOutlined,
+  RobotOutlined,
+  TeamOutlined,
   ThunderboltOutlined,
-  TrophyOutlined,
+  VideoCameraOutlined,
+  WarningOutlined,
 } from '@ant-design/icons';
 import { useFeatureFlag, useFeatureFlagString, useFeatureFlagNumber } from './hooks/useFeatureFlag';
-import { useFeatureFlagContext } from './contexts/FeatureFlagContext';
 import { loadCurrentUser } from './lib/users';
-import { FlightCard } from './components/airline/FlightCard';
-import { FlightTimeline } from './components/airline/FlightTimeline';
-import { FlightBooking } from './components/airline/FlightBooking';
-import { SeatSelector } from './components/airline/SeatSelector';
-import { LoungeAccessCard } from './components/airline/LoungeAccessCard';
-import { PriorityServicesCard } from './components/airline/PriorityServicesCard';
-import { MobileCheckinCard } from './components/airline/MobileCheckinCard';
-import { UpgradeOfferCard } from './components/airline/UpgradeOfferCard';
-import { FlightDealsWidget } from './components/airline/FlightDealsWidget';
+import { ClinicalAlertBanner } from './components/healthcare/ClinicalAlertBanner';
+import { TelemedicinePanel } from './components/healthcare/TelemedicinePanel';
+import { PatientInsightsPanel } from './components/healthcare/PatientInsightsPanel';
+import { CarePlanCard } from './components/healthcare/CarePlanCard';
+import { PrescriptionPanel } from './components/healthcare/PrescriptionPanel';
+import { LabResultsCard } from './components/healthcare/LabResultsCard';
+import { AIClinicalSummary } from './components/healthcare/AIClinicalSummary';
+import { AppointmentList, type Appointment } from './components/healthcare/AppointmentList';
 import './App.css';
 
 const { Header, Content } = Layout;
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
+
+// ============================================
+// DATA INTERFACES
+// ============================================
+
+interface Patient {
+  id: string;
+  name: string;
+  age: number;
+  gender: 'M' | 'F';
+  mrn: string;
+  condition: string;
+  riskScore: number;
+  lastVisit: string;
+  nextAppointment: string;
+  status: 'stable' | 'needs-attention' | 'critical' | 'discharged';
+  insuranceType: string;
+}
+
+// ============================================
+// SAMPLE DATA
+// ============================================
+
+const PATIENT_DATA: Patient[] = [
+  { id: 'p-01', name: 'Harold Jenkins', age: 67, gender: 'M', mrn: 'MRN-100234', condition: 'Type 2 Diabetes', riskScore: 9, lastVisit: '2 days ago', nextAppointment: 'Mar 18', status: 'critical', insuranceType: 'Medicare' },
+  { id: 'p-02', name: 'Dorothy Price', age: 74, gender: 'F', mrn: 'MRN-100456', condition: 'Congestive Heart Failure', riskScore: 8, lastVisit: 'Yesterday', nextAppointment: 'Mar 19', status: 'needs-attention', insuranceType: 'Medicare' },
+  { id: 'p-03', name: 'Margaret Wilson', age: 58, gender: 'F', mrn: 'MRN-100789', condition: 'Hypertension', riskScore: 5, lastVisit: 'Today', nextAppointment: 'Apr 2', status: 'stable', insuranceType: 'BlueCross' },
+  { id: 'p-04', name: 'Robert Garcia', age: 45, gender: 'M', mrn: 'MRN-101023', condition: 'Type 2 Diabetes', riskScore: 4, lastVisit: '1 week ago', nextAppointment: 'Mar 20', status: 'stable', insuranceType: 'Aetna' },
+  { id: 'p-05', name: 'Frank Russo', age: 62, gender: 'M', mrn: 'MRN-101234', condition: 'Hyperlipidemia', riskScore: 7, lastVisit: '5 days ago', nextAppointment: 'Mar 22', status: 'needs-attention', insuranceType: 'UnitedHealth' },
+  { id: 'p-06', name: 'Lisa Park', age: 51, gender: 'F', mrn: 'MRN-101456', condition: 'Post-Op Knee Replacement', riskScore: 3, lastVisit: 'Today', nextAppointment: 'Mar 23', status: 'stable', insuranceType: 'Cigna' },
+  { id: 'p-07', name: 'Betty Simmons', age: 70, gender: 'F', mrn: 'MRN-101678', condition: 'Osteoarthritis', riskScore: 6, lastVisit: '3 days ago', nextAppointment: 'Mar 25', status: 'needs-attention', insuranceType: 'Medicare' },
+  { id: 'p-08', name: 'David Kim', age: 39, gender: 'M', mrn: 'MRN-101890', condition: 'Hypothyroidism', riskScore: 2, lastVisit: '2 weeks ago', nextAppointment: 'Apr 5', status: 'stable', insuranceType: 'Aetna' },
+  { id: 'p-09', name: 'Wayne Collins', age: 55, gender: 'M', mrn: 'MRN-102012', condition: 'Pre-Diabetes / Obesity', riskScore: 5, lastVisit: '1 week ago', nextAppointment: 'Mar 28', status: 'needs-attention', insuranceType: 'BlueCross' },
+  { id: 'p-10', name: 'Joyce Yamamoto', age: 33, gender: 'F', mrn: 'MRN-102234', condition: 'Depression', riskScore: 4, lastVisit: '4 days ago', nextAppointment: 'Mar 30', status: 'stable', insuranceType: 'UnitedHealth' },
+  { id: 'p-11', name: 'Michael Thompson', age: 48, gender: 'M', mrn: 'MRN-102456', condition: 'Chronic Kidney Disease', riskScore: 8, lastVisit: 'Today', nextAppointment: 'Mar 17', status: 'critical', insuranceType: 'Medicare' },
+  { id: 'p-12', name: 'Susan Martinez', age: 61, gender: 'F', mrn: 'MRN-102678', condition: 'COPD', riskScore: 6, lastVisit: '3 days ago', nextAppointment: 'Mar 26', status: 'needs-attention', insuranceType: 'Cigna' },
+  { id: 'p-13', name: 'James O\'Brien', age: 72, gender: 'M', mrn: 'MRN-102890', condition: 'Atrial Fibrillation', riskScore: 7, lastVisit: '1 week ago', nextAppointment: 'Mar 24', status: 'needs-attention', insuranceType: 'Medicare' },
+  { id: 'p-14', name: 'Angela Foster', age: 28, gender: 'F', mrn: 'MRN-103012', condition: 'Asthma', riskScore: 2, lastVisit: '2 weeks ago', nextAppointment: 'Apr 10', status: 'stable', insuranceType: 'BlueCross' },
+  { id: 'p-15', name: 'Richard Nguyen', age: 56, gender: 'M', mrn: 'MRN-103234', condition: 'Chronic Back Pain', riskScore: 3, lastVisit: '1 week ago', nextAppointment: 'Apr 1', status: 'stable', insuranceType: 'Aetna' },
+];
+
+const APPOINTMENT_DATA: Appointment[] = [
+  { id: 'apt-1', patientName: 'Harold Jenkins', patientMrn: 'MRN-100234', type: 'in-person', time: '8:00 AM', duration: '30 min', reason: 'Diabetes Management', status: 'completed' },
+  { id: 'apt-2', patientName: 'Michael Thompson', patientMrn: 'MRN-102456', type: 'in-person', time: '8:30 AM', duration: '30 min', reason: 'CKD Follow-Up', status: 'completed' },
+  { id: 'apt-3', patientName: 'Lisa Park', patientMrn: 'MRN-101456', type: 'follow-up', time: '9:00 AM', duration: '20 min', reason: 'Post-Op Check', status: 'in-progress' },
+  { id: 'apt-4', patientName: 'Margaret Wilson', patientMrn: 'MRN-100789', type: 'telehealth', time: '10:30 AM', duration: '20 min', reason: 'BP Follow-Up', status: 'confirmed' },
+  { id: 'apt-5', patientName: 'Robert Garcia', patientMrn: 'MRN-101023', type: 'telehealth', time: '11:15 AM', duration: '15 min', reason: 'Medication Review', status: 'confirmed' },
+  { id: 'apt-6', patientName: 'Dorothy Price', patientMrn: 'MRN-100456', type: 'in-person', time: '1:00 PM', duration: '30 min', reason: 'CHF Management', status: 'confirmed' },
+  { id: 'apt-7', patientName: 'Frank Russo', patientMrn: 'MRN-101234', type: 'follow-up', time: '1:45 PM', duration: '20 min', reason: 'Lipid Panel Review', status: 'confirmed' },
+  { id: 'apt-8', patientName: 'David Kim', patientMrn: 'MRN-101890', type: 'telehealth', time: '2:30 PM', duration: '15 min', reason: 'Lab Results Review', status: 'confirmed' },
+  { id: 'apt-9', patientName: 'Betty Simmons', patientMrn: 'MRN-101678', type: 'in-person', time: '3:00 PM', duration: '30 min', reason: 'Joint Pain Assessment', status: 'confirmed' },
+  { id: 'apt-10', patientName: 'Wayne Collins', patientMrn: 'MRN-102012', type: 'follow-up', time: '3:45 PM', duration: '20 min', reason: 'Weight Management', status: 'confirmed' },
+];
+
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+
+function getStatusTag(status: Patient['status']) {
+  switch (status) {
+    case 'critical':
+      return <Tag color="red">Critical</Tag>;
+    case 'needs-attention':
+      return <Tag color="orange">Needs Attention</Tag>;
+    case 'discharged':
+      return <Tag>Discharged</Tag>;
+    default:
+      return <Tag color="green">Stable</Tag>;
+  }
+}
+
+function getRiskColor(score: number): string {
+  if (score >= 8) return '#f5222d';
+  if (score >= 6) return '#faad14';
+  if (score >= 4) return '#0891b2';
+  return '#52c41a';
+}
+
+// ============================================
+// PATIENT VIEW COMPONENTS
+// ============================================
 
 /**
- * Flight Interface
- *
- * Represents a flight booking with all necessary information for the portal
+ * Table View — Detailed sortable columns
+ * PATTERN: Default patientChartView mode
  */
-interface Flight {
-  id: string;
-  flightNumber: string;
-  departure: {
-    airport: string;
-    code: string;
-    city: string;
-    time: string;
-    gate?: string;
-  };
-  arrival: {
-    airport: string;
-    code: string;
-    city: string;
-    time: string;
-    gate?: string;
-  };
-  cabinClass: string;
-  bookingRef: string;
-  status: 'scheduled' | 'boarding' | 'delayed' | 'departed' | 'completed';
-  upgradeable: boolean;
-  duration: string;
+function PatientTableView({ patients }: { patients: Patient[] }) {
+  const columns = [
+    { title: 'Name', dataIndex: 'name', key: 'name', render: (text: string) => <Text strong>{text}</Text> },
+    { title: 'MRN', dataIndex: 'mrn', key: 'mrn', render: (text: string) => <Text type="secondary">{text}</Text> },
+    { title: 'Age/Sex', key: 'demo', render: (_: unknown, r: Patient) => `${r.age}${r.gender}` },
+    { title: 'Condition', dataIndex: 'condition', key: 'condition' },
+    { title: 'Risk', dataIndex: 'riskScore', key: 'risk', render: (score: number) => <Tag color={getRiskColor(score)}>{score}/10</Tag> },
+    { title: 'Status', dataIndex: 'status', key: 'status', render: (_: string, r: Patient) => getStatusTag(r.status) },
+    { title: 'Next Appt', dataIndex: 'nextAppointment', key: 'next', render: (text: string) => <Text type="secondary">{text}</Text> },
+  ];
+
+  return <Table columns={columns} dataSource={patients} rowKey="id" pagination={false} size="small" />;
 }
 
 /**
- * Sample Flight Data
- *
- * Realistic flight bookings for demonstrating the airline portal.
- * In a production app, this would come from a booking API.
+ * Card View — Visual cards with patient summary
+ * PATTERN: patientChartView === 'card'
  */
-const FLIGHT_DATA: Flight[] = [
-  {
-    id: 'flight-001',
-    flightNumber: 'SK 1234',
-    departure: {
-      airport: 'John F. Kennedy International',
-      code: 'JFK',
-      city: 'New York',
-      time: '2026-03-02T15:45:00',
-      gate: 'B12',
-    },
-    arrival: {
-      airport: 'Los Angeles International',
-      code: 'LAX',
-      city: 'Los Angeles',
-      time: '2026-03-02T19:15:00',
-      gate: 'D8',
-    },
-    cabinClass: 'Economy',
-    bookingRef: 'ABC123',
-    status: 'scheduled',
-    upgradeable: true,
-    duration: '5h 30m',
-  },
-  {
-    id: 'flight-002',
-    flightNumber: 'SK 5678',
-    departure: {
-      airport: 'San Francisco International',
-      code: 'SFO',
-      city: 'San Francisco',
-      time: '2026-03-08T09:30:00',
-      gate: 'A5',
-    },
-    arrival: {
-      airport: 'Chicago O\'Hare International',
-      code: 'ORD',
-      city: 'Chicago',
-      time: '2026-03-08T15:45:00',
-      gate: 'C14',
-    },
-    cabinClass: 'Business',
-    bookingRef: 'DEF456',
-    status: 'scheduled',
-    upgradeable: false,
-    duration: '4h 15m',
-  },
-  {
-    id: 'flight-003',
-    flightNumber: 'SK 9012',
-    departure: {
-      airport: 'Miami International',
-      code: 'MIA',
-      city: 'Miami',
-      time: '2026-03-15T11:00:00',
-      gate: 'E22',
-    },
-    arrival: {
-      airport: 'Seattle-Tacoma International',
-      code: 'SEA',
-      city: 'Seattle',
-      time: '2026-03-15T14:30:00',
-      gate: 'N7',
-    },
-    cabinClass: 'Economy Plus',
-    bookingRef: 'GHI789',
-    status: 'scheduled',
-    upgradeable: true,
-    duration: '6h 30m',
-  },
-  {
-    id: 'flight-004',
-    flightNumber: 'SK 3456',
-    departure: {
-      airport: 'Boston Logan International',
-      code: 'BOS',
-      city: 'Boston',
-      time: '2026-03-22T07:15:00',
-      gate: 'B8',
-    },
-    arrival: {
-      airport: 'Denver International',
-      code: 'DEN',
-      city: 'Denver',
-      time: '2026-03-22T10:45:00',
-      gate: 'A12',
-    },
-    cabinClass: 'Economy',
-    bookingRef: 'JKL012',
-    status: 'scheduled',
-    upgradeable: true,
-    duration: '4h 30m',
-  },
-  {
-    id: 'flight-005',
-    flightNumber: 'SK 7890',
-    departure: {
-      airport: 'Dallas/Fort Worth International',
-      code: 'DFW',
-      city: 'Dallas',
-      time: '2026-03-28T16:20:00',
-      gate: 'D15',
-    },
-    arrival: {
-      airport: 'LaGuardia Airport',
-      code: 'LGA',
-      city: 'New York',
-      time: '2026-03-28T21:05:00',
-      gate: 'B4',
-    },
-    cabinClass: 'Business',
-    bookingRef: 'MNO345',
-    status: 'scheduled',
-    upgradeable: false,
-    duration: '3h 45m',
-  },
-];
+function PatientCardView({ patients }: { patients: Patient[] }) {
+  return (
+    <Row gutter={[16, 16]}>
+      {patients.map((patient) => (
+        <Col xs={24} sm={12} lg={8} key={patient.id}>
+          <Card size="small" hoverable>
+            <Space direction="vertical" size="small" style={{ width: '100%' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Text strong>{patient.name}</Text>
+                {getStatusTag(patient.status)}
+              </div>
+              <Text type="secondary">{patient.condition}</Text>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Text type="secondary">{patient.age}{patient.gender} — {patient.mrn}</Text>
+                <Tag color={getRiskColor(patient.riskScore)}>Risk: {patient.riskScore}/10</Tag>
+              </div>
+              <Text type="secondary" style={{ fontSize: 12 }}>Next: {patient.nextAppointment}</Text>
+            </Space>
+          </Card>
+        </Col>
+      ))}
+    </Row>
+  );
+}
 
 /**
- * Past Flight Data
- *
- * Completed flights for travel history.
- * Shows previous bookings with RDU destinations.
+ * Compact View — Minimal single-line entries
+ * PATTERN: patientChartView === 'compact'
  */
-const PAST_FLIGHTS: Flight[] = [
-  {
-    id: 'past-001',
-    flightNumber: 'SK 2345',
-    departure: {
-      airport: 'Raleigh-Durham International',
-      code: 'RDU',
-      city: 'Raleigh-Durham',
-      time: '2026-02-10T08:30:00',
-      gate: 'C5',
-    },
-    arrival: {
-      airport: 'John F. Kennedy International',
-      code: 'JFK',
-      city: 'New York',
-      time: '2026-02-10T10:15:00',
-      gate: 'B22',
-    },
-    cabinClass: 'Economy',
-    bookingRef: 'PQR678',
-    status: 'completed',
-    upgradeable: false,
-    duration: '1h 45m',
-  },
-  {
-    id: 'past-002',
-    flightNumber: 'SK 6789',
-    departure: {
-      airport: 'Los Angeles International',
-      code: 'LAX',
-      city: 'Los Angeles',
-      time: '2026-02-05T14:20:00',
-      gate: 'D12',
-    },
-    arrival: {
-      airport: 'Raleigh-Durham International',
-      code: 'RDU',
-      city: 'Raleigh-Durham',
-      time: '2026-02-05T22:35:00',
-      gate: 'A8',
-    },
-    cabinClass: 'Business',
-    bookingRef: 'STU901',
-    status: 'completed',
-    upgradeable: false,
-    duration: '5h 15m',
-  },
-  {
-    id: 'past-003',
-    flightNumber: 'SK 4567',
-    departure: {
-      airport: 'Raleigh-Durham International',
-      code: 'RDU',
-      city: 'Raleigh-Durham',
-      time: '2026-01-28T11:45:00',
-      gate: 'B3',
-    },
-    arrival: {
-      airport: 'Miami International',
-      code: 'MIA',
-      city: 'Miami',
-      time: '2026-01-28T14:30:00',
-      gate: 'E15',
-    },
-    cabinClass: 'Economy',
-    bookingRef: 'VWX234',
-    status: 'completed',
-    upgradeable: false,
-    duration: '2h 45m',
-  },
-  {
-    id: 'past-004',
-    flightNumber: 'SK 8901',
-    departure: {
-      airport: 'Chicago O\'Hare International',
-      code: 'ORD',
-      city: 'Chicago',
-      time: '2026-01-15T16:00:00',
-      gate: 'C9',
-    },
-    arrival: {
-      airport: 'Raleigh-Durham International',
-      code: 'RDU',
-      city: 'Raleigh-Durham',
-      time: '2026-01-15T19:15:00',
-      gate: 'A12',
-    },
-    cabinClass: 'Economy Plus',
-    bookingRef: 'YZA567',
-    status: 'completed',
-    upgradeable: false,
-    duration: '2h 15m',
-  },
-];
+function PatientCompactView({ patients }: { patients: Patient[] }) {
+  return (
+    <List
+      size="small"
+      dataSource={patients}
+      renderItem={(patient) => (
+        <List.Item>
+          <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+            <Space>
+              <Text strong>{patient.name}</Text>
+              <Text type="secondary">{patient.mrn}</Text>
+              <Text type="secondary">{patient.condition}</Text>
+            </Space>
+            <Space>
+              <Tag color={getRiskColor(patient.riskScore)}>{patient.riskScore}</Tag>
+              {getStatusTag(patient.status)}
+            </Space>
+          </Space>
+        </List.Item>
+      )}
+    />
+  );
+}
 
-/**
- * Legacy sample data - kept for reference
- * Remove this when all sections are converted to airline content
- */
-const SAMPLE_DATA = [
-  'Sample Item 1 - Example data entry',
-  'Sample Item 2 - Example data entry',
-  'Sample Item 3 - Example data entry',
-  'Sample Item 4 - Example data entry',
-  'Sample Item 5 - Example data entry',
-  'Sample Item 6 - Example data entry',
-  'Sample Item 7 - Example data entry',
-  'Sample Item 8 - Example data entry',
-  'Sample Item 9 - Example data entry',
-  'Sample Item 10 - Example data entry',
-  'Sample Item 11 - Example data entry',
-  'Sample Item 12 - Example data entry',
-  'Sample Item 13 - Example data entry',
-  'Sample Item 14 - Example data entry',
-  'Sample Item 15 - Example data entry',
-  'Sample Item 16 - Example data entry',
-  'Sample Item 17 - Example data entry',
-  'Sample Item 18 - Example data entry',
-  'Sample Item 19 - Example data entry',
-  'Sample Item 20 - Example data entry',
-  'Sample Item 21 - Example data entry',
-  'Sample Item 22 - Example data entry',
-  'Sample Item 23 - Example data entry',
-  'Sample Item 24 - Example data entry',
-  'Sample Item 25 - Example data entry',
-  'Sample Item 26 - Example data entry',
-  'Sample Item 27 - Example data entry',
-  'Sample Item 28 - Example data entry',
-  'Sample Item 29 - Example data entry',
-  'Sample Item 30 - Example data entry',
-  'Sample Item 31 - Example data entry',
-  'Sample Item 32 - Example data entry',
-  'Sample Item 33 - Example data entry',
-  'Sample Item 34 - Example data entry',
-  'Sample Item 35 - Example data entry',
-  'Sample Item 36 - Example data entry',
-  'Sample Item 37 - Example data entry',
-  'Sample Item 38 - Example data entry',
-  'Sample Item 39 - Example data entry',
-  'Sample Item 40 - Example data entry',
-  'Sample Item 41 - Example data entry',
-  'Sample Item 42 - Example data entry',
-  'Sample Item 43 - Example data entry',
-  'Sample Item 44 - Example data entry',
-  'Sample Item 45 - Example data entry',
-  'Sample Item 46 - Example data entry',
-  'Sample Item 47 - Example data entry',
-  'Sample Item 48 - Example data entry',
-  'Sample Item 49 - Example data entry',
-  'Sample Item 50 - Example data entry',
-];
+// ============================================
+// MAIN COMPONENT
+// ============================================
 
-/**
- * App Component - Airline Passenger Portal
- *
- * Main dashboard demonstrating all 11 feature flags:
- * - Boolean (5): Seat selection, lounge access, priority boarding, flight alerts, mobile check-in
- * - String (3): Dashboard layout, flight display mode, upgrade prompt style
- * - Number (3): Bookings to show, refresh interval, loyalty multiplier
- *
- * USER-AWARE FEATURES:
- * - Statistics display current user's data (miles, flights, tier)
- * - Conditional sections based on user properties (lounge, priority, upgrades)
- * - Feature flags combined with user targeting for sophisticated control
- */
 function App() {
   // ============================================
   // USER CONTEXT
   // ============================================
-  // Load current user for personalized experience
   const currentUser = loadCurrentUser();
 
   // ============================================
   // BOOLEAN FLAGS - Feature Toggles
   // ============================================
-  const enableSeatSelection = useFeatureFlag('enableSeatSelection');
-  const enableLoungeAccess = useFeatureFlag('enableLoungeAccess');
-  const enablePriorityBoarding = useFeatureFlag('enablePriorityBoarding');
-  const showFlightAlerts = useFeatureFlag('showFlightAlerts');
-  const enableMobileCheckin = useFeatureFlag('enableMobileCheckin');
+  const enableTelemedicine = useFeatureFlag('enableTelemedicine');
+  const showPatientInsights = useFeatureFlag('showPatientInsights');
+  const enableCarePlans = useFeatureFlag('enableCarePlans');
+  const showClinicalAlerts = useFeatureFlag('showClinicalAlerts');
+  const enablePrescriptions = useFeatureFlag('enablePrescriptions');
+  const enableAIClinicalSummary = useFeatureFlag('enableAIClinicalSummary');
 
   // ============================================
   // STRING FLAGS - A/B Testing & Variants
   // ============================================
-  const dashboardLayout = useFeatureFlagString('dashboardLayout');
-  const flightDisplayMode = useFeatureFlagString('flightDisplayMode');
-  const upgradePromptStyle = useFeatureFlagString('upgradePromptStyle');
+  const clinicalWorkflow = useFeatureFlagString('clinicalWorkflow');
+  const patientChartView = useFeatureFlagString('patientChartView');
+  const appointmentViewMode = useFeatureFlagString('appointmentViewMode');
 
   // ============================================
   // NUMBER FLAGS - Numeric Configuration
   // ============================================
-  const recentBookingsToShow = useFeatureFlagNumber('recentBookingsToShow');
-  const flightStatusRefreshInterval = useFeatureFlagNumber('flightStatusRefreshInterval');
-  const loyaltyPointsMultiplier = useFeatureFlagNumber('loyaltyPointsMultiplier');
+  const patientsPerPage = useFeatureFlagNumber('patientsPerPage');
+  const maxConcurrentTelehealthSessions = useFeatureFlagNumber('maxConcurrentTelehealthSessions');
+  const riskScoreThreshold = useFeatureFlagNumber('riskScoreThreshold');
 
   // ============================================
   // USER PROPERTIES
   // ============================================
-  // Extract user properties for easier access
   const userProperties = currentUser?.properties || {
     booleans: {},
     strings: {},
     numbers: {},
   };
 
-  // Calculate display values with multipliers
-  const baseMiles = userProperties.numbers.frequentFlyerMiles || 0;
-  const displayMiles = Math.floor(baseMiles * loyaltyPointsMultiplier);
+  // Active tab state — stat cards can switch tabs
+  const [activeTab, setActiveTab] = useState('patients');
+
+  // Slice patient data based on patientsPerPage number flag
+  const visiblePatients = PATIENT_DATA.slice(0, patientsPerPage);
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -430,9 +265,9 @@ function App() {
         }}
       >
         <Space>
-          <RocketOutlined style={{ fontSize: 28, color: '#1890ff' }} />
+          <MedicineBoxOutlined style={{ fontSize: 28, color: '#0891b2' }} />
           <Title level={3} style={{ margin: 0 }}>
-            SkyTravel Passenger Portal
+            MedConnect Provider Portal
           </Title>
         </Space>
       </Header>
@@ -442,237 +277,198 @@ function App() {
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
             {/* ============================================ */}
-            {/* FLIGHT STATUS ALERTS */}
+            {/* CLINICAL ALERTS */}
             {/* ============================================ */}
             {/*
-              PATTERN: Boolean flag controls notification banner visibility
-              USE CASE: Real-time flight updates, gate changes, delays
-              FLAG: showFlightAlerts (boolean)
+              PATTERN: Boolean flag controls clinical alert banner visibility
+              USE CASE: Critical lab results, overdue follow-ups, drug interactions
+              FLAG: showClinicalAlerts (boolean)
+              NOTE: Safety-critical — default is ON
             */}
-            {showFlightAlerts && (
+            {showClinicalAlerts && <ClinicalAlertBanner />}
+
+            {/* ============================================ */}
+            {/* CLINICAL WORKFLOW INDICATOR */}
+            {/* ============================================ */}
+            {/*
+              PATTERN: String flag changes the entire workflow experience
+              USE CASE: A/B test which documentation workflow reduces burnout
+              FLAG: clinicalWorkflow (string: 'standard' | 'streamlined' | 'guided')
+              DEMO STORY: "Which workflow reduces documentation time?" — a C-suite decision
+            */}
+            {clinicalWorkflow !== 'standard' && (
               <Alert
-                message="Flight Status Update"
-                description="Flight SK 1234 to LAX: On-time departure at 3:45 PM from Gate B12. Boarding begins at 3:15 PM."
+                message={
+                  clinicalWorkflow === 'streamlined'
+                    ? 'Streamlined Workflow Active'
+                    : 'Guided Workflow Active'
+                }
+                description={
+                  clinicalWorkflow === 'streamlined'
+                    ? 'Smart defaults enabled — fields auto-populate from patient history. Click any value to override.'
+                    : 'Step-by-step guided documentation — follow the checklist to complete each encounter efficiently.'
+                }
                 type="info"
                 showIcon
-                icon={<InfoCircleOutlined />}
+                icon={<ThunderboltOutlined />}
                 closable
+                banner
               />
             )}
 
             {/* ============================================ */}
-            {/* PASSENGER STATISTICS */}
+            {/* PROVIDER STATISTICS */}
             {/* ============================================ */}
             {/*
               PATTERN: Display user-specific metrics from properties
-              USE CASE: Personalized dashboard based on passenger profile
+              USE CASE: Personalized dashboard based on provider profile
               DATA SOURCE: currentUser.properties.numbers
-              FLAGS: loyaltyPointsMultiplier (number) affects miles display
             */}
             <Row gutter={16}>
-              {/* Upcoming Flights */}
               <Col xs={24} sm={12} lg={6}>
-                <Card>
+                <Card hoverable onClick={() => setActiveTab('patients')} style={{ cursor: 'pointer' }}>
                   <Statistic
-                    title="Upcoming Flights"
-                    value={userProperties.numbers.currentBookings || 1}
-                    prefix={<RocketOutlined />}
-                    valueStyle={{ color: '#1890ff' }}
+                    title="Total Patients"
+                    value={userProperties.numbers.patientPanelSize || 0}
+                    prefix={<TeamOutlined />}
+                    valueStyle={{ color: '#0891b2' }}
                   />
                 </Card>
               </Col>
-
-              {/* Loyalty Miles with Multiplier Bonus */}
               <Col xs={24} sm={12} lg={6}>
-                <Card>
+                <Card hoverable onClick={() => setActiveTab('schedule')} style={{ cursor: 'pointer' }}>
                   <Statistic
-                    title={
-                      <Space>
-                        <span>Loyalty Miles</span>
-                        {loyaltyPointsMultiplier > 1 && (
-                          <Tag color="gold" style={{ marginLeft: 4 }}>
-                            {loyaltyPointsMultiplier}x Bonus!
-                          </Tag>
-                        )}
-                      </Space>
-                    }
-                    value={displayMiles}
-                    precision={0}
-                    prefix={<TrophyOutlined />}
-                    suffix="miles"
+                    title="Today's Appointments"
+                    value={userProperties.numbers.appointmentsPerDay || 0}
+                    prefix={<CalendarOutlined />}
+                    valueStyle={{ color: '#52c41a' }}
+                  />
+                </Card>
+              </Col>
+              <Col xs={24} sm={12} lg={6}>
+                <Card hoverable onClick={() => setActiveTab('patients')} style={{ cursor: 'pointer' }}>
+                  <Statistic
+                    title="Active Care Plans"
+                    value={userProperties.numbers.activeCarePlans || 0}
+                    prefix={<FileTextOutlined />}
                     valueStyle={{ color: '#faad14' }}
                   />
                 </Card>
               </Col>
-
-              {/* Member Status with Tier Badge */}
               <Col xs={24} sm={12} lg={6}>
-                <Card>
+                <Card hoverable onClick={() => setActiveTab('labs')} style={{ cursor: 'pointer' }}>
                   <Statistic
-                    title="Member Status"
-                    value={userProperties.strings.membershipTier || 'Standard'}
-                    prefix={<CrownOutlined />}
-                    valueStyle={{
-                      color:
-                        userProperties.strings.membershipTier === 'platinum'
-                          ? '#722ed1'
-                          : userProperties.strings.membershipTier === 'employee'
-                          ? '#52c41a'
-                          : '#1890ff',
-                      textTransform: 'capitalize',
-                    }}
-                  />
-                </Card>
-              </Col>
-
-              {/* Lifetime Flights */}
-              <Col xs={24} sm={12} lg={6}>
-                <Card>
-                  <Statistic
-                    title="Lifetime Flights"
-                    value={userProperties.numbers.totalFlights || 0}
-                    prefix={<GlobalOutlined />}
-                    valueStyle={{ color: '#52c41a' }}
+                    title="Pending Results"
+                    value={7}
+                    prefix={<ExperimentOutlined />}
+                    valueStyle={{ color: '#f5222d' }}
                   />
                 </Card>
               </Col>
             </Row>
 
             {/* ============================================ */}
-            {/* MAIN NAVIGATION TABS */}
+            {/* GUIDED WORKFLOW STEPS */}
             {/* ============================================ */}
             {/*
-              PATTERN: Minimal, friction-free tabbed interface (Jony Ive inspired)
-              USE CASE: Separate booking flow from flight management
-              TABS:
-                - Book: Flight search, deals, and booking
-                - Your Flights: Existing bookings and itinerary
+              PATTERN: String flag adds entirely new UI sections
+              USE CASE: Guided workflow shows a step-by-step encounter checklist
+              FLAG: clinicalWorkflow === 'guided'
+              DEMO STORY: New residents and onboarding providers get structure
             */}
+            {clinicalWorkflow === 'guided' && (
+              <Card size="small" title={<Space><CheckCircleOutlined />Encounter Checklist</Space>}>
+                <Steps
+                  current={2}
+                  size="small"
+                  items={[
+                    { title: 'Review Chart', description: 'Patient history loaded' },
+                    { title: 'Chief Complaint', description: 'Documented' },
+                    { title: 'Examination', description: 'In progress' },
+                    { title: 'Assessment', description: 'Pending' },
+                    { title: 'Plan & Orders', description: 'Pending' },
+                    { title: 'Sign Note', description: 'Pending' },
+                  ]}
+                />
+              </Card>
+            )}
+
+            {/* ============================================ */}
+            {/* MAIN NAVIGATION TABS */}
+            {/* ============================================ */}
             <Tabs
-              defaultActiveKey="book"
+              activeKey={activeTab}
+              onChange={setActiveTab}
               size="large"
               items={[
                 {
-                  key: 'book',
+                  key: 'patients',
                   label: (
                     <Space>
-                      <SearchOutlined />
-                      <span>Book</span>
-                    </Space>
-                  ),
-                  children: (
-                    <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                      {/* Flight Search & Booking */}
-                      <div>
-                        <FlightBooking
-                          userCabinClass={
-                            currentUser?.properties.strings.cabinClass === 'business' ? 'business' : 'economy'
-                          }
-                          onBookFlight={(flight, cabinClass) => {
-                            console.log('Booked flight:', flight.flightNumber, 'in', cabinClass);
-                          }}
-                        />
-                      </div>
-
-                      {/* Top Flight Deals */}
-                      <div>
-                        <FlightDealsWidget />
-                      </div>
-                    </Space>
-                  ),
-                },
-                {
-                  key: 'flights',
-                  label: (
-                    <Space>
-                      <RocketOutlined />
-                      <span>Your Flights</span>
+                      <TeamOutlined />
+                      <span>Patients</span>
                       <Tag color="blue" style={{ marginLeft: 4 }}>
-                        {FLIGHT_DATA.length}
+                        {PATIENT_DATA.length}
                       </Tag>
                     </Space>
                   ),
                   children: (
                     <div>
-                      {/* Timeline Display Mode */}
-                      {flightDisplayMode === 'timeline' && (
-                        <FlightTimeline flights={FLIGHT_DATA.slice(0, recentBookingsToShow)} />
-                      )}
+                      {/*
+                        PATTERN: String flag switches patient list display mode
+                        FLAG: patientChartView (string: 'table' | 'card' | 'compact')
+                        NUMBER FLAG: patientsPerPage controls how many patients to show
+                      */}
+                      {patientChartView === 'table' && <PatientTableView patients={visiblePatients} />}
+                      {patientChartView === 'card' && <PatientCardView patients={visiblePatients} />}
+                      {patientChartView === 'compact' && <PatientCompactView patients={visiblePatients} />}
 
-                      {/* Card Display Mode */}
-                      {flightDisplayMode === 'card' && (
-                        <Row gutter={[16, 16]}>
-                          {FLIGHT_DATA.slice(0, recentBookingsToShow).map((flight) => (
-                            <Col xs={24} md={12} key={flight.id}>
-                              <FlightCard flight={flight} displayMode="card" />
-                            </Col>
-                          ))}
-                        </Row>
-                      )}
-
-                      {/* List Display Mode */}
-                      {flightDisplayMode === 'list' && (
-                        <div style={{ background: '#fff' }}>
-                          {FLIGHT_DATA.slice(0, recentBookingsToShow).map((flight) => (
-                            <FlightCard key={flight.id} flight={flight} displayMode="list" />
-                          ))}
-                        </div>
-                      )}
-
-                      {/* Footer with count */}
+                      {/* Footer with count — controlled by patientsPerPage number flag */}
                       <div style={{ marginTop: 24, textAlign: 'center' }}>
                         <Text type="secondary">
-                          Showing <strong>{Math.min(recentBookingsToShow, FLIGHT_DATA.length)}</strong> of{' '}
-                          {FLIGHT_DATA.length} upcoming flights
+                          Showing <strong>{Math.min(patientsPerPage, PATIENT_DATA.length)}</strong> of{' '}
+                          {PATIENT_DATA.length} patients
                         </Text>
                       </div>
                     </div>
                   ),
                 },
                 {
-                  key: 'history',
+                  key: 'schedule',
                   label: (
                     <Space>
-                      <HistoryOutlined />
-                      <span>Previous Flights</span>
-                      <Tag color="gray" style={{ marginLeft: 4 }}>
-                        {PAST_FLIGHTS.length}
+                      <CalendarOutlined />
+                      <span>Schedule</span>
+                      <Tag color="blue" style={{ marginLeft: 4 }}>
+                        {APPOINTMENT_DATA.length}
                       </Tag>
                     </Space>
                   ),
                   children: (
                     <div>
-                      {/* Timeline Display Mode */}
-                      {flightDisplayMode === 'timeline' && (
-                        <FlightTimeline flights={PAST_FLIGHTS} />
-                      )}
-
-                      {/* Card Display Mode */}
-                      {flightDisplayMode === 'card' && (
-                        <Row gutter={[16, 16]}>
-                          {PAST_FLIGHTS.map((flight) => (
-                            <Col xs={24} md={12} key={flight.id}>
-                              <FlightCard flight={flight} displayMode="card" />
-                            </Col>
-                          ))}
-                        </Row>
-                      )}
-
-                      {/* List Display Mode */}
-                      {flightDisplayMode === 'list' && (
-                        <div style={{ background: '#fff' }}>
-                          {PAST_FLIGHTS.map((flight) => (
-                            <FlightCard key={flight.id} flight={flight} displayMode="list" />
-                          ))}
-                        </div>
-                      )}
-
-                      {/* Footer with count */}
-                      <div style={{ marginTop: 24, textAlign: 'center' }}>
-                        <Text type="secondary">
-                          {PAST_FLIGHTS.length} completed flight{PAST_FLIGHTS.length !== 1 ? 's' : ''}
-                        </Text>
-                      </div>
+                      {/*
+                        PATTERN: String flag switches appointment view mode
+                        FLAG: appointmentViewMode (string: 'calendar' | 'list' | 'timeline')
+                      */}
+                      <AppointmentList
+                        appointments={APPOINTMENT_DATA}
+                        viewMode={appointmentViewMode}
+                      />
+                    </div>
+                  ),
+                },
+                {
+                  key: 'labs',
+                  label: (
+                    <Space>
+                      <ExperimentOutlined />
+                      <span>Lab Results</span>
+                    </Space>
+                  ),
+                  children: (
+                    <div>
+                      {/* Always visible — standard clinical content */}
+                      <LabResultsCard />
                     </div>
                   ),
                 },
@@ -687,96 +483,77 @@ function App() {
             {/* ============================================ */}
             {/* FEATURE-FLAGGED SECTIONS */}
             {/* ============================================ */}
-            {/* Two-column layout for desktop, single column for mobile */}
             <Row gutter={[16, 16]}>
-              {/* LEFT COLUMN - Primary Actions */}
+              {/* LEFT COLUMN - Primary Clinical Tools */}
               <Col xs={24} lg={16}>
                 <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                  {/* SEAT SELECTION */}
+                  {/* TELEMEDICINE */}
                   {/*
-                    PATTERN: Boolean flag controls visibility
-                    USE CASE: Interactive seat map for flight selection
-                    FLAG: enableSeatSelection (boolean)
-                    USER PROPERTY: isPremiumMember affects premium seat access
+                    PATTERN: Double conditional (flag AND user property)
+                    USE CASE: Virtual visit capabilities for authorized providers
+                    FLAG: enableTelemedicine (boolean)
+                    USER PROPERTY: hasTelemedicineAccess (physicians, NPs — not residents)
                   */}
-                  {enableSeatSelection && (
-                    <Card title={<Space><CrownOutlined />Select Your Seat</Space>}>
-                      <SeatSelector
-                        cabinClass={userProperties.strings.cabinClass || 'economy'}
-                        isPremiumMember={userProperties.booleans.isPremiumMember || false}
-                      />
+                  {enableTelemedicine && userProperties.booleans.hasTelemedicineAccess && (
+                    <Card title={<Space><VideoCameraOutlined />Telemedicine</Space>}>
+                      <TelemedicinePanel maxConcurrentSessions={maxConcurrentTelehealthSessions} />
                     </Card>
                   )}
 
-                  {/* MOBILE CHECK-IN */}
+                  {/* AI CLINICAL SUMMARY */}
                   {/*
-                    PATTERN: Boolean flag controls visibility
-                    USE CASE: Mobile check-in and boarding pass
-                    FLAG: enableMobileCheckin (boolean)
-                    USER PROPERTY: hasCheckedIn determines if already checked in
+                    PATTERN: Double conditional (flag AND user property)
+                    USE CASE: AI-generated visit notes — the "wow" demo feature
+                    FLAG: enableAIClinicalSummary (boolean)
+                    USER PROPERTY: isAttending (senior physicians only — not residents)
+                    DEMO STORY: High-stakes AI feature with careful role-based rollout
                   */}
-                  {enableMobileCheckin && !userProperties.booleans.hasCheckedIn && (
-                    <Card title={<Space><RocketOutlined />Mobile Check-In</Space>}>
-                      <MobileCheckinCard
-                        flightNumber={FLIGHT_DATA[0]?.flightNumber}
-                        departure={FLIGHT_DATA[0]?.departure}
-                        canCheckIn={true}
-                      />
+                  {enableAIClinicalSummary && userProperties.booleans.isAttending && (
+                    <Card title={<Space><RobotOutlined />AI Clinical Summary</Space>}>
+                      <AIClinicalSummary />
+                    </Card>
+                  )}
+
+                  {/* PRESCRIPTIONS */}
+                  {/*
+                    PATTERN: Double conditional (flag AND user property)
+                    USE CASE: Electronic prescribing for authorized prescribers
+                    FLAG: enablePrescriptions (boolean)
+                    USER PROPERTY: canPrescribe (physicians, NPs — not residents)
+                  */}
+                  {enablePrescriptions && userProperties.booleans.canPrescribe && (
+                    <Card title={<Space><MedicineBoxOutlined />Prescriptions</Space>}>
+                      <PrescriptionPanel />
                     </Card>
                   )}
                 </Space>
               </Col>
 
-              {/* RIGHT COLUMN - Premium Services & Offers */}
+              {/* RIGHT COLUMN - Insights & Care Plans */}
               <Col xs={24} lg={8}>
                 <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                  {/* LOUNGE ACCESS */}
+                  {/* PATIENT INSIGHTS */}
                   {/*
-                    PATTERN: Double conditional (flag AND user property)
-                    USE CASE: Show lounge info to eligible passengers
-                    FLAG: enableLoungeAccess (boolean)
-                    USER PROPERTY: hasLoungeAccess (business, elite, staff)
+                    PATTERN: Boolean flag + number flag combo
+                    USE CASE: AI-driven risk scores filtered by threshold
+                    FLAG: showPatientInsights (boolean)
+                    NUMBER FLAG: riskScoreThreshold controls which patients appear
                   */}
-                  {enableLoungeAccess && userProperties.booleans.hasLoungeAccess && (
-                    <Card title={<Space><CoffeeOutlined />Airport Lounge Access</Space>}>
-                      <LoungeAccessCard
-                        homeAirport={userProperties.strings.homeAirport || 'JFK'}
-                        membershipTier={userProperties.strings.membershipTier || 'standard'}
-                      />
+                  {showPatientInsights && (
+                    <Card title={<Space><HeartOutlined />Patient Insights</Space>}>
+                      <PatientInsightsPanel riskScoreThreshold={riskScoreThreshold} />
                     </Card>
                   )}
 
-                  {/* PRIORITY SERVICES */}
+                  {/* CARE PLANS */}
                   {/*
-                    PATTERN: Double conditional (flag AND user property)
-                    USE CASE: Priority boarding and services for premium passengers
-                    FLAG: enablePriorityBoarding (boolean)
-                    USER PROPERTY: hasPriorityBoarding (business, elite)
+                    PATTERN: Boolean flag controls visibility
+                    USE CASE: Care plan management for treatment tracking
+                    FLAG: enableCarePlans (boolean)
                   */}
-                  {enablePriorityBoarding && userProperties.booleans.hasPriorityBoarding && (
-                    <Card title={<Space><ThunderboltOutlined />Priority Services</Space>}>
-                      <PriorityServicesCard
-                        boardingGroup="Group 1"
-                        hasFastTrack={true}
-                        hasBaggagePriority={true}
-                      />
-                    </Card>
-                  )}
-
-                  {/* UPGRADE OFFERS */}
-                  {/*
-                    PATTERN: String flag controls presentation style
-                    USE CASE: A/B test upgrade offer conversion
-                    FLAG: upgradePromptStyle (string: 'subtle', 'prominent', 'modal')
-                    USER PROPERTY: Only show to non-business class passengers
-                  */}
-                  {!userProperties.booleans.isBusinessClass && (
-                    <Card title={<Space><ArrowUpOutlined />Upgrade Your Flight</Space>}>
-                      <UpgradeOfferCard
-                        style={upgradePromptStyle as 'subtle' | 'prominent' | 'modal'}
-                        currentClass={userProperties.strings.cabinClass || 'economy'}
-                        upgradePrice={149}
-                      />
+                  {enableCarePlans && (
+                    <Card title={<Space><FileTextOutlined />Active Care Plans</Space>}>
+                      <CarePlanCard />
                     </Card>
                   )}
                 </Space>

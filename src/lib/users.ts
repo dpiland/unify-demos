@@ -33,142 +33,127 @@ export interface User {
 }
 
 /**
- * Default Airline Passenger Personas
+ * Default Healthcare Provider Personas
  *
- * These users represent different types of airline passengers for demonstrations.
+ * These users represent different types of clinical providers for demonstrations.
  * Each persona has unique properties that enable targeted feature flag rules.
  *
  * TARGETING USE CASES:
- * - Economy passengers see standard features + upgrade offers
- * - Business passengers get lounge access and priority services
- * - Elite frequent flyers get all premium features
- * - Staff members have employee-specific features and restrictions
+ * - Primary care physicians see full clinical toolset
+ * - Specialists get admin access and advanced features
+ * - Nurse practitioners have prescribing but limited admin
+ * - Residents have restricted access (no prescribing, no telemedicine)
  */
 export const DEFAULT_USERS: User[] = [
   {
-    id: 'economy-traveler',
-    name: 'Emma Economy',
-    email: 'emma.economy@example.com',
-    description: 'Leisure traveler with economy class ticket and no loyalty status',
+    id: 'primary-care',
+    name: 'Dr. Sarah Chen',
+    email: 'sarah.chen@medconnect.com',
+    description: 'Board-certified family medicine physician with a full patient panel',
     properties: {
       booleans: {
-        hasLoungeAccess: false,
-        isPremiumMember: false,
-        isBusinessClass: false,
-        hasCheckedIn: false,
-        hasPriorityBoarding: false,
-        isFrequentFlyer: false,
+        isAttending: true,
+        hasTelemedicineAccess: true,
+        canPrescribe: true,
+        isResident: false,
+        hasAdminAccess: false,
       },
       strings: {
-        membershipTier: 'standard',
-        cabinClass: 'economy',
-        bookingType: 'leisure',
-        homeAirport: 'JFK',
+        role: 'physician',
+        department: 'family-medicine',
+        specialty: 'primary-care',
         region: 'us-east',
-        userId: 'economy-001',
+        userId: 'pcp-001',
       },
       numbers: {
-        frequentFlyerMiles: 2500,
-        totalFlights: 4,
-        membershipYears: 0,
-        averageSpend: 350,
-        currentBookings: 1,
+        patientPanelSize: 1200,
+        yearsOfExperience: 12,
+        appointmentsPerDay: 22,
+        activeCarePlans: 85,
       },
     },
   },
   {
-    id: 'business-passenger',
-    name: 'Bryan Business',
-    email: 'bryan.business@example.com',
-    description: 'Corporate traveler with business class ticket and lounge access',
+    id: 'specialist',
+    name: 'Dr. James Morton',
+    email: 'james.morton@medconnect.com',
+    description: 'Orthopedic surgeon with hospital privileges and advanced clinical access',
     properties: {
       booleans: {
-        hasLoungeAccess: true,
-        isPremiumMember: false,
-        isBusinessClass: true,
-        hasCheckedIn: true,
-        hasPriorityBoarding: true,
-        isFrequentFlyer: false,
+        isAttending: true,
+        hasTelemedicineAccess: true,
+        canPrescribe: true,
+        isResident: false,
+        hasAdminAccess: true,
       },
       strings: {
-        membershipTier: 'standard',
-        cabinClass: 'business',
-        bookingType: 'corporate',
-        homeAirport: 'LAX',
+        role: 'surgeon',
+        department: 'orthopedics',
+        specialty: 'orthopedic-surgery',
         region: 'us-west',
-        userId: 'business-001',
+        userId: 'surg-001',
       },
       numbers: {
-        frequentFlyerMiles: 15000,
-        totalFlights: 18,
-        membershipYears: 2,
-        averageSpend: 1800,
-        currentBookings: 2,
+        patientPanelSize: 450,
+        yearsOfExperience: 18,
+        appointmentsPerDay: 10,
+        activeCarePlans: 120,
       },
     },
   },
   {
-    id: 'elite-flyer',
-    name: 'Olivia Elite',
-    email: 'olivia.elite@example.com',
-    description: 'Elite frequent flyer with top-tier status and exclusive benefits',
+    id: 'nurse-practitioner',
+    name: 'Maria Lopez, NP',
+    email: 'maria.lopez@medconnect.com',
+    description: 'Family nurse practitioner managing chronic disease and wellness visits',
     properties: {
       booleans: {
-        hasLoungeAccess: true,
-        isPremiumMember: true,
-        isBusinessClass: false, // Flies economy but gets upgrades
-        hasCheckedIn: true,
-        hasPriorityBoarding: true,
-        isFrequentFlyer: true,
+        isAttending: false,
+        hasTelemedicineAccess: true,
+        canPrescribe: true,
+        isResident: false,
+        hasAdminAccess: false,
       },
       strings: {
-        membershipTier: 'platinum',
-        cabinClass: 'economy-plus',
-        bookingType: 'leisure',
-        homeAirport: 'SFO',
-        region: 'us-west',
-        userId: 'elite-001',
+        role: 'nurse-practitioner',
+        department: 'family-medicine',
+        specialty: 'chronic-disease',
+        region: 'us-east',
+        userId: 'np-001',
       },
       numbers: {
-        frequentFlyerMiles: 185000,
-        totalFlights: 127,
-        membershipYears: 8,
-        averageSpend: 2400,
-        currentBookings: 3,
+        patientPanelSize: 600,
+        yearsOfExperience: 6,
+        appointmentsPerDay: 18,
+        activeCarePlans: 45,
       },
     },
   },
   {
-    id: 'airline-staff',
-    name: 'Alex Staff',
-    email: 'alex.staff@airlineco.com',
-    description: 'Airline employee traveling on staff benefits',
+    id: 'resident',
+    name: 'Dr. Anil Patel',
+    email: 'anil.patel@medconnect.com',
+    description: 'Second-year internal medicine resident on clinical rotations',
     properties: {
       booleans: {
-        hasLoungeAccess: true,
-        isPremiumMember: false,
-        isBusinessClass: false,
-        hasCheckedIn: false,
-        hasPriorityBoarding: false,
-        isFrequentFlyer: false,
-        isStaffMember: true, // Special property for staff
+        isAttending: false,
+        hasTelemedicineAccess: false,
+        canPrescribe: false,
+        isResident: true,
+        hasAdminAccess: false,
       },
       strings: {
-        membershipTier: 'employee',
-        cabinClass: 'standby',
-        bookingType: 'employee',
-        homeAirport: 'ORD',
-        region: 'us-central',
-        userId: 'staff-001',
-        employeeDepartment: 'operations',
+        role: 'resident',
+        department: 'internal-medicine',
+        specialty: 'general',
+        region: 'us-east',
+        userId: 'res-001',
       },
       numbers: {
-        frequentFlyerMiles: 0, // Staff don't earn miles on employee travel
-        totalFlights: 52,
-        membershipYears: 5,
-        averageSpend: 0, // Employee tickets
-        currentBookings: 1,
-        employeeId: 10423,
+        patientPanelSize: 30,
+        yearsOfExperience: 1,
+        appointmentsPerDay: 8,
+        activeCarePlans: 10,
       },
     },
   },

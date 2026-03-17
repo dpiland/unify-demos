@@ -1,11 +1,9 @@
 /**
  * CloudBees Feature Flags SDK Integration
  *
- * This module provides a generic foundation for CloudBees Feature Management
- * demonstrations. It includes three example flags (boolean, string, number)
- * that showcase common feature flag patterns.
- *
- * 🎯 CUSTOMIZATION: Replace these generic flags with your use case-specific flags
+ * This module provides the feature flag definitions for the MedConnect Provider Portal.
+ * It includes healthcare-specific flags (boolean, string, number) that control
+ * clinical features based on provider role, department, and access level.
  *
  * HOW TO ADD NEW FLAGS:
  * 1. Add flag definition to the 'flags' object below
@@ -19,11 +17,11 @@ import type { RoxSetupOptions} from './types';
 import type { User } from './users';
 
 /**
- * Feature Flag Definitions - Airline Passenger Portal
+ * Feature Flag Definitions - Healthcare Provider Portal
  *
- * These flags control features in the airline passenger booking portal.
- * They demonstrate how CloudBees Feature Management enables personalized
- * travel experiences based on passenger tier, booking class, and loyalty status.
+ * These flags control clinical features in the provider dashboard.
+ * They demonstrate how CloudBees Feature Management enables role-based
+ * feature delivery for physicians, nurses, and residents.
  */
 export const flags = {
   // ============================================
@@ -31,339 +29,307 @@ export const flags = {
   // ============================================
 
   /**
-   * Enable Seat Selection
+   * Enable Telemedicine
    *
-   * 📖 USE CASE: Interactive seat map for flight seat selection
-   * 💡 PATTERN: Toggle visibility of seat selection interface
+   * USE CASE: Virtual visit / video consultation capabilities
+   * PATTERN: Toggle visibility of telemedicine panel
    *
-   * AIRLINE SCENARIO:
-   * - Progressive rollout of new seat selection UI
-   * - Test interactive seat maps before general availability
-   * - Enable for specific routes or aircraft types
+   * HEALTHCARE SCENARIO:
+   * - Progressive rollout of virtual visit capabilities
+   * - Enable for providers with hasTelemedicineAccess property
+   * - Restrict from residents who cannot conduct independent visits
    *
    * HOW TO USE:
    * ```typescript
-   * const enableSeatSelection = useFeatureFlag('enableSeatSelection');
-   * return enableSeatSelection ? <SeatSelector /> : null;
+   * const enableTelemedicine = useFeatureFlag('enableTelemedicine');
+   * const hasAccess = user.properties.booleans.hasTelemedicineAccess;
+   * return (enableTelemedicine && hasAccess) ? <TelemedicinePanel /> : null;
    * ```
    *
    * IN CLOUDBEES UI:
    * - Create as Boolean flag
    * - Default: false (rollout gradually)
-   * - Target rules: Enable for premium members first, then all users
+   * - Target rule: hasTelemedicineAccess == true
    */
-  enableSeatSelection: new Rox.Flag(),
+  enableTelemedicine: new Rox.Flag(),
 
   /**
-   * Enable Lounge Access
+   * Show Patient Insights
    *
-   * 📖 USE CASE: Airport lounge information and amenities
-   * 💡 PATTERN: Show/hide lounge access section based on eligibility
+   * USE CASE: AI-driven patient risk scores and clinical insights
+   * PATTERN: Toggle visibility of insights panel
    *
-   * AIRLINE SCENARIO:
-   * - Display lounge details only to eligible passengers
-   * - Combine flag with user property: hasLoungeAccess
-   * - Test lounge benefit visibility for upsell opportunities
+   * HEALTHCARE SCENARIO:
+   * - Display risk-stratified patient lists and care gap alerts
+   * - Enable for experienced physicians first, then expand
+   * - Uses riskScoreThreshold flag to filter highlighted patients
    *
    * HOW TO USE:
    * ```typescript
-   * const enableLoungeAccess = useFeatureFlag('enableLoungeAccess');
-   * const hasAccess = user.properties.booleans.hasLoungeAccess;
-   * return (enableLoungeAccess && hasAccess) ? <LoungeAccessCard /> : null;
+   * const showPatientInsights = useFeatureFlag('showPatientInsights');
+   * return showPatientInsights ? <PatientInsightsPanel /> : null;
    * ```
    *
    * IN CLOUDBEES UI:
    * - Create as Boolean flag
    * - Default: false
-   * - Target rule: hasLoungeAccess == true (business, elite, staff)
+   * - Target rule: isAttending == true AND yearsOfExperience > 5
    */
-  enableLoungeAccess: new Rox.Flag(),
+  showPatientInsights: new Rox.Flag(),
 
   /**
-   * Enable Priority Boarding
+   * Enable Care Plans
    *
-   * 📖 USE CASE: Priority services including boarding, security, baggage
-   * 💡 PATTERN: Display premium service benefits for eligible passengers
+   * USE CASE: Care plan creation and management
+   * PATTERN: Toggle care plan management section
    *
-   * AIRLINE SCENARIO:
-   * - Show priority boarding groups and fast-track security
-   * - Test visibility of premium services for conversion
-   * - Enable for business class and elite frequent flyers
+   * HEALTHCARE SCENARIO:
+   * - Enable for providers who can prescribe and manage treatment
+   * - Show active care plans with goals, progress, and tasks
+   * - Restrict from residents without prescribing authority
    *
    * HOW TO USE:
    * ```typescript
-   * const enablePriorityBoarding = useFeatureFlag('enablePriorityBoarding');
-   * const hasPriority = user.properties.booleans.hasPriorityBoarding;
-   * return (enablePriorityBoarding && hasPriority) ? <PriorityServicesCard /> : null;
+   * const enableCarePlans = useFeatureFlag('enableCarePlans');
+   * return enableCarePlans ? <CarePlanCard /> : null;
    * ```
    *
    * IN CLOUDBEES UI:
    * - Create as Boolean flag
    * - Default: false
-   * - Target rule: hasPriorityBoarding == true (business class, elite status)
+   * - Target rule: canPrescribe == true
    */
-  enablePriorityBoarding: new Rox.Flag(),
+  enableCarePlans: new Rox.Flag(),
 
   /**
-   * Show Flight Alerts
+   * Show Clinical Alerts
    *
-   * 📖 USE CASE: Real-time flight status notifications and updates
-   * 💡 PATTERN: Toggle notification banner visibility
+   * USE CASE: Critical lab results, drug interactions, clinical notifications
+   * PATTERN: Toggle clinical alert banner visibility
    *
-   * AIRLINE SCENARIO:
-   * - Display gate changes, delays, boarding announcements
-   * - Test different notification styles
-   * - Disable during off-peak hours to reduce noise
+   * HEALTHCARE SCENARIO:
+   * - Safety-critical: on by default for all providers
+   * - Display critical lab values, overdue follow-ups, drug interactions
+   * - Can be temporarily disabled during system maintenance
    *
    * HOW TO USE:
    * ```typescript
-   * const showFlightAlerts = useFeatureFlag('showFlightAlerts');
-   * return showFlightAlerts ? <Alert message="Flight Update" /> : null;
+   * const showClinicalAlerts = useFeatureFlag('showClinicalAlerts');
+   * return showClinicalAlerts ? <ClinicalAlertBanner /> : null;
    * ```
    *
    * IN CLOUDBEES UI:
    * - Create as Boolean flag
-   * - Default: true (important for all passengers)
-   * - Can disable temporarily for system maintenance
+   * - Default: true (safety-critical, always on)
+   * - Only disable for maintenance windows
    */
-  showFlightAlerts: new Rox.Flag(),
+  showClinicalAlerts: new Rox.Flag(),
 
   /**
-   * Enable Mobile Check-in
+   * Enable Prescriptions
    *
-   * 📖 USE CASE: Mobile check-in and digital boarding pass features
-   * 💡 PATTERN: Toggle mobile-first check-in capabilities
+   * USE CASE: Electronic prescribing and refill management
+   * PATTERN: Toggle prescription panel visibility
    *
-   * AIRLINE SCENARIO:
-   * - Gradual rollout of mobile check-in features
-   * - Test digital boarding pass adoption
-   * - Enable for specific routes or flight types
+   * HEALTHCARE SCENARIO:
+   * - Enable for providers with prescribing authority
+   * - Show pending refill requests, recent prescriptions, interactions
+   * - Double-gate with canPrescribe user property
    *
    * HOW TO USE:
    * ```typescript
-   * const enableMobileCheckin = useFeatureFlag('enableMobileCheckin');
-   * return enableMobileCheckin ? <MobileCheckinCard /> : null;
+   * const enablePrescriptions = useFeatureFlag('enablePrescriptions');
+   * const canPrescribe = user.properties.booleans.canPrescribe;
+   * return (enablePrescriptions && canPrescribe) ? <PrescriptionPanel /> : null;
    * ```
    *
    * IN CLOUDBEES UI:
    * - Create as Boolean flag
-   * - Default: true (mobile-first strategy)
-   * - Can target by device type or user preferences
+   * - Default: false
+   * - Target rule: canPrescribe == true
    */
-  enableMobileCheckin: new Rox.Flag(),
+  enablePrescriptions: new Rox.Flag(),
+
+  /**
+   * Enable AI Clinical Summary
+   *
+   * USE CASE: AI-generated visit summaries and clinical documentation
+   * PATTERN: Toggle AI-powered documentation assistant
+   *
+   * HEALTHCARE SCENARIO:
+   * - The "wow" feature — AI generates visit notes, summaries, and follow-up plans
+   * - Roll out to attendings first, then NPs, never to unsupervised residents
+   * - Demonstrates high-stakes feature rollout with careful targeting
+   * - Provider burnout from documentation is the #1 industry pain point
+   *
+   * HOW TO USE:
+   * ```typescript
+   * const enableAIClinicalSummary = useFeatureFlag('enableAIClinicalSummary');
+   * const isAttending = user.properties.booleans.isAttending;
+   * return (enableAIClinicalSummary && isAttending) ? <AIClinicalSummary /> : null;
+   * ```
+   *
+   * IN CLOUDBEES UI:
+   * - Create as Boolean flag
+   * - Default: false (high-stakes — careful rollout)
+   * - Target rule: isAttending == true AND yearsOfExperience > 5
+   */
+  enableAIClinicalSummary: new Rox.Flag(),
 
   // ============================================
   // STRING FLAGS - A/B Testing & Variants
   // ============================================
 
   /**
-   * Dashboard Layout
+   * Clinical Workflow
    *
-   * 📖 USE CASE: Test different dashboard layout variants
-   * 💡 PATTERN: Switch between layout styles for UX optimization
+   * USE CASE: A/B test which clinical documentation workflow reduces provider burnout
+   * PATTERN: Switch between workflow variants that affect the entire dashboard experience
    *
    * VARIANTS:
-   * - 'classic': Traditional airline layout with sidebar navigation
-   * - 'modern': Card-based responsive design (default, recommended)
-   * - 'compact': Dense information display for power users
+   * - 'standard': Traditional clinical workflow with full manual documentation
+   * - 'streamlined': Reduced clicks, smart defaults, auto-populated fields
+   * - 'guided': Step-by-step guided workflow with prompts and checklists
    *
-   * AIRLINE SCENARIO:
-   * - A/B test which layout drives more bookings
-   * - Modern layout optimized for mobile, classic for desktop
-   * - Compact layout for frequent flyers who want efficiency
-   *
-   * HOW TO USE:
-   * ```typescript
-   * const layout = useFeatureFlagString('dashboardLayout');
-   * switch (layout) {
-   *   case 'classic': return <ClassicLayout />;
-   *   case 'modern': return <ModernLayout />;
-   *   case 'compact': return <CompactLayout />;
-   * }
-   * ```
+   * HEALTHCARE SCENARIO:
+   * - "Which workflow reduces documentation time?" is a C-suite question
+   * - Standard for established providers who prefer control
+   * - Streamlined for high-volume clinics targeting efficiency
+   * - Guided for residents and new providers who need structure
    *
    * IN CLOUDBEES UI:
    * - Create as String flag
-   * - Variants: 'classic', 'modern', 'compact'
-   * - Default: 'modern'
-   * - A/B test: 33% each or 50% modern, 25% classic, 25% compact
+   * - Variants: 'standard', 'streamlined', 'guided'
+   * - Default: 'standard'
+   * - A/B test: measure documentation time per encounter
    */
-  dashboardLayout: new Rox.RoxString('modern', ['classic', 'modern', 'compact']),
+  clinicalWorkflow: new Rox.RoxString('standard', ['standard', 'streamlined', 'guided']),
 
   /**
-   * Flight Display Mode
+   * Patient Chart View
    *
-   * 📖 USE CASE: Control how upcoming flights are displayed
-   * 💡 PATTERN: Test different visualization styles for flight information
+   * USE CASE: Control how the patient list/chart is displayed
+   * PATTERN: Test different visualization styles for patient data
    *
    * VARIANTS:
-   * - 'timeline': Visual timeline with departure/arrival markers (default)
-   * - 'card': Individual flight cards with detailed info
-   * - 'list': Compact list view with maximum information density
+   * - 'table': Detailed table with sortable columns (default)
+   * - 'card': Visual cards with patient summary and risk indicators
+   * - 'compact': Minimal single-line entries for quick scanning
    *
-   * AIRLINE SCENARIO:
-   * - Test which display mode improves engagement
-   * - Timeline is visual and intuitive for casual travelers
-   * - List view preferred by business travelers for efficiency
-   * - Card view balances detail and visual appeal
-   *
-   * HOW TO USE:
-   * ```typescript
-   * const displayMode = useFeatureFlagString('flightDisplayMode');
-   * {displayMode === 'timeline' && <FlightTimeline />}
-   * {displayMode === 'card' && <FlightCards />}
-   * {displayMode === 'list' && <FlightList />}
-   * ```
+   * HEALTHCARE SCENARIO:
+   * - Table view for detailed clinical review
+   * - Card view for visual patient overview
+   * - Compact view for high-volume clinics
    *
    * IN CLOUDBEES UI:
    * - Create as String flag
-   * - Variants: 'timeline', 'card', 'list'
-   * - Default: 'timeline'
-   * - Target rules: 'list' for isPremiumMember == true
+   * - Variants: 'table', 'card', 'compact'
+   * - Default: 'table'
    */
-  flightDisplayMode: new Rox.RoxString('timeline', ['timeline', 'card', 'list']),
+  patientChartView: new Rox.RoxString('table', ['table', 'card', 'compact']),
 
   /**
-   * Upgrade Prompt Style
+   * Appointment View Mode
    *
-   * 📖 USE CASE: A/B test different upgrade offer presentation styles
-   * 💡 PATTERN: Optimize conversion rates for cabin upgrades
+   * USE CASE: Control how appointments are displayed
+   * PATTERN: Switch between scheduling visualization styles
    *
    * VARIANTS:
-   * - 'subtle': Small banner at bottom of flight card
-   * - 'prominent': Large card with benefits highlighted (default)
-   * - 'modal': Full-screen modal with interactive comparison
+   * - 'calendar': Mini calendar grid with appointment counts
+   * - 'list': Chronological list with time, patient, reason (default)
+   * - 'timeline': Ant Design Timeline with color-coded entries
    *
-   * AIRLINE SCENARIO:
-   * - Test which presentation style drives more upgrade purchases
-   * - Subtle for low-pressure approach
-   * - Prominent for clear value proposition
-   * - Modal for detailed comparison (highest conversion potential)
-   *
-   * HOW TO USE:
-   * ```typescript
-   * const upgradeStyle = useFeatureFlagString('upgradePromptStyle');
-   * return <UpgradeOfferCard style={upgradeStyle} />;
-   * ```
+   * HEALTHCARE SCENARIO:
+   * - Calendar for visual scheduling overview
+   * - List for quick daily agenda scanning
+   * - Timeline for chronological patient flow
    *
    * IN CLOUDBEES UI:
    * - Create as String flag
-   * - Variants: 'subtle', 'prominent', 'modal'
-   * - Default: 'prominent'
-   * - A/B test: 50% prominent vs 50% modal (exclude business class)
-   * - Target rule: isBusinessClass == false
+   * - Variants: 'calendar', 'list', 'timeline'
+   * - Default: 'list'
    */
-  upgradePromptStyle: new Rox.RoxString('prominent', ['subtle', 'prominent', 'modal']),
+  appointmentViewMode: new Rox.RoxString('list', ['calendar', 'list', 'timeline']),
 
   // ============================================
   // NUMBER FLAGS - Numeric Configuration
   // ============================================
 
   /**
-   * Recent Bookings to Show
+   * Patients Per Page
    *
-   * 📖 USE CASE: Control how many flight bookings to display
-   * 💡 PATTERN: Balance information density vs. page performance
+   * USE CASE: Control how many patients to display per page
+   * PATTERN: Balance information density vs. readability
    *
-   * OPTIONS: 2, 3, 5, 8 bookings
+   * OPTIONS: 5, 10, 20, 50 patients
    *
-   * AIRLINE SCENARIO:
-   * - Show 2-3 for casual travelers (cleaner interface)
-   * - Show 5-8 for business travelers (need to see more trips)
-   * - Test optimal number for engagement without overwhelming
-   *
-   * HOW TO USE:
-   * ```typescript
-   * const bookingCount = useFeatureFlagNumber('recentBookingsToShow');
-   * const visibleFlights = allFlights.slice(0, bookingCount);
-   * return <FlightList flights={visibleFlights} />;
-   * ```
+   * HEALTHCARE SCENARIO:
+   * - 5 for focused care reviews
+   * - 10 for standard daily workflow (default)
+   * - 20-50 for high-volume clinics or administrative review
    *
    * IN CLOUDBEES UI:
    * - Create as Number flag
-   * - Options: 2, 3, 5, 8
-   * - Default: 3
-   * - Target rules: 5 for isPremiumMember == true, 2 for isNewUser == true
+   * - Options: 5, 10, 20, 50
+   * - Default: 10
    */
-  recentBookingsToShow: new Rox.RoxNumber(3, [2, 3, 5, 8]),
+  patientsPerPage: new Rox.RoxNumber(10, [5, 10, 20, 50]),
 
   /**
-   * Flight Status Refresh Interval
+   * Max Concurrent Telehealth Sessions
    *
-   * 📖 USE CASE: Flight status update frequency in seconds
-   * 💡 PATTERN: Balance real-time accuracy vs. API load and battery usage
+   * USE CASE: Capacity management for virtual visit infrastructure
+   * PATTERN: Control how many simultaneous telehealth sessions a provider can run
    *
-   * OPTIONS: 30, 60, 120, 300 seconds (0.5min, 1min, 2min, 5min)
+   * OPTIONS: 1, 2, 3, 5 concurrent sessions
    *
-   * AIRLINE SCENARIO:
-   * - 30s for active travelers near departure time
-   * - 60s for general use (balanced)
-   * - 120s+ for longer wait times or battery saving
-   *
-   * HOW TO USE:
-   * ```typescript
-   * const refreshInterval = useFeatureFlagNumber('flightStatusRefreshInterval');
-   * useEffect(() => {
-   *   const timer = setInterval(() => fetchFlightStatus(), refreshInterval * 1000);
-   *   return () => clearInterval(timer);
-   * }, [refreshInterval]);
-   * ```
+   * HEALTHCARE SCENARIO:
+   * - "We can scale telemedicine capacity in real-time without a deploy"
+   * - 1 for standard providers (one patient at a time)
+   * - 2-3 for experienced providers running back-to-back virtual visits
+   * - 5 for group sessions or triage scenarios
+   * - Adjustable by department or provider role
    *
    * IN CLOUDBEES UI:
    * - Create as Number flag
-   * - Options: 30, 60, 120, 300
-   * - Default: 60 (1 minute)
-   * - Can increase interval during off-peak hours to reduce load
+   * - Options: 1, 2, 3, 5
+   * - Default: 2
+   * - Target rule: isAttending == true → 3, isResident == true → 1
    */
-  flightStatusRefreshInterval: new Rox.RoxNumber(60, [30, 60, 120, 300]),
+  maxConcurrentTelehealthSessions: new Rox.RoxNumber(2, [1, 2, 3, 5]),
 
   /**
-   * Loyalty Points Multiplier
+   * Risk Score Threshold
    *
-   * 📖 USE CASE: Bonus loyalty points for promotions
-   * 💡 PATTERN: Test promotional campaigns impact on loyalty program
+   * USE CASE: Minimum risk score to highlight in patient insights
+   * PATTERN: Control sensitivity of risk-based alerts
    *
-   * OPTIONS: 1, 1.5, 2, 3 (1x, 1.5x, 2x, 3x points)
+   * OPTIONS: 3, 5, 7, 9 (scale of 1-10)
    *
-   * AIRLINE SCENARIO:
-   * - 1x = standard earning (no promotion)
-   * - 1.5x = moderate promotion (weekend special)
-   * - 2x = strong promotion (double points campaign)
-   * - 3x = mega promotion (holiday special, new route launch)
-   *
-   * HOW TO USE:
-   * ```typescript
-   * const multiplier = useFeatureFlagNumber('loyaltyPointsMultiplier');
-   * const earnedPoints = basePoints * multiplier;
-   * return <Text>Earn {earnedPoints} points {multiplier > 1 && `(${multiplier}x bonus!)`}</Text>;
-   * ```
+   * HEALTHCARE SCENARIO:
+   * - 3: Show all moderate+ risk patients (high sensitivity)
+   * - 5: Balanced threshold
+   * - 7: Only elevated risk patients (default)
+   * - 9: Only critical patients (emergency focus)
    *
    * IN CLOUDBEES UI:
    * - Create as Number flag
-   * - Options: 1, 1.5, 2, 3
-   * - Default: 1 (no promotion)
-   * - Enable 2x-3x for promotional periods
-   * - Can target specific routes or membership tiers
+   * - Options: 3, 5, 7, 9
+   * - Default: 7
    */
-  loyaltyPointsMultiplier: new Rox.RoxNumber(1, [1, 1.5, 2, 3]),
+  riskScoreThreshold: new Rox.RoxNumber(7, [3, 5, 7, 9]),
 };
 
 /**
  * Initialize CloudBees Feature Flags SDK
  *
- * ⚙️ SETUP INSTRUCTIONS:
+ * SETUP INSTRUCTIONS:
  * 1. Get your SDK key from CloudBees Unify:
- *    - Go to Feature Management → Installation
+ *    - Go to Feature Management -> Installation
  *    - Copy the SDK key for your environment
  * 2. Create .env.local file (copy from .env.example)
  * 3. Add: VITE_CLOUDBEES_SDK_KEY=your_actual_key
  * 4. Restart dev server
- *
- * This function:
- * - Retrieves SDK key from environment
- * - Registers all flag definitions with Rox
- * - Connects to CloudBees Feature Management
- * - Enables real-time flag updates (no page refresh needed!)
  *
  * @param options - Optional Rox setup configuration
  * @returns Promise that resolves when SDK is initialized
@@ -386,14 +352,12 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
 
   try {
     // Register all flags with Rox SDK
-    // Empty string means default namespace (recommended for simplicity)
     Rox.register('', flags);
 
     console.log('🚀 Initializing CloudBees Feature Flags...');
 
     // Connect to CloudBees and fetch flag configurations
     await Rox.setup(sdkKey, {
-      // Only enable development mode in local dev (adds extra logging)
       developmentOnly: import.meta.env.DEV,
       ...options,
     });
@@ -401,20 +365,21 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
     console.log('✅ CloudBees Feature Flags initialized successfully');
     console.log(`📊 Registered ${Object.keys(flags).length} feature flags`);
 
-    // Log current flag states in development (helpful for debugging)
+    // Log current flag states in development
     if (import.meta.env.DEV) {
-      console.log('✈️  Current airline flag states:', {
-        enableSeatSelection: flags.enableSeatSelection.isEnabled(),
-        enableLoungeAccess: flags.enableLoungeAccess.isEnabled(),
-        enablePriorityBoarding: flags.enablePriorityBoarding.isEnabled(),
-        showFlightAlerts: flags.showFlightAlerts.isEnabled(),
-        enableMobileCheckin: flags.enableMobileCheckin.isEnabled(),
-        dashboardLayout: flags.dashboardLayout.getValue(),
-        flightDisplayMode: flags.flightDisplayMode.getValue(),
-        upgradePromptStyle: flags.upgradePromptStyle.getValue(),
-        recentBookingsToShow: flags.recentBookingsToShow.getValue(),
-        flightStatusRefreshInterval: flags.flightStatusRefreshInterval.getValue(),
-        loyaltyPointsMultiplier: flags.loyaltyPointsMultiplier.getValue(),
+      console.log('🏥 Current healthcare flag states:', {
+        enableTelemedicine: flags.enableTelemedicine.isEnabled(),
+        showPatientInsights: flags.showPatientInsights.isEnabled(),
+        enableCarePlans: flags.enableCarePlans.isEnabled(),
+        showClinicalAlerts: flags.showClinicalAlerts.isEnabled(),
+        enablePrescriptions: flags.enablePrescriptions.isEnabled(),
+        enableAIClinicalSummary: flags.enableAIClinicalSummary.isEnabled(),
+        clinicalWorkflow: flags.clinicalWorkflow.getValue(),
+        patientChartView: flags.patientChartView.getValue(),
+        appointmentViewMode: flags.appointmentViewMode.getValue(),
+        patientsPerPage: flags.patientsPerPage.getValue(),
+        maxConcurrentTelehealthSessions: flags.maxConcurrentTelehealthSessions.getValue(),
+        riskScoreThreshold: flags.riskScoreThreshold.getValue(),
       });
     }
   } catch (error) {
@@ -425,16 +390,11 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
 
 /**
  * Type-safe flag keys for use throughout the application
- *
- * This ensures you can't reference flags that don't exist
- * TypeScript will autocomplete available flag names
  */
 export type FlagKey = keyof typeof flags;
 
 /**
  * Get all flag keys as an array
- *
- * Useful for building flag management UIs or debugging
  */
 export function getAllFlagKeys(): FlagKey[] {
   return Object.keys(flags) as FlagKey[];
@@ -443,20 +403,16 @@ export function getAllFlagKeys(): FlagKey[] {
 /**
  * Get flag type (boolean, string, or number)
  *
- * Useful for building dynamic flag management UIs
- *
  * @param key - Flag key to check
  * @returns Flag type: 'boolean', 'string', or 'number'
  */
 export function getFlagType(key: FlagKey): 'boolean' | 'string' | 'number' {
   const flag = flags[key];
 
-  // Boolean flags have isEnabled() method
   if ('isEnabled' in flag && typeof flag.isEnabled === 'function') {
     return 'boolean';
   }
 
-  // String and Number flags have getValue()
   if ('getValue' in flag) {
     const value = flag.getValue();
     return typeof value === 'number' ? 'number' : 'string';
@@ -468,18 +424,10 @@ export function getFlagType(key: FlagKey): 'boolean' | 'string' | 'number' {
 /**
  * Set Custom Properties from User Object
  *
- * This function sets all custom properties based on a user object.
+ * Sets all custom properties based on a user object.
  * Call this when a user logs in or switches profiles.
  *
  * @param user - User object with properties to set
- *
- * EXAMPLE:
- * ```typescript
- * const user = loadCurrentUser();
- * if (user) {
- *   setUserProperties(user);
- * }
- * ```
  */
 export function setUserProperties(user: User): void {
   // Set boolean properties

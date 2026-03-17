@@ -12,18 +12,18 @@
  * Customize these to match your demo's target industry.
  */
 export const colors = {
-  // Primary brand colors (CloudBees blue)
+  // Primary brand colors (healthcare teal)
   primary: {
-    50: '#e6f4ff',
-    100: '#bae7ff',
-    200: '#91d5ff',
-    300: '#69c0ff',
-    400: '#40a9ff',
-    500: '#1890ff', // Primary
-    600: '#096dd9',
-    700: '#0050b3',
-    800: '#003a8c',
-    900: '#002766',
+    50: '#ecfeff',
+    100: '#cffafe',
+    200: '#a5f3fc',
+    300: '#67e8f9',
+    400: '#22d3ee',
+    500: '#0891b2', // Primary
+    600: '#0e7490',
+    700: '#155e75',
+    800: '#164e63',
+    900: '#143a4a',
   },
 
   // Success colors (green)

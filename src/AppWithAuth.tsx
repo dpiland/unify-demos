@@ -73,7 +73,7 @@ export function AppWithAuth() {
           <Text strong>{currentUser?.name}</Text>
           <br />
           <Text type="secondary" style={{ fontSize: 12 }}>
-            {currentUser?.properties.strings.userTier} • {currentUser?.properties.strings.region}
+            {currentUser?.properties.strings.role} • {currentUser?.properties.strings.department}
           </Text>
         </div>
       ),
@@ -142,7 +142,7 @@ export function AppWithAuth() {
                   width: 24,
                   height: 24,
                   borderRadius: '50%',
-                  background: '#1890ff',
+                  background: '#0891b2',
                   color: '#fff',
                   display: 'flex',
                   alignItems: 'center',

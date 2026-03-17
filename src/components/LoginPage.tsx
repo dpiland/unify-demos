@@ -7,7 +7,7 @@
  */
 
 import { Card, Row, Col, Typography, Button, Space, Tag } from 'antd';
-import { UserOutlined, CrownOutlined, RocketOutlined, TeamOutlined } from '@ant-design/icons';
+import { MedicineBoxOutlined, HeartOutlined, TeamOutlined, ReadOutlined } from '@ant-design/icons';
 import { DEFAULT_USERS, type User } from '../lib/users';
 
 const { Title, Text, Paragraph } = Typography;
@@ -17,33 +17,34 @@ interface LoginPageProps {
 }
 
 /**
- * Get icon for airline passenger type
+ * Get icon for healthcare provider role
  */
 function getUserIcon(userId: string) {
   const iconProps = { style: { fontSize: 32 } };
 
   switch (userId) {
-    case 'business-passenger':
-      return <RocketOutlined {...iconProps} style={{ ...iconProps.style, color: '#722ed1' }} />;
-    case 'elite-flyer':
-      return <CrownOutlined {...iconProps} style={{ ...iconProps.style, color: '#faad14' }} />;
-    case 'airline-staff':
+    case 'specialist':
+      return <HeartOutlined {...iconProps} style={{ ...iconProps.style, color: '#722ed1' }} />;
+    case 'nurse-practitioner':
       return <TeamOutlined {...iconProps} style={{ ...iconProps.style, color: '#52c41a' }} />;
-    default: // economy-traveler
-      return <UserOutlined {...iconProps} style={{ ...iconProps.style, color: '#1890ff' }} />;
+    case 'resident':
+      return <ReadOutlined {...iconProps} style={{ ...iconProps.style, color: '#faad14' }} />;
+    default: // primary-care
+      return <MedicineBoxOutlined {...iconProps} style={{ ...iconProps.style, color: '#0891b2' }} />;
   }
 }
 
 /**
- * Get color for membership tier tag
+ * Get color for role tag
  */
-function getTierColor(tier: string): string {
+function getRoleColor(role: string): string {
   const colorMap: Record<string, string> = {
-    platinum: 'purple',
-    employee: 'green',
-    standard: 'blue',
+    physician: 'blue',
+    surgeon: 'purple',
+    'nurse-practitioner': 'green',
+    resident: 'orange',
   };
-  return colorMap[tier] || 'default';
+  return colorMap[role] || 'default';
 }
 
 export function LoginPage({ onSelectUser }: LoginPageProps) {
@@ -51,7 +52,7 @@ export function LoginPage({ onSelectUser }: LoginPageProps) {
     <div
       style={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #1890ff 0%, #096dd9 100%)',
+        background: 'linear-gradient(135deg, #0891b2 0%, #155e75 100%)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -61,10 +62,10 @@ export function LoginPage({ onSelectUser }: LoginPageProps) {
       <div style={{ maxWidth: 1200, width: '100%' }}>
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
           <Title level={1} style={{ color: '#fff', marginBottom: 8 }}>
-            Select Your Passenger Profile
+            Select Your Provider Profile
           </Title>
           <Text style={{ fontSize: 16, color: 'rgba(255, 255, 255, 0.85)' }}>
-            Choose a passenger persona to experience personalized airline features
+            Choose a provider persona to experience personalized clinical features
           </Text>
         </div>
 
@@ -107,8 +108,8 @@ export function LoginPage({ onSelectUser }: LoginPageProps) {
                       {user.name}
                     </Title>
 
-                    <Tag color={getTierColor(user.properties.strings.userTier)}>
-                      {user.properties.strings.userTier}
+                    <Tag color={getRoleColor(user.properties.strings.role)}>
+                      {user.properties.strings.role}
                     </Tag>
                   </div>
 
@@ -136,16 +137,16 @@ export function LoginPage({ onSelectUser }: LoginPageProps) {
                       }}
                     >
                       <div style={{ marginBottom: 4 }}>
-                        <Text strong>Cabin Class:</Text>{' '}
-                        <Text type="secondary">{user.properties.strings.cabinClass}</Text>
+                        <Text strong>Department:</Text>{' '}
+                        <Text type="secondary">{user.properties.strings.department}</Text>
                       </div>
                       <div style={{ marginBottom: 4 }}>
-                        <Text strong>Home Airport:</Text>{' '}
-                        <Text type="secondary">{user.properties.strings.homeAirport}</Text>
+                        <Text strong>Specialty:</Text>{' '}
+                        <Text type="secondary">{user.properties.strings.specialty}</Text>
                       </div>
                       <div>
-                        <Text strong>FF Miles:</Text>{' '}
-                        <Text type="secondary">{user.properties.numbers.frequentFlyerMiles.toLocaleString()}</Text>
+                        <Text strong>Patient Panel:</Text>{' '}
+                        <Text type="secondary">{user.properties.numbers.patientPanelSize.toLocaleString()}</Text>
                       </div>
                     </div>
                   </div>
@@ -176,9 +177,9 @@ export function LoginPage({ onSelectUser }: LoginPageProps) {
           }}
         >
           <Text style={{ color: 'rgba(255, 255, 255, 0.85)', fontSize: 13 }}>
-            ✈️ <strong>Tip:</strong> Each passenger has unique properties (cabin class, loyalty
-            tier, miles) that enable personalized feature targeting in CloudBees Unify. Switch
-            between passengers to see how the portal adapts.
+            <strong>Tip:</strong> Each provider has unique properties (role, department, experience)
+            that enable personalized feature targeting in CloudBees Unify. Switch between providers
+            to see how the dashboard adapts clinical features.
           </Text>
         </div>
       </div>
