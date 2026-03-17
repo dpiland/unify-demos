@@ -9,18 +9,22 @@
  * - recentTransactionsToShow (number): controls transaction table row count
  */
 
-import { Button, Card, Col, Row, Space, Statistic, Table, Typography } from 'antd';
+import { useState } from 'react';
+import { Alert, Button, Card, Col, Modal, Row, Space, Statistic, Table, Typography, Upload, message } from 'antd';
 import {
   BankOutlined,
+  CameraOutlined,
   CreditCardOutlined,
-  DollarOutlined,
+  DownOutlined,
+  ExclamationCircleOutlined,
   FileTextOutlined,
   HomeOutlined,
+  InboxOutlined,
   SendOutlined,
   WalletOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { useFeatureFlagString, useFeatureFlagNumber } from '../hooks/useFeatureFlag';
+import { useFeatureFlag, useFeatureFlagString, useFeatureFlagNumber } from '../hooks/useFeatureFlag';
 import { ACCOUNTS, TRANSACTIONS, TRANSACTION_COLUMNS, type Account } from '../data/mockData.tsx';
 import type { User } from '../lib/users';
 
@@ -52,12 +56,18 @@ function getGreeting(): string {
 }
 
 function AccountCard({ account, compact }: { account: Account; compact: boolean }) {
+  const [expanded, setExpanded] = useState(false);
   const accentColor = ACCENT_COLORS[account.type];
 
   return (
     <Card
       size={compact ? 'small' : 'default'}
-      style={{ borderLeft: `4px solid ${accentColor}` }}
+      hoverable
+      style={{
+        borderLeft: `4px solid ${accentColor}`,
+        cursor: 'pointer',
+      }}
+      onClick={() => setExpanded(!expanded)}
     >
       <Space direction="vertical" size="small" style={{ width: '100%' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -69,15 +79,25 @@ function AccountCard({ account, compact }: { account: Account; compact: boolean 
               <Text type="secondary" style={{ fontSize: 12 }}>{account.accountNumber}</Text>
             </div>
           </Space>
-          <Statistic
-            value={account.balance}
-            precision={2}
-            prefix="$"
-            valueStyle={{
-              fontSize: compact ? 18 : 22,
-              color: account.type === 'credit' ? '#faad14' : undefined,
-            }}
-          />
+          <Space align="center">
+            <Statistic
+              value={account.balance}
+              precision={2}
+              prefix="$"
+              valueStyle={{
+                fontSize: compact ? 18 : 22,
+                color: account.type === 'credit' ? '#faad14' : undefined,
+              }}
+            />
+            <DownOutlined
+              style={{
+                fontSize: 12,
+                color: '#8c8c8c',
+                transition: 'transform 0.3s',
+                transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
+              }}
+            />
+          </Space>
         </div>
 
         {/* Account-specific details */}
@@ -106,8 +126,8 @@ function AccountCard({ account, compact }: { account: Account; compact: boolean 
           )}
         </div>
 
-        {/* Mini recent transactions */}
-        {!compact && account.recentTransactions.length > 0 && (
+        {/* Collapsed: mini preview */}
+        {!expanded && !compact && account.recentTransactions.length > 0 && (
           <div style={{ marginTop: 4 }}>
             {account.recentTransactions.slice(0, 3).map(tx => (
               <div
@@ -127,6 +147,49 @@ function AccountCard({ account, compact }: { account: Account; compact: boolean 
             ))}
           </div>
         )}
+
+        {/* Expanded: full transaction table */}
+        {expanded && (
+          <div
+            style={{ marginTop: 8 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Table
+              dataSource={account.recentTransactions}
+              columns={TRANSACTION_COLUMNS}
+              rowKey="id"
+              pagination={false}
+              size="small"
+              scroll={{ x: 500 }}
+            />
+            {account.type === 'checking' && (
+              <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
+                <Button size="small" type="primary">View All Transactions</Button>
+                <Button size="small">Download Statement</Button>
+              </div>
+            )}
+            {account.type === 'savings' && (
+              <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
+                <Button size="small" type="primary">Transfer Funds</Button>
+                <Button size="small">View Interest History</Button>
+              </div>
+            )}
+            {account.type === 'credit' && (
+              <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
+                <Button size="small" type="primary">Make a Payment</Button>
+                <Button size="small">View Statements</Button>
+                <Button size="small">Report Lost Card</Button>
+              </div>
+            )}
+            {account.type === 'mortgage' && (
+              <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
+                <Button size="small" type="primary">Make Extra Payment</Button>
+                <Button size="small">View Amortization</Button>
+                <Button size="small">Refinance Options</Button>
+              </div>
+            )}
+          </div>
+        )}
       </Space>
     </Card>
   );
@@ -134,6 +197,11 @@ function AccountCard({ account, compact }: { account: Account; compact: boolean 
 
 export function AccountSummary({ currentUser }: AccountSummaryProps) {
   const navigate = useNavigate();
+  const [depositModalOpen, setDepositModalOpen] = useState(false);
+  const [fraudDismissed, setFraudDismissed] = useState(false);
+
+  // Boolean flag: show fraud detection alerts
+  const showFraudAlerts = useFeatureFlag('showFraudAlerts');
 
   // String flag: controls card layout arrangement
   const dashboardLayout = useFeatureFlagString('dashboardLayout');
@@ -167,6 +235,58 @@ export function AccountSummary({ currentUser }: AccountSummaryProps) {
         </Title>
         <Text type="secondary">{today}</Text>
       </div>
+
+      {/* Fraud Alert - controlled by showFraudAlerts boolean flag */}
+      {showFraudAlerts && !fraudDismissed && (
+        <Alert
+          type="error"
+          showIcon
+          icon={<ExclamationCircleOutlined />}
+          message={
+            <Text strong>Suspicious Activity Detected</Text>
+          }
+          description={
+            <div>
+              <Text>
+                We noticed an unusual transaction on your Active Cash Credit Card:
+              </Text>
+              <div style={{
+                margin: '12px 0',
+                padding: 12,
+                background: '#fff1f0',
+                borderRadius: 4,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+                <div>
+                  <Text strong>Electronics Plus - Miami, FL</Text>
+                  <br />
+                  <Text type="secondary">March 16, 2026 at 2:47 AM</Text>
+                </div>
+                <Text strong style={{ color: '#f5222d', fontSize: 18 }}>$1,247.99</Text>
+              </div>
+              <Space>
+                <Button type="primary" danger size="small" onClick={() => {
+                  message.success('Transaction reported as fraud. Your card has been locked. A new card will be mailed to you.');
+                  setFraudDismissed(true);
+                }}>
+                  This wasn't me — Lock Card
+                </Button>
+                <Button size="small" onClick={() => {
+                  message.info('Thank you for confirming. No further action needed.');
+                  setFraudDismissed(true);
+                }}>
+                  Yes, this was me
+                </Button>
+              </Space>
+            </div>
+          }
+          closable
+          onClose={() => setFraudDismissed(true)}
+          style={{ border: '1px solid #ffa39e' }}
+        />
+      )}
 
       {/* Account Cards */}
       <Row gutter={[16, 16]}>
@@ -203,9 +323,10 @@ export function AccountSummary({ currentUser }: AccountSummaryProps) {
           </Col>
           <Col xs={24} sm={8}>
             <Button
-              icon={<DollarOutlined />}
+              icon={<CameraOutlined />}
               size={isCompact ? 'middle' : 'large'}
               block
+              onClick={() => setDepositModalOpen(true)}
             >
               Deposit Check
             </Button>
@@ -229,6 +350,78 @@ export function AccountSummary({ currentUser }: AccountSummaryProps) {
           </Text>
         </div>
       </Card>
+
+      {/* Deposit Check Modal */}
+      <Modal
+        title="Mobile Check Deposit"
+        open={depositModalOpen}
+        onCancel={() => setDepositModalOpen(false)}
+        footer={[
+          <Button key="cancel" onClick={() => setDepositModalOpen(false)}>Cancel</Button>,
+          <Button
+            key="submit"
+            type="primary"
+            onClick={() => {
+              message.success('Check submitted for deposit! Funds will be available within 1 business day.');
+              setDepositModalOpen(false);
+            }}
+          >
+            Submit Deposit
+          </Button>,
+        ]}
+      >
+        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+          <div>
+            <Text strong>Deposit to</Text>
+            <div style={{ marginTop: 4, padding: '8px 12px', background: '#f5f5f5', borderRadius: 4 }}>
+              Everyday Checking (****4523)
+            </div>
+          </div>
+
+          <div>
+            <Text strong>Check Amount</Text>
+            <div style={{ marginTop: 4 }}>
+              <input
+                type="text"
+                placeholder="$0.00"
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  border: '1px solid #d9d9d9',
+                  borderRadius: 4,
+                  fontSize: 16,
+                }}
+              />
+            </div>
+          </div>
+
+          <div>
+            <Text strong>Front of Check</Text>
+            <Upload.Dragger
+              accept="image/*"
+              showUploadList={false}
+              beforeUpload={() => { message.info('Check front captured'); return false; }}
+              style={{ marginTop: 4 }}
+            >
+              <p className="ant-upload-drag-icon"><InboxOutlined /></p>
+              <p className="ant-upload-text">Tap to take a photo or drag image here</p>
+            </Upload.Dragger>
+          </div>
+
+          <div>
+            <Text strong>Back of Check</Text>
+            <Upload.Dragger
+              accept="image/*"
+              showUploadList={false}
+              beforeUpload={() => { message.info('Check back captured'); return false; }}
+              style={{ marginTop: 4 }}
+            >
+              <p className="ant-upload-drag-icon"><InboxOutlined /></p>
+              <p className="ant-upload-text">Tap to take a photo or drag image here</p>
+            </Upload.Dragger>
+          </div>
+        </Space>
+      </Modal>
     </Space>
   );
 }

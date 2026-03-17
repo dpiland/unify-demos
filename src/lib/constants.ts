@@ -10,6 +10,9 @@ export const FEATURE_FLAG_KEYS = {
   SHOW_INVESTMENT_PORTFOLIO: 'showInvestmentPortfolio',
   DASHBOARD_LAYOUT: 'dashboardLayout',
   RECENT_TRANSACTIONS_TO_SHOW: 'recentTransactionsToShow',
+  SHOW_FRAUD_ALERTS: 'showFraudAlerts',
+  PROMOTIONAL_BANNER: 'promotionalBanner',
+  ENABLE_CHAT_SUPPORT: 'enableChatSupport',
 } as const;
 
 /**
@@ -24,6 +27,12 @@ export const FLAG_DESCRIPTIONS: Record<string, string> = {
     'Dashboard layout variant for A/B testing (classic, modern, or compact)',
   recentTransactionsToShow:
     'Number of recent transactions visible on the dashboard (5, 10, 25, or 50)',
+  showFraudAlerts:
+    'Display fraud detection alerts with suspicious transaction warnings on the Account Summary',
+  promotionalBanner:
+    'Promotional banner campaign shown across the app (none, mortgage-refi, travel-rewards, savings-bonus)',
+  enableChatSupport:
+    'Show floating chat support widget for customer assistance',
 };
 
 /**
@@ -34,4 +43,7 @@ export const DEFAULT_FLAG_VALUES = {
   showInvestmentPortfolio: false,
   dashboardLayout: 'classic',
   recentTransactionsToShow: 10,
+  showFraudAlerts: false,
+  promotionalBanner: 'none',
+  enableChatSupport: false,
 };

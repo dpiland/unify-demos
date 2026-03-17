@@ -77,6 +77,49 @@ export const flags = {
    *   Show 50 for premier customers, 10 for standard, 5 for new users
    */
   recentTransactionsToShow: new Rox.RoxNumber(10, [5, 10, 25, 50]),
+
+  /**
+   * Boolean Flag - Show Fraud Alerts
+   *
+   * PATTERN: Conditional rendering of alert banner
+   * USE CASE: Display a fraud detection alert on the Account Summary
+   * with a suspicious transaction and "Was this you?" prompt.
+   * Toggle on during a demo for immediate visual impact.
+   *
+   * TARGETING EXAMPLE:
+   *   Show IF accountBalance > 10000 (high-value accounts get monitoring)
+   */
+  showFraudAlerts: new Rox.Flag(),
+
+  /**
+   * String Flag - Promotional Banner Campaign
+   *
+   * PATTERN: Content switching based on flag value
+   * USE CASE: Display different marketing campaigns across the top of pages.
+   * Marketing teams can target offers to segments without code changes.
+   * - 'none': No banner shown
+   * - 'mortgage-refi': Mortgage refinance promotion
+   * - 'travel-rewards': Travel rewards credit card promo
+   * - 'savings-bonus': High-yield savings account promo
+   *
+   * TARGETING EXAMPLE:
+   *   Show "mortgage-refi" IF accountType == "mortgage"
+   *   Show "savings-bonus" IF isNewUser == true
+   */
+  promotionalBanner: new Rox.RoxString('none', ['none', 'mortgage-refi', 'travel-rewards', 'savings-bonus']),
+
+  /**
+   * Boolean Flag - Enable Chat Support
+   *
+   * PATTERN: Conditional rendering of floating UI element
+   * USE CASE: Show/hide a floating chat support widget.
+   * Roll out to premium customers first, then expand.
+   * Visually dramatic in demos - widget appears/disappears live.
+   *
+   * TARGETING EXAMPLE:
+   *   Enable IF isPremiumCustomer == true OR userTier == "premier"
+   */
+  enableChatSupport: new Rox.Flag(),
 };
 
 /**
@@ -139,6 +182,9 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
         showInvestmentPortfolio: flags.showInvestmentPortfolio.isEnabled(),
         dashboardLayout: flags.dashboardLayout.getValue(),
         recentTransactionsToShow: flags.recentTransactionsToShow.getValue(),
+        showFraudAlerts: flags.showFraudAlerts.isEnabled(),
+        promotionalBanner: flags.promotionalBanner.getValue(),
+        enableChatSupport: flags.enableChatSupport.isEnabled(),
       });
     }
   } catch (error) {
