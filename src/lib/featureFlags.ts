@@ -176,6 +176,58 @@ export const flags = {
    */
   enableAIClinicalSummary: new Rox.Flag(),
 
+  /**
+   * Enable Notification Center
+   *
+   * USE CASE: Real-time clinical notifications in the header
+   * PATTERN: Toggle notification bell icon with popover dropdown
+   *
+   * HEALTHCARE SCENARIO:
+   * - Rolling out real-time alerts to providers who opted in
+   * - Consolidates critical labs, appointment reminders, messages, handoff alerts
+   * - Uses notificationDisplayCount to control information density
+   *
+   * IN CLOUDBEES UI:
+   * - Create as Boolean flag
+   * - Default: false (opt-in rollout)
+   */
+  enableNotificationCenter: new Rox.Flag(),
+
+  /**
+   * Enable Patient Intake
+   *
+   * USE CASE: Digital patient check-in and intake workflow
+   * PATTERN: Toggle interactive intake Steps flow in Patients tab
+   *
+   * HEALTHCARE SCENARIO:
+   * - Digital intake replaces paper forms — phased rollout by department
+   * - Multi-step: Demographics > Insurance > Chief Complaint > Vitals > Complete
+   * - Reduces check-in time from 15 min to 3 min
+   *
+   * IN CLOUDBEES UI:
+   * - Create as Boolean flag
+   * - Default: false (phased rollout)
+   */
+  enablePatientIntake: new Rox.Flag(),
+
+  /**
+   * Enable Patient Messaging
+   *
+   * USE CASE: Secure patient-provider messaging inbox
+   * PATTERN: Toggle entire Messages tab visibility
+   *
+   * HEALTHCARE SCENARIO:
+   * - Compliance-sensitive secure messaging rolled out to PCPs and NPs first
+   * - Double-gated: flag + !isResident (residents cannot message independently)
+   * - Demo moment: switch to resident persona and Messages tab disappears
+   *
+   * IN CLOUDBEES UI:
+   * - Create as Boolean flag
+   * - Default: false (compliance review required)
+   * - Target rule: isResident == false
+   */
+  enablePatientMessaging: new Rox.Flag(),
+
   // ============================================
   // STRING FLAGS - A/B Testing & Variants
   // ============================================
@@ -251,6 +303,30 @@ export const flags = {
    */
   appointmentViewMode: new Rox.RoxString('list', ['calendar', 'list', 'timeline']),
 
+  /**
+   * Quality Dashboard View
+   *
+   * USE CASE: A/B test which quality metrics view helps admins vs clinicians
+   * PATTERN: Switch between quality dashboard display variants
+   *
+   * VARIANTS:
+   * - 'scorecard': Big circular progress rings for key metrics (default)
+   * - 'detailed': Full breakdown with all metrics, population health, performance
+   * - 'compact': Condensed single-row summary for quick glance
+   *
+   * HEALTHCARE SCENARIO:
+   * - Admin users (hasAdminAccess) see 'detailed' for CMS compliance review
+   * - Clinicians see 'scorecard' for quick quality pulse check
+   * - Compact for mobile or secondary displays
+   *
+   * IN CLOUDBEES UI:
+   * - Create as String flag
+   * - Variants: 'scorecard', 'detailed', 'compact'
+   * - Default: 'scorecard'
+   * - Target rule: hasAdminAccess == true → 'detailed'
+   */
+  qualityDashboardView: new Rox.RoxString('scorecard', ['scorecard', 'detailed', 'compact']),
+
   // ============================================
   // NUMBER FLAGS - Numeric Configuration
   // ============================================
@@ -318,6 +394,27 @@ export const flags = {
    * - Default: 7
    */
   riskScoreThreshold: new Rox.RoxNumber(7, [3, 5, 7, 9]),
+
+  /**
+   * Notification Display Count
+   *
+   * USE CASE: Control how many notifications appear in the dropdown
+   * PATTERN: Balance information overload vs clinical awareness
+   *
+   * OPTIONS: 3, 5, 10, 20 notifications
+   *
+   * HEALTHCARE SCENARIO:
+   * - 3 for focused view (only most critical)
+   * - 5 for standard awareness (default)
+   * - 10-20 for shift supervisors monitoring multiple providers
+   * - "How many alerts is optimal before fatigue sets in?"
+   *
+   * IN CLOUDBEES UI:
+   * - Create as Number flag
+   * - Options: 3, 5, 10, 20
+   * - Default: 5
+   */
+  notificationDisplayCount: new Rox.RoxNumber(5, [3, 5, 10, 20]),
 };
 
 /**
@@ -380,6 +477,11 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
         patientsPerPage: flags.patientsPerPage.getValue(),
         maxConcurrentTelehealthSessions: flags.maxConcurrentTelehealthSessions.getValue(),
         riskScoreThreshold: flags.riskScoreThreshold.getValue(),
+        enableNotificationCenter: flags.enableNotificationCenter.isEnabled(),
+        enablePatientIntake: flags.enablePatientIntake.isEnabled(),
+        enablePatientMessaging: flags.enablePatientMessaging.isEnabled(),
+        qualityDashboardView: flags.qualityDashboardView.getValue(),
+        notificationDisplayCount: flags.notificationDisplayCount.getValue(),
       });
     }
   } catch (error) {

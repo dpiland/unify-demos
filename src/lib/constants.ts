@@ -19,15 +19,21 @@ export const FEATURE_FLAG_KEYS = {
   ENABLE_PRESCRIPTIONS: 'enablePrescriptions',
   ENABLE_AI_CLINICAL_SUMMARY: 'enableAIClinicalSummary',
 
+  ENABLE_NOTIFICATION_CENTER: 'enableNotificationCenter',
+  ENABLE_PATIENT_INTAKE: 'enablePatientIntake',
+  ENABLE_PATIENT_MESSAGING: 'enablePatientMessaging',
+
   // String flags
   CLINICAL_WORKFLOW: 'clinicalWorkflow',
   PATIENT_CHART_VIEW: 'patientChartView',
   APPOINTMENT_VIEW_MODE: 'appointmentViewMode',
+  QUALITY_DASHBOARD_VIEW: 'qualityDashboardView',
 
   // Number flags
   PATIENTS_PER_PAGE: 'patientsPerPage',
   MAX_CONCURRENT_TELEHEALTH_SESSIONS: 'maxConcurrentTelehealthSessions',
   RISK_SCORE_THRESHOLD: 'riskScoreThreshold',
+  NOTIFICATION_DISPLAY_COUNT: 'notificationDisplayCount',
 } as const;
 
 /**
@@ -56,6 +62,15 @@ export const FLAG_DESCRIPTIONS: Record<string, string> = {
   enableAIClinicalSummary:
     'Enable AI-generated visit summaries and clinical documentation assistant. Automatically generates structured visit notes, assessment plans, and follow-up recommendations. High-stakes feature rolled out to senior attendings first.',
 
+  enableNotificationCenter:
+    'Enable real-time notification center in the header. Consolidates critical lab alerts, appointment reminders, secure messages, and shift handoff notifications into a single bell icon with popover dropdown.',
+
+  enablePatientIntake:
+    'Enable digital patient check-in and intake workflow. Replaces paper forms with a guided multi-step flow: verify demographics, insurance, chief complaint, and vitals. Reduces check-in time from 15 minutes to 3 minutes.',
+
+  enablePatientMessaging:
+    'Enable secure patient-provider messaging inbox. Adds a Messages tab with threaded conversations, reply capability, and unread tracking. Compliance-sensitive — rolled out to PCPs and NPs first, restricted from residents.',
+
   // String Flags
   clinicalWorkflow:
     'A/B test clinical documentation workflow: standard (full manual), streamlined (smart defaults, reduced clicks), or guided (step-by-step with checklists). Tests which workflow reduces provider documentation burden — the #1 burnout driver.',
@@ -66,6 +81,9 @@ export const FLAG_DESCRIPTIONS: Record<string, string> = {
   appointmentViewMode:
     'Control appointment display format: calendar (visual grid overview), list (chronological with details), or timeline (color-coded patient flow). Tests optimal scheduling visualization.',
 
+  qualityDashboardView:
+    'Control quality metrics dashboard display: scorecard (big progress rings for key metrics), detailed (full breakdown with population health and provider performance), or compact (condensed single-row summary). A/B tests which view helps administrators vs clinicians.',
+
   // Number Flags
   patientsPerPage:
     'Number of patients to display per page (5-50). Controls information density - fewer for focused care reviews, more for high-volume clinics.',
@@ -75,6 +93,9 @@ export const FLAG_DESCRIPTIONS: Record<string, string> = {
 
   riskScoreThreshold:
     'Minimum risk score (1-10) to highlight in patient insights. Lower threshold shows more patients (high sensitivity), higher threshold focuses on critical cases only.',
+
+  notificationDisplayCount:
+    'Number of notifications to show in the dropdown (3-20). Controls information density — fewer for focused critical alerts, more for shift supervisors monitoring multiple providers.',
 };
 
 /**
@@ -95,14 +116,19 @@ export const DEFAULT_FLAG_VALUES = {
   showClinicalAlerts: true,             // Safety-critical, always on
   enablePrescriptions: false,           // Rollout by prescribing authority
   enableAIClinicalSummary: false,       // High-stakes, careful rollout
+  enableNotificationCenter: false,     // Opt-in rollout
+  enablePatientIntake: false,          // Phased rollout by department
+  enablePatientMessaging: false,       // Compliance review required
 
   // String flags
   clinicalWorkflow: 'standard',         // Traditional documentation workflow
   patientChartView: 'table',            // Detailed clinical view
   appointmentViewMode: 'list',          // Quick daily agenda
+  qualityDashboardView: 'scorecard',   // Big progress rings
 
   // Number flags
   patientsPerPage: 10,                  // Standard workflow
   maxConcurrentTelehealthSessions: 2,   // Default capacity
   riskScoreThreshold: 7,                // Elevated risk and above
+  notificationDisplayCount: 5,         // Standard awareness
 };

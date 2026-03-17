@@ -29,10 +29,10 @@ export const lightTheme: ThemeConfig = {
     fontSizeHeading4: 20,
     fontSizeHeading5: 16,
 
-    // Border radius
-    borderRadius: 6,
-    borderRadiusLG: 8,
-    borderRadiusSM: 4,
+    // Border radius (rounder for modern feel)
+    borderRadius: 8,
+    borderRadiusLG: 12,
+    borderRadiusSM: 6,
 
     // Layout
     colorBgContainer: '#ffffff',
@@ -86,7 +86,7 @@ export const lightTheme: ThemeConfig = {
     Layout: {
       headerBg: '#ffffff',
       headerColor: colors.neutral[900],
-      headerHeight: 64,
+      headerHeight: 72,
       headerPadding: '0 24px',
       siderBg: '#ffffff',
       footerBg: colors.neutral[50],
@@ -113,16 +113,17 @@ export const lightTheme: ThemeConfig = {
 
     Card: {
       headerBg: 'transparent',
-      headerFontSize: 16,
+      headerFontSize: 15,
       headerFontSizeSM: 14,
-      borderRadiusLG: 8,
+      borderRadiusLG: 12,
+      paddingLG: 20,
     },
 
     Table: {
-      headerBg: colors.neutral[50],
-      headerColor: colors.neutral[900],
-      borderRadius: 6,
-      borderRadiusLG: 8,
+      headerBg: '#f9fafb',
+      headerColor: colors.neutral[600],
+      borderRadius: 8,
+      borderRadiusLG: 12,
     },
 
     Badge: {

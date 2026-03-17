@@ -5,9 +5,9 @@
  * to deliver role-based clinical features for physicians, nurses, and residents.
  *
  * FEATURE FLAGS IN USE:
- * - Boolean: enableTelemedicine, showPatientInsights, enableCarePlans, showClinicalAlerts, enablePrescriptions, enableAIClinicalSummary
- * - String: clinicalWorkflow, patientChartView, appointmentViewMode
- * - Number: patientsPerPage, maxConcurrentTelehealthSessions, riskScoreThreshold
+ * - Boolean: enableTelemedicine, showPatientInsights, enableCarePlans, showClinicalAlerts, enablePrescriptions, enableAIClinicalSummary, enableNotificationCenter, enablePatientIntake, enablePatientMessaging
+ * - String: clinicalWorkflow, patientChartView, appointmentViewMode, qualityDashboardView
+ * - Number: patientsPerPage, maxConcurrentTelehealthSessions, riskScoreThreshold, notificationDisplayCount
  *
  * USER TARGETING:
  * - Primary care physicians: Full clinical toolset
@@ -19,12 +19,14 @@
 import { useState } from 'react';
 import { Alert, Card, Col, Layout, List, Row, Space, Statistic, Steps, Table, Tabs, Tag, Typography } from 'antd';
 import {
+  BarChartOutlined,
   CalendarOutlined,
   CheckCircleOutlined,
   ExperimentOutlined,
   FileTextOutlined,
   HeartOutlined,
   MedicineBoxOutlined,
+  MessageOutlined,
   RobotOutlined,
   TeamOutlined,
   ThunderboltOutlined,
@@ -41,6 +43,11 @@ import { PrescriptionPanel } from './components/healthcare/PrescriptionPanel';
 import { LabResultsCard } from './components/healthcare/LabResultsCard';
 import { AIClinicalSummary } from './components/healthcare/AIClinicalSummary';
 import { AppointmentList, type Appointment } from './components/healthcare/AppointmentList';
+import { NotificationCenter } from './components/healthcare/NotificationCenter';
+import { QualityMetricsDashboard } from './components/healthcare/QualityMetricsDashboard';
+import { PatientIntakeFlow } from './components/healthcare/PatientIntakeFlow';
+import { PatientMessagingInbox } from './components/healthcare/PatientMessagingInbox';
+import { ShiftHandoffNotes } from './components/healthcare/ShiftHandoffNotes';
 import './App.css';
 
 const { Header, Content } = Layout;
@@ -221,6 +228,9 @@ function App() {
   const showClinicalAlerts = useFeatureFlag('showClinicalAlerts');
   const enablePrescriptions = useFeatureFlag('enablePrescriptions');
   const enableAIClinicalSummary = useFeatureFlag('enableAIClinicalSummary');
+  const enableNotificationCenter = useFeatureFlag('enableNotificationCenter');
+  const enablePatientIntake = useFeatureFlag('enablePatientIntake');
+  const enablePatientMessaging = useFeatureFlag('enablePatientMessaging');
 
   // ============================================
   // STRING FLAGS - A/B Testing & Variants
@@ -228,6 +238,7 @@ function App() {
   const clinicalWorkflow = useFeatureFlagString('clinicalWorkflow');
   const patientChartView = useFeatureFlagString('patientChartView');
   const appointmentViewMode = useFeatureFlagString('appointmentViewMode');
+  const qualityDashboardView = useFeatureFlagString('qualityDashboardView');
 
   // ============================================
   // NUMBER FLAGS - Numeric Configuration
@@ -235,6 +246,7 @@ function App() {
   const patientsPerPage = useFeatureFlagNumber('patientsPerPage');
   const maxConcurrentTelehealthSessions = useFeatureFlagNumber('maxConcurrentTelehealthSessions');
   const riskScoreThreshold = useFeatureFlagNumber('riskScoreThreshold');
+  const notificationDisplayCount = useFeatureFlagNumber('notificationDisplayCount');
 
   // ============================================
   // USER PROPERTIES
@@ -256,24 +268,49 @@ function App() {
       {/* Header */}
       <Header
         style={{
-          background: '#fff',
-          padding: '0 24px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          background: 'linear-gradient(135deg, #0e7490 0%, #0891b2 50%, #22d3ee 100%)',
+          padding: '0 32px',
+          height: 72,
+          lineHeight: 'normal',
+          boxShadow: '0 2px 12px rgba(8, 145, 178, 0.25)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
+          borderBottom: 'none',
         }}
       >
-        <Space>
-          <MedicineBoxOutlined style={{ fontSize: 28, color: '#0891b2' }} />
-          <Title level={3} style={{ margin: 0 }}>
-            MedConnect Provider Portal
-          </Title>
+        <Space size="middle">
+          <div
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 10,
+              background: 'rgba(255,255,255,0.2)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backdropFilter: 'blur(10px)',
+            }}
+          >
+            <MedicineBoxOutlined style={{ fontSize: 22, color: '#fff' }} />
+          </div>
+          <div>
+            <Title level={4} style={{ margin: 0, color: '#fff', fontWeight: 600, letterSpacing: '-0.02em' }}>
+              MedConnect
+            </Title>
+            <Text style={{ color: 'rgba(255,255,255,0.75)', fontSize: 12, lineHeight: 1 }}>
+              Provider Portal
+            </Text>
+          </div>
         </Space>
+        {/* Notification bell — right side of header */}
+        {enableNotificationCenter && (
+          <NotificationCenter maxItems={notificationDisplayCount} />
+        )}
       </Header>
 
       {/* Main Content Area */}
-      <Content style={{ padding: '24px', background: '#f0f2f5' }}>
+      <Content style={{ padding: '28px 24px', background: '#f5f7fa' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
             {/* ============================================ */}
@@ -324,47 +361,48 @@ function App() {
               USE CASE: Personalized dashboard based on provider profile
               DATA SOURCE: currentUser.properties.numbers
             */}
-            <Row gutter={16}>
-              <Col xs={24} sm={12} lg={6}>
-                <Card hoverable onClick={() => setActiveTab('patients')} style={{ cursor: 'pointer' }}>
-                  <Statistic
-                    title="Total Patients"
-                    value={userProperties.numbers.patientPanelSize || 0}
-                    prefix={<TeamOutlined />}
-                    valueStyle={{ color: '#0891b2' }}
-                  />
-                </Card>
-              </Col>
-              <Col xs={24} sm={12} lg={6}>
-                <Card hoverable onClick={() => setActiveTab('schedule')} style={{ cursor: 'pointer' }}>
-                  <Statistic
-                    title="Today's Appointments"
-                    value={userProperties.numbers.appointmentsPerDay || 0}
-                    prefix={<CalendarOutlined />}
-                    valueStyle={{ color: '#52c41a' }}
-                  />
-                </Card>
-              </Col>
-              <Col xs={24} sm={12} lg={6}>
-                <Card hoverable onClick={() => setActiveTab('patients')} style={{ cursor: 'pointer' }}>
-                  <Statistic
-                    title="Active Care Plans"
-                    value={userProperties.numbers.activeCarePlans || 0}
-                    prefix={<FileTextOutlined />}
-                    valueStyle={{ color: '#faad14' }}
-                  />
-                </Card>
-              </Col>
-              <Col xs={24} sm={12} lg={6}>
-                <Card hoverable onClick={() => setActiveTab('labs')} style={{ cursor: 'pointer' }}>
-                  <Statistic
-                    title="Pending Results"
-                    value={7}
-                    prefix={<ExperimentOutlined />}
-                    valueStyle={{ color: '#f5222d' }}
-                  />
-                </Card>
-              </Col>
+            <Row gutter={[16, 16]}>
+              {[
+                { key: 'patients', title: 'Total Patients', value: userProperties.numbers.patientPanelSize || 0, icon: <TeamOutlined />, color: '#0891b2', bg: '#ecfeff', border: '#a5f3fc' },
+                { key: 'schedule', title: "Today's Appointments", value: userProperties.numbers.appointmentsPerDay || 0, icon: <CalendarOutlined />, color: '#059669', bg: '#ecfdf5', border: '#a7f3d0' },
+                { key: 'patients', title: 'Active Care Plans', value: userProperties.numbers.activeCarePlans || 0, icon: <FileTextOutlined />, color: '#d97706', bg: '#fffbeb', border: '#fde68a' },
+                { key: 'labs', title: 'Pending Results', value: 7, icon: <ExperimentOutlined />, color: '#dc2626', bg: '#fef2f2', border: '#fecaca' },
+              ].map((stat, i) => (
+                <Col xs={24} sm={12} lg={6} key={i}>
+                  <Card
+                    className="stat-card"
+                    hoverable
+                    onClick={() => setActiveTab(stat.key)}
+                    style={{ cursor: 'pointer', borderLeft: `3px solid ${stat.color}`, borderRadius: 10 }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                      <div
+                        style={{
+                          width: 48,
+                          height: 48,
+                          borderRadius: 12,
+                          background: stat.bg,
+                          border: `1px solid ${stat.border}`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: 22,
+                          color: stat.color,
+                          flexShrink: 0,
+                        }}
+                      >
+                        {stat.icon}
+                      </div>
+                      <div>
+                        <Text type="secondary" style={{ fontSize: 13 }}>{stat.title}</Text>
+                        <div style={{ fontSize: 28, fontWeight: 700, color: stat.color, lineHeight: 1.2 }}>
+                          {stat.value.toLocaleString()}
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                </Col>
+              ))}
             </Row>
 
             {/* ============================================ */}
@@ -414,6 +452,9 @@ function App() {
                   ),
                   children: (
                     <div>
+                      {/* Patient Intake Flow — gated by enablePatientIntake flag */}
+                      {enablePatientIntake && <PatientIntakeFlow />}
+
                       {/*
                         PATTERN: String flag switches patient list display mode
                         FLAG: patientChartView (string: 'table' | 'card' | 'compact')
@@ -454,6 +495,9 @@ function App() {
                         appointments={APPOINTMENT_DATA}
                         viewMode={appointmentViewMode}
                       />
+
+                      {/* Shift Handoff Notes — visible in streamlined/guided workflow modes */}
+                      {clinicalWorkflow !== 'standard' && <ShiftHandoffNotes />}
                     </div>
                   ),
                 },
@@ -472,11 +516,46 @@ function App() {
                     </div>
                   ),
                 },
+                {
+                  key: 'quality',
+                  label: (
+                    <Space>
+                      <BarChartOutlined />
+                      <span>Quality</span>
+                    </Space>
+                  ),
+                  children: (
+                    <div>
+                      {/*
+                        PATTERN: String flag switches quality dashboard view mode
+                        FLAG: qualityDashboardView (string: 'scorecard' | 'detailed' | 'compact')
+                      */}
+                      <QualityMetricsDashboard viewMode={qualityDashboardView} />
+                    </div>
+                  ),
+                },
+                // Messages tab — conditionally included based on flag + user property
+                ...(enablePatientMessaging && !userProperties.booleans.isResident ? [{
+                  key: 'messages',
+                  label: (
+                    <Space>
+                      <MessageOutlined />
+                      <span>Messages</span>
+                      <Tag color="blue" style={{ marginLeft: 4 }}>2</Tag>
+                    </Space>
+                  ),
+                  children: (
+                    <div>
+                      <PatientMessagingInbox />
+                    </div>
+                  ),
+                }] : []),
               ]}
               style={{
                 background: '#fff',
-                borderRadius: 8,
-                padding: '0 24px',
+                borderRadius: 12,
+                padding: '8px 24px 0',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
               }}
             />
 
@@ -495,7 +574,11 @@ function App() {
                     USER PROPERTY: hasTelemedicineAccess (physicians, NPs — not residents)
                   */}
                   {enableTelemedicine && userProperties.booleans.hasTelemedicineAccess && (
-                    <Card title={<Space><VideoCameraOutlined />Telemedicine</Space>}>
+                    <Card
+                      className="feature-card"
+                      title={<Space><VideoCameraOutlined style={{ color: '#0891b2' }} />Telemedicine</Space>}
+                      style={{ borderRadius: 12 }}
+                    >
                       <TelemedicinePanel maxConcurrentSessions={maxConcurrentTelehealthSessions} />
                     </Card>
                   )}
@@ -509,7 +592,11 @@ function App() {
                     DEMO STORY: High-stakes AI feature with careful role-based rollout
                   */}
                   {enableAIClinicalSummary && userProperties.booleans.isAttending && (
-                    <Card title={<Space><RobotOutlined />AI Clinical Summary</Space>}>
+                    <Card
+                      className="feature-card"
+                      title={<Space><RobotOutlined style={{ color: '#7c3aed' }} />AI Clinical Summary <Tag color="purple" style={{ marginLeft: 4, fontWeight: 500 }}>AI</Tag></Space>}
+                      style={{ borderRadius: 12 }}
+                    >
                       <AIClinicalSummary />
                     </Card>
                   )}
@@ -522,7 +609,11 @@ function App() {
                     USER PROPERTY: canPrescribe (physicians, NPs — not residents)
                   */}
                   {enablePrescriptions && userProperties.booleans.canPrescribe && (
-                    <Card title={<Space><MedicineBoxOutlined />Prescriptions</Space>}>
+                    <Card
+                      className="feature-card"
+                      title={<Space><MedicineBoxOutlined style={{ color: '#059669' }} />Prescriptions</Space>}
+                      style={{ borderRadius: 12 }}
+                    >
                       <PrescriptionPanel />
                     </Card>
                   )}
@@ -540,7 +631,11 @@ function App() {
                     NUMBER FLAG: riskScoreThreshold controls which patients appear
                   */}
                   {showPatientInsights && (
-                    <Card title={<Space><HeartOutlined />Patient Insights</Space>}>
+                    <Card
+                      className="feature-card"
+                      title={<Space><HeartOutlined style={{ color: '#dc2626' }} />Patient Insights</Space>}
+                      style={{ borderRadius: 12 }}
+                    >
                       <PatientInsightsPanel riskScoreThreshold={riskScoreThreshold} />
                     </Card>
                   )}
@@ -552,7 +647,11 @@ function App() {
                     FLAG: enableCarePlans (boolean)
                   */}
                   {enableCarePlans && (
-                    <Card title={<Space><FileTextOutlined />Active Care Plans</Space>}>
+                    <Card
+                      className="feature-card"
+                      title={<Space><FileTextOutlined style={{ color: '#d97706' }} />Active Care Plans</Space>}
+                      style={{ borderRadius: 12 }}
+                    >
                       <CarePlanCard />
                     </Card>
                   )}

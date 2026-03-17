@@ -132,29 +132,32 @@ export function AppWithAuth() {
             type="default"
             size="large"
             style={{
-              background: '#fff',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+              background: 'rgba(255,255,255,0.95)',
+              boxShadow: '0 2px 12px rgba(0,0,0,0.12)',
+              borderRadius: 10,
+              border: '1px solid rgba(0,0,0,0.06)',
+              backdropFilter: 'blur(10px)',
             }}
           >
             <Space>
               <div
                 style={{
-                  width: 24,
-                  height: 24,
-                  borderRadius: '50%',
-                  background: '#0891b2',
+                  width: 26,
+                  height: 26,
+                  borderRadius: 8,
+                  background: 'linear-gradient(135deg, #0891b2, #0e7490)',
                   color: '#fff',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: 12,
+                  fontSize: 11,
                   fontWeight: 600,
                 }}
               >
                 {getUserInitials(currentUser.name)}
               </div>
-              <span>{currentUser.name.split(' ')[0]}</span>
-              <UserOutlined />
+              <span style={{ fontWeight: 500 }}>{currentUser.name.split(' ')[0]}</span>
+              <UserOutlined style={{ color: '#8c8c8c' }} />
             </Space>
           </Button>
         </Dropdown>
