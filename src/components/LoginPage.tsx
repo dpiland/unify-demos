@@ -1,5 +1,5 @@
 /**
- * LoginPage Component
+ * LoginPage Component — NovaCRM
  *
  * Provides a user selector for demo purposes.
  * Users can "log in" by clicking on a persona, which sets their
@@ -7,7 +7,7 @@
  */
 
 import { Card, Row, Col, Typography, Button, Space, Tag } from 'antd';
-import { UserOutlined, CrownOutlined, ExperimentOutlined, SmileOutlined } from '@ant-design/icons';
+import { SettingOutlined, CodeOutlined, CrownOutlined, RocketOutlined } from '@ant-design/icons';
 import { DEFAULT_USERS, type User } from '../lib/users';
 
 const { Title, Text, Paragraph } = Typography;
@@ -23,26 +23,27 @@ function getUserIcon(userId: string) {
   const iconProps = { style: { fontSize: 32 } };
 
   switch (userId) {
-    case 'premium-user':
+    case 'platform-admin':
+      return <SettingOutlined {...iconProps} style={{ ...iconProps.style, color: '#1890ff' }} />;
+    case 'developer-user':
+      return <CodeOutlined {...iconProps} style={{ ...iconProps.style, color: '#722ed1' }} />;
+    case 'enterprise-csm':
       return <CrownOutlined {...iconProps} style={{ ...iconProps.style, color: '#faad14' }} />;
-    case 'beta-tester':
-      return <ExperimentOutlined {...iconProps} style={{ ...iconProps.style, color: '#722ed1' }} />;
-    case 'new-user':
-      return <SmileOutlined {...iconProps} style={{ ...iconProps.style, color: '#52c41a' }} />;
+    case 'trial-user':
+      return <RocketOutlined {...iconProps} style={{ ...iconProps.style, color: '#52c41a' }} />;
     default:
-      return <UserOutlined {...iconProps} style={{ ...iconProps.style, color: '#1890ff' }} />;
+      return <SettingOutlined {...iconProps} style={{ ...iconProps.style, color: '#1890ff' }} />;
   }
 }
 
 /**
- * Get color for user tier tag
+ * Get color for subscription tier tag
  */
 function getTierColor(tier: string): string {
   const colorMap: Record<string, string> = {
-    premium: 'gold',
-    beta: 'purple',
-    new: 'green',
-    standard: 'blue',
+    enterprise: 'gold',
+    starter: 'blue',
+    trial: 'green',
   };
   return colorMap[tier] || 'default';
 }
@@ -62,10 +63,10 @@ export function LoginPage({ onSelectUser }: LoginPageProps) {
       <div style={{ maxWidth: 1200, width: '100%' }}>
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
           <Title level={1} style={{ color: '#fff', marginBottom: 8 }}>
-            Demo User Selector
+            NovaCRM
           </Title>
           <Text style={{ fontSize: 16, color: 'rgba(255, 255, 255, 0.85)' }}>
-            Choose a user persona to see how features change based on targeting rules
+            Select your account to continue
           </Text>
         </div>
 
@@ -108,8 +109,8 @@ export function LoginPage({ onSelectUser }: LoginPageProps) {
                       {user.name}
                     </Title>
 
-                    <Tag color={getTierColor(user.properties.strings.userTier)}>
-                      {user.properties.strings.userTier}
+                    <Tag color={getTierColor(user.properties.strings.subscriptionTier)}>
+                      {user.properties.strings.subscriptionTier}
                     </Tag>
                   </div>
 
@@ -137,16 +138,18 @@ export function LoginPage({ onSelectUser }: LoginPageProps) {
                       }}
                     >
                       <div style={{ marginBottom: 4 }}>
-                        <Text strong>Account Type:</Text>{' '}
-                        <Text type="secondary">{user.properties.strings.accountType}</Text>
+                        <Text strong>Role:</Text>{' '}
+                        <Text type="secondary">{user.properties.strings.role}</Text>
                       </div>
                       <div style={{ marginBottom: 4 }}>
-                        <Text strong>Region:</Text>{' '}
-                        <Text type="secondary">{user.properties.strings.region}</Text>
+                        <Text strong>MRR:</Text>{' '}
+                        <Text type="secondary">
+                          ${user.properties.numbers.accountMRR.toLocaleString()}
+                        </Text>
                       </div>
                       <div>
-                        <Text strong>Account Age:</Text>{' '}
-                        <Text type="secondary">{user.properties.numbers.accountAge} months</Text>
+                        <Text strong>Seats:</Text>{' '}
+                        <Text type="secondary">{user.properties.numbers.seatCount}</Text>
                       </div>
                     </div>
                   </div>
@@ -177,9 +180,8 @@ export function LoginPage({ onSelectUser }: LoginPageProps) {
           }}
         >
           <Text style={{ color: 'rgba(255, 255, 255, 0.85)', fontSize: 13 }}>
-            💡 <strong>Tip:</strong> Each user has different properties that can be used to target
-            feature flags in CloudBees Unify. Switch between users to see how features change
-            dynamically.
+            Each account has different properties used for feature flag targeting in CloudBees.
+            Switch between accounts to see how features change dynamically.
           </Text>
         </div>
       </div>

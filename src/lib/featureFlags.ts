@@ -19,93 +19,82 @@ import type { RoxSetupOptions} from './types';
 import type { User } from './users';
 
 /**
- * Feature Flag Definitions
+ * Feature Flag Definitions — NovaCRM SaaS Dashboard
  *
- * These are GENERIC EXAMPLES showing the three types of feature flags.
- * Customize these for your specific use case (retail, fintech, healthcare, etc.)
+ * These flags control key features of the SaaS platform dashboard.
+ * Each flag demonstrates a different feature-flag pattern used in real
+ * software-provider applications.
  */
 export const flags = {
   /**
-   * EXAMPLE 1: Boolean Flag - Simple On/Off Toggle
+   * Boolean Flag — AI Insights Panel Toggle
    *
-   * 📖 USE CASE: Enable/disable entire features or UI elements
-   * 💡 PATTERN: if (enabled) { show feature } else { hide feature }
+   * Controls visibility of the AI-powered insights section on the dashboard.
+   * This section shows churn prediction scores, upsell recommendations,
+   * and usage trend analysis.
    *
-   * REAL-WORLD EXAMPLES:
-   * - Toggle promotional banners
-   * - Enable beta feature access
-   * - Show/hide new UI sections
-   * - Control maintenance mode
-   * - Enable experimental functionality
+   * USE CASE: Progressive rollout of a new AI-driven feature to gauge
+   * adoption and performance before enabling for all customers.
+   *
+   * TARGETING EXAMPLES:
+   * - Enable for enterprise-tier customers first
+   * - Enable for accounts with > 12 months tenure
+   * - A/B test impact on support ticket volume
    *
    * HOW TO USE:
    * ```typescript
-   * const showBanner = useFeatureFlag('showWelcomeBanner');
-   * return showBanner ? <Banner /> : null;
+   * const showAI = useFeatureFlag('showAIInsights');
+   * return showAI ? <AIInsightsPanel /> : null;
    * ```
-   *
-   * IN CLOUDBEES UI:
-   * - Create as Boolean flag
-   * - Set default value (true/false)
-   * - Target specific users/groups if needed
    */
-  showWelcomeBanner: new Rox.Flag(),
+  showAIInsights: new Rox.Flag(),
 
   /**
-   * EXAMPLE 2: String Flag - A/B Testing Variants
+   * Boolean Flag — Enterprise Dashboard Gate
    *
-   * 📖 USE CASE: Test different versions of a feature (A/B/C testing)
-   * 💡 PATTERN: switch (variant) { case 'A': ... case 'B': ... }
+   * Gates access to enterprise-tier analytics features including
+   * cohort analysis, customer lifetime value projections,
+   * advanced segmentation, and exportable reports.
    *
-   * REAL-WORLD EXAMPLES:
-   * - Button styles/colors (primary, success, warning)
-   * - Layout variations (grid, list, card)
-   * - Content variations (short, long, with-image)
-   * - Pricing tiers (basic, premium, enterprise)
-   * - Checkout flows (standard, express, one-click)
+   * USE CASE: Feature gating based on subscription tier. Enterprise
+   * customers see full analytics; starter/trial customers see an
+   * upgrade prompt.
+   *
+   * TARGETING EXAMPLES:
+   * - Enable for subscriptionTier == "enterprise"
+   * - Enable for isPremiumCustomer == true
+   * - Enable for accountMRR > 5000
    *
    * HOW TO USE:
    * ```typescript
-   * const variant = useFeatureFlagString('buttonVariant');
-   * return <Button type={variant}>Click Me</Button>;
+   * const hasEnterprise = useFeatureFlag('enableEnterpriseDashboard');
+   * return <EnterpriseDashboardCard isEnabled={hasEnterprise} />;
    * ```
-   *
-   * IN CLOUDBEES UI:
-   * - Create as String flag
-   * - Define variants: 'default', 'primary', 'success'
-   * - Set percentages for A/B testing (e.g., 33% each)
-   * - Target different variants to different audiences
    */
-  buttonVariant: new Rox.RoxString('default', ['default', 'primary', 'success']),
+  enableEnterpriseDashboard: new Rox.Flag(),
 
   /**
-   * EXAMPLE 3: Number Flag - Numeric Configuration
+   * Number Flag — Recent Events Display Limit
    *
-   * 📖 USE CASE: Control numeric values like limits, sizes, intervals
-   * 💡 PATTERN: const size = getNumberFlag(); <Component size={size} />
+   * Controls how many subscription events (signups, upgrades,
+   * cancellations) are displayed in the activity feed table.
    *
-   * REAL-WORLD EXAMPLES:
-   * - Page size (5, 10, 20, 50 items)
-   * - Refresh intervals (10s, 30s, 60s)
-   * - Max items to display
-   * - Timeouts and delays
-   * - Cache durations
-   * - Rate limits
+   * USE CASE: Performance tuning and UX optimization. Show fewer items
+   * on slower connections or for users who prefer a compact view.
+   *
+   * TARGETING EXAMPLES:
+   * - Show 5 for trial users (compact onboarding view)
+   * - Show 10 default for most users
+   * - Show 25 for power users / admins
+   * - Show 50 for enterprise accounts needing full audit trail
    *
    * HOW TO USE:
    * ```typescript
-   * const itemCount = useFeatureFlagNumber('itemsToDisplay');
-   * const items = data.slice(0, itemCount);
-   * return <List items={items} />;
+   * const count = useFeatureFlagNumber('recentEventsToShow');
+   * const events = allEvents.slice(0, count);
    * ```
-   *
-   * IN CLOUDBEES UI:
-   * - Create as Number flag
-   * - Define numeric options: 5, 10, 20, 50
-   * - Set default value (e.g., 10)
-   * - Gradually roll out higher values to test performance
    */
-  itemsToDisplay: new Rox.RoxNumber(10, [5, 10, 20, 50]),
+  recentEventsToShow: new Rox.RoxNumber(10, [5, 10, 25, 50]),
 };
 
 /**
@@ -163,10 +152,10 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
 
     // Log current flag states in development (helpful for debugging)
     if (import.meta.env.DEV) {
-      console.log('🏴 Current flag states:', {
-        showWelcomeBanner: flags.showWelcomeBanner.isEnabled(),
-        buttonVariant: flags.buttonVariant.getValue(),
-        itemsToDisplay: flags.itemsToDisplay.getValue(),
+      console.log('Current flag states:', {
+        showAIInsights: flags.showAIInsights.isEnabled(),
+        enableEnterpriseDashboard: flags.enableEnterpriseDashboard.isEnabled(),
+        recentEventsToShow: flags.recentEventsToShow.getValue(),
       });
     }
   } catch (error) {

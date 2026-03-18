@@ -1,14 +1,14 @@
 /**
- * User Management System
+ * User Management System — NovaCRM SaaS Dashboard
  *
  * Provides a fake user authentication system for demos.
  * Users can "log in" by selecting a persona, which sets their properties
  * for feature flag targeting.
  *
  * This allows demos to showcase:
- * - User segmentation and targeting
- * - Different user experiences based on properties
- * - A/B testing with different user types
+ * - Subscription-tier-based targeting
+ * - Role-based feature gating
+ * - Usage-based rollouts
  */
 
 /**
@@ -33,101 +33,117 @@ export interface User {
 }
 
 /**
- * Default Demo Users
+ * Default Demo Users — SaaS Platform Personas
  *
- * These users represent common personas for demonstrations.
- * Customize these for your specific demo use case.
+ * Four personas representing common SaaS user types with
+ * different subscription tiers, roles, and usage levels.
  */
 export const DEFAULT_USERS: User[] = [
   {
-    id: 'standard-user',
-    name: 'Alex Standard',
-    email: 'alex.standard@example.com',
-    description: 'Regular user with standard features',
-    properties: {
-      booleans: {
-        isPremiumCustomer: false,
-        isBetaTester: false,
-        isNewUser: false,
-      },
-      strings: {
-        accountType: 'basic',
-        userTier: 'standard',
-        region: 'us-east',
-        userId: 'standard-user',
-      },
-      numbers: {
-        accountAge: 12, // months
-        usageLevel: 5, // low usage
-      },
-    },
-  },
-  {
-    id: 'premium-user',
-    name: 'Jordan Premium',
-    email: 'jordan.premium@example.com',
-    description: 'Premium customer with access to advanced features',
+    id: 'platform-admin',
+    name: 'Sarah Admin',
+    email: 'sarah.admin@novacrm.io',
+    description: 'Platform administrator managing all customer accounts',
     properties: {
       booleans: {
         isPremiumCustomer: true,
         isBetaTester: false,
         isNewUser: false,
+        isAdmin: true,
       },
       strings: {
-        accountType: 'premium',
-        userTier: 'premium',
+        accountType: 'enterprise',
+        subscriptionTier: 'enterprise',
+        role: 'admin',
         region: 'us-west',
-        userId: 'premium-user',
+        userId: 'platform-admin',
       },
       numbers: {
-        accountAge: 36, // months
-        usageLevel: 25, // high usage
+        accountAge: 48,
+        usageLevel: 95,
+        accountMRR: 12500,
+        seatCount: 150,
       },
     },
   },
   {
-    id: 'beta-tester',
-    name: 'Sam Beta',
-    email: 'sam.beta@example.com',
-    description: 'Beta tester with access to experimental features',
+    id: 'developer-user',
+    name: 'Dev Patel',
+    email: 'dev.patel@startup.io',
+    description: 'Developer on a starter plan building integrations',
     properties: {
       booleans: {
         isPremiumCustomer: false,
         isBetaTester: true,
         isNewUser: false,
+        isAdmin: false,
       },
       strings: {
-        accountType: 'basic',
-        userTier: 'beta',
-        region: 'us-west',
-        userId: 'beta-tester',
+        accountType: 'starter',
+        subscriptionTier: 'starter',
+        role: 'developer',
+        region: 'us-east',
+        userId: 'developer-user',
       },
       numbers: {
-        accountAge: 24, // months
-        usageLevel: 15, // medium usage
+        accountAge: 18,
+        usageLevel: 40,
+        accountMRR: 299,
+        seatCount: 5,
       },
     },
   },
   {
-    id: 'new-user',
-    name: 'Taylor New',
-    email: 'taylor.new@example.com',
-    description: 'New user just getting started',
+    id: 'enterprise-csm',
+    name: 'Morgan Enterprise',
+    email: 'morgan.e@bigcorp.com',
+    description: 'Enterprise customer with premium support and analytics',
+    properties: {
+      booleans: {
+        isPremiumCustomer: true,
+        isBetaTester: false,
+        isNewUser: false,
+        isAdmin: false,
+      },
+      strings: {
+        accountType: 'enterprise',
+        subscriptionTier: 'enterprise',
+        role: 'customer-success',
+        region: 'eu-west',
+        userId: 'enterprise-csm',
+      },
+      numbers: {
+        accountAge: 36,
+        usageLevel: 75,
+        accountMRR: 8500,
+        seatCount: 85,
+      },
+    },
+  },
+  {
+    id: 'trial-user',
+    name: 'Riley Trial',
+    email: 'riley.trial@newco.io',
+    description: 'New trial user exploring the platform for the first time',
     properties: {
       booleans: {
         isPremiumCustomer: false,
         isBetaTester: false,
         isNewUser: true,
+        isAdmin: false,
       },
       strings: {
-        accountType: 'basic',
-        userTier: 'new',
+        accountType: 'trial',
+        subscriptionTier: 'trial',
+        role: 'viewer',
         region: 'us-east',
-        userId: 'new-user',
+        userId: 'trial-user',
       },
       numbers: {
-        accountAge: 1, // months
-        usageLevel: 2, // very low usage
+        accountAge: 0,
+        usageLevel: 3,
+        accountMRR: 0,
+        seatCount: 1,
       },
     },
   },

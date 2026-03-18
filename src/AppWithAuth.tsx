@@ -73,7 +73,7 @@ export function AppWithAuth() {
           <Text strong>{currentUser?.name}</Text>
           <br />
           <Text type="secondary" style={{ fontSize: 12 }}>
-            {currentUser?.properties.strings.userTier} • {currentUser?.properties.strings.region}
+            {currentUser?.properties.strings.subscriptionTier} • {currentUser?.properties.strings.role}
           </Text>
         </div>
       ),

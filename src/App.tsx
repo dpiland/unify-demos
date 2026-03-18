@@ -1,125 +1,48 @@
 /**
- * Main Application - Generic Dashboard
+ * NovaCRM — SaaS Platform Dashboard
  *
- * This is a GENERIC starting point for building custom applications.
- * Customize this dashboard for your specific use case (retail, fintech, healthcare, etc.)
+ * Admin dashboard for a fictitious SaaS software provider.
+ * Showcases subscription management, revenue metrics, customer health,
+ * and AI-powered insights.
  *
- * Under the hood, this uses feature flags to control different aspects of the UI,
- * demonstrating 3 common patterns:
- * 1. Boolean flag (showWelcomeBanner) - toggle UI visibility
- * 2. String flag (buttonVariant) - A/B test variants
- * 3. Number flag (itemsToDisplay) - configure numeric values
- *
- * 🎯 TO CUSTOMIZE:
- * - Replace generic content with your industry-specific content
- * - Add your own feature flags in src/lib/featureFlags.ts
- * - Add your components in src/components/
- * - Update theme in src/theme/
- *
- * 🤖 AI-FRIENDLY:
- * Tell an AI agent to transform this into your specific use case:
- * "Transform this dashboard into a [INDUSTRY] application with [FEATURES]"
+ * Feature flags control three key aspects:
+ * 1. Boolean flag (showAIInsights) — toggle AI insights panel
+ * 2. Boolean flag (enableEnterpriseDashboard) — gate enterprise analytics
+ * 3. Number flag (recentEventsToShow) — control activity table row count
  */
 
-import { Alert, Button, Card, Col, Layout, List, Row, Space, Statistic, Typography } from 'antd';
+import { Button, Card, Col, Layout, Row, Space, Statistic, Typography } from 'antd';
 import {
-  AppstoreOutlined,
-  CheckCircleOutlined,
-  DashboardOutlined,
-  UnorderedListOutlined,
+  CloudOutlined,
+  DollarOutlined,
+  TeamOutlined,
+  HeartOutlined,
+  CustomerServiceOutlined,
+  PlusOutlined,
+  FileTextOutlined,
+  CreditCardOutlined,
+  BookOutlined,
+  ArrowUpOutlined,
 } from '@ant-design/icons';
-import { useFeatureFlag, useFeatureFlagString, useFeatureFlagNumber } from './hooks/useFeatureFlag';
+import { useFeatureFlag, useFeatureFlagNumber } from './hooks/useFeatureFlag';
+import { SubscriptionActivityTable } from './components/SubscriptionActivityTable';
+import { AIInsightsPanel } from './components/AIInsightsPanel';
+import { RevenueBreakdown } from './components/RevenueBreakdown';
+import { EnterpriseDashboardCard } from './components/EnterpriseDashboardCard';
 import './App.css';
 
 const { Header, Content } = Layout;
-const { Title, Text, Paragraph } = Typography;
+const { Title } = Typography;
 
-/**
- * Sample data for demonstrating the number flag
- * In a real app, this would come from an API or database
- */
-const SAMPLE_DATA = [
-  'Sample Item 1 - Example data entry',
-  'Sample Item 2 - Example data entry',
-  'Sample Item 3 - Example data entry',
-  'Sample Item 4 - Example data entry',
-  'Sample Item 5 - Example data entry',
-  'Sample Item 6 - Example data entry',
-  'Sample Item 7 - Example data entry',
-  'Sample Item 8 - Example data entry',
-  'Sample Item 9 - Example data entry',
-  'Sample Item 10 - Example data entry',
-  'Sample Item 11 - Example data entry',
-  'Sample Item 12 - Example data entry',
-  'Sample Item 13 - Example data entry',
-  'Sample Item 14 - Example data entry',
-  'Sample Item 15 - Example data entry',
-  'Sample Item 16 - Example data entry',
-  'Sample Item 17 - Example data entry',
-  'Sample Item 18 - Example data entry',
-  'Sample Item 19 - Example data entry',
-  'Sample Item 20 - Example data entry',
-  'Sample Item 21 - Example data entry',
-  'Sample Item 22 - Example data entry',
-  'Sample Item 23 - Example data entry',
-  'Sample Item 24 - Example data entry',
-  'Sample Item 25 - Example data entry',
-  'Sample Item 26 - Example data entry',
-  'Sample Item 27 - Example data entry',
-  'Sample Item 28 - Example data entry',
-  'Sample Item 29 - Example data entry',
-  'Sample Item 30 - Example data entry',
-  'Sample Item 31 - Example data entry',
-  'Sample Item 32 - Example data entry',
-  'Sample Item 33 - Example data entry',
-  'Sample Item 34 - Example data entry',
-  'Sample Item 35 - Example data entry',
-  'Sample Item 36 - Example data entry',
-  'Sample Item 37 - Example data entry',
-  'Sample Item 38 - Example data entry',
-  'Sample Item 39 - Example data entry',
-  'Sample Item 40 - Example data entry',
-  'Sample Item 41 - Example data entry',
-  'Sample Item 42 - Example data entry',
-  'Sample Item 43 - Example data entry',
-  'Sample Item 44 - Example data entry',
-  'Sample Item 45 - Example data entry',
-  'Sample Item 46 - Example data entry',
-  'Sample Item 47 - Example data entry',
-  'Sample Item 48 - Example data entry',
-  'Sample Item 49 - Example data entry',
-  'Sample Item 50 - Example data entry',
-];
-
-/**
- * App Component - Simple Dashboard
- *
- * This component demonstrates all three types of feature flags:
- * - Boolean: Controls visibility of the announcement banner
- * - String: Controls button styling variant
- * - Number: Controls how many items to display in the list
- */
 function App() {
-  // ============================================
-  // EXAMPLE 1: Boolean Flag
-  // ============================================
-  // Controls whether the announcement banner is visible
-  // This could be a promotional banner, announcement, or any toggleable UI element
-  const showBanner = useFeatureFlag('showWelcomeBanner');
+  // Boolean flag — controls visibility of the AI insights panel
+  const showAIInsights = useFeatureFlag('showAIInsights');
 
-  // ============================================
-  // EXAMPLE 2: String Flag
-  // ============================================
-  // Controls the button styling variant (A/B testing example)
-  // Variants: 'default' | 'primary' | 'success'
-  const buttonVariant = useFeatureFlagString('buttonVariant');
+  // Boolean flag — gates enterprise-tier analytics features
+  const enableEnterprise = useFeatureFlag('enableEnterpriseDashboard');
 
-  // ============================================
-  // EXAMPLE 3: Number Flag
-  // ============================================
-  // Controls how many items to display in the list
-  // Options: 5, 10, 20, 50
-  const itemCount = useFeatureFlagNumber('itemsToDisplay');
+  // Number flag — controls how many subscription events appear in the table
+  const eventsToShow = useFeatureFlagNumber('recentEventsToShow');
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -135,177 +58,139 @@ function App() {
         }}
       >
         <Space>
-          <DashboardOutlined style={{ fontSize: 28, color: '#1890ff' }} />
+          <CloudOutlined style={{ fontSize: 28, color: '#1890ff' }} />
           <Title level={3} style={{ margin: 0 }}>
-            Dashboard
+            NovaCRM
           </Title>
         </Space>
       </Header>
 
-      {/* Main Content Area */}
+      {/* Main Content */}
       <Content style={{ padding: '24px', background: '#f0f2f5' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+        <div style={{ maxWidth: 1400, margin: '0 auto' }}>
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
-            {/* EXAMPLE: Boolean flag controls whether banner is visible */}
-            {/*
-              PATTERN: Conditional rendering based on flag state
-              USE CASE: Show/hide promotional banners, announcements, new features
-            */}
-            {showBanner && (
-              <Alert
-                message="Welcome to your dashboard!"
-                description="This is an example announcement banner that can be toggled on or off dynamically. Perfect for promotions, updates, or important notices."
-                type="info"
-                showIcon
-                closable
-              />
-            )}
-
-            {/* Stats Cards Section */}
+            {/* Stats Row */}
             <Row gutter={16}>
               <Col xs={24} sm={12} lg={6}>
                 <Card>
                   <Statistic
-                    title="Total Items"
-                    value={SAMPLE_DATA.length}
-                    prefix={<CheckCircleOutlined />}
+                    title="Monthly Recurring Revenue"
+                    value={248500}
+                    prefix={<DollarOutlined />}
+                    valueStyle={{ color: '#52c41a' }}
+                    formatter={(value) => `$${Number(value).toLocaleString()}`}
                   />
+                  <div style={{ marginTop: 8 }}>
+                    <ArrowUpOutlined style={{ color: '#52c41a', fontSize: 12 }} />
+                    <span style={{ color: '#52c41a', fontSize: 12, marginLeft: 4 }}>
+                      12.5% from last month
+                    </span>
+                  </div>
                 </Card>
               </Col>
               <Col xs={24} sm={12} lg={6}>
                 <Card>
                   <Statistic
-                    title="Active Users"
-                    value={1234}
-                    prefix={<AppstoreOutlined />}
+                    title="Active Subscriptions"
+                    value={1247}
+                    prefix={<TeamOutlined />}
                     valueStyle={{ color: '#1890ff' }}
                   />
+                  <div style={{ marginTop: 8 }}>
+                    <ArrowUpOutlined style={{ color: '#52c41a', fontSize: 12 }} />
+                    <span style={{ color: '#52c41a', fontSize: 12, marginLeft: 4 }}>
+                      38 new this month
+                    </span>
+                  </div>
                 </Card>
               </Col>
               <Col xs={24} sm={12} lg={6}>
                 <Card>
                   <Statistic
-                    title="Displayed"
-                    value={itemCount}
-                    suffix={`/ ${SAMPLE_DATA.length}`}
-                    prefix={<UnorderedListOutlined />}
+                    title="Customer Health Score"
+                    value={87}
+                    suffix="/ 100"
+                    prefix={<HeartOutlined />}
                     valueStyle={{ color: '#52c41a' }}
                   />
+                  <div style={{ marginTop: 8 }}>
+                    <span style={{ color: '#8c8c8c', fontSize: 12 }}>
+                      3 accounts at risk
+                    </span>
+                  </div>
                 </Card>
               </Col>
               <Col xs={24} sm={12} lg={6}>
                 <Card>
                   <Statistic
-                    title="Conversion Rate"
-                    value={93.5}
-                    suffix="%"
-                    valueStyle={{ color: '#52c41a' }}
+                    title="Open Support Tickets"
+                    value={23}
+                    prefix={<CustomerServiceOutlined />}
+                    valueStyle={{ color: '#faad14' }}
                   />
+                  <div style={{ marginTop: 8 }}>
+                    <span style={{ color: '#8c8c8c', fontSize: 12 }}>
+                      Avg. resolution: 4.2 hrs
+                    </span>
+                  </div>
                 </Card>
               </Col>
             </Row>
 
-            {/* EXAMPLE: Number flag controls list length */}
-            {/*
-              PATTERN: Use flag value to slice/limit data
-              USE CASE: Configure page sizes, limits, batch sizes
-            */}
-            <Card
-              title={
-                <Space>
-                  <UnorderedListOutlined />
-                  <span>Recent Activity</span>
-                </Space>
-              }
-            >
-              <List
-                dataSource={SAMPLE_DATA.slice(0, itemCount)}
-                renderItem={(item, index) => (
-                  <List.Item>
-                    <Text>
-                      {index + 1}. {item}
-                    </Text>
-                  </List.Item>
-                )}
-                bordered
-                size="small"
-                style={{ background: '#fff', marginBottom: 16 }}
-              />
-              <Text type="secondary">
-                Showing <strong>{itemCount}</strong> of {SAMPLE_DATA.length} items
-              </Text>
-            </Card>
+            {/* Main Content — Two Column Layout */}
+            <Row gutter={24}>
+              {/* Left Column — Activity & AI Insights */}
+              <Col xs={24} lg={16}>
+                <Space direction="vertical" size="large" style={{ width: '100%' }}>
+                  {/*
+                    NUMBER FLAG: recentEventsToShow
+                    Controls how many rows appear in the subscription activity table.
+                    Default is 10; options are 5, 10, 25, 50.
+                  */}
+                  <SubscriptionActivityTable itemCount={eventsToShow} />
 
-            {/* EXAMPLE: String flag controls button variant */}
-            {/*
-              PATTERN: Use flag value to determine component props/styling
-              USE CASE: A/B test different UI variants, layouts, themes
-            */}
+                  {/*
+                    BOOLEAN FLAG: showAIInsights
+                    Toggles visibility of the AI-powered insights panel.
+                    When enabled, shows churn predictions, upsell opportunities, and trends.
+                  */}
+                  {showAIInsights && <AIInsightsPanel />}
+                </Space>
+              </Col>
+
+              {/* Right Column — Revenue & Enterprise */}
+              <Col xs={24} lg={8}>
+                <Space direction="vertical" size="large" style={{ width: '100%' }}>
+                  <RevenueBreakdown />
+
+                  {/*
+                    BOOLEAN FLAG: enableEnterpriseDashboard
+                    Gates enterprise-tier analytics features.
+                    When off, shows an upgrade prompt with locked state.
+                    When on, shows LTV, churn rate, expansion revenue, and cohort data.
+                  */}
+                  <EnterpriseDashboardCard isEnabled={enableEnterprise} />
+                </Space>
+              </Col>
+            </Row>
+
+            {/* Quick Actions */}
             <Card title="Quick Actions">
               <Space size="middle" wrap>
-                <Button
-                  type={
-                    buttonVariant === 'primary'
-                      ? 'primary'
-                      : buttonVariant === 'success'
-                      ? 'primary'
-                      : 'default'
-                  }
-                  size="large"
-                  style={
-                    buttonVariant === 'success'
-                      ? { background: '#52c41a', borderColor: '#52c41a' }
-                      : {}
-                  }
-                >
-                  Primary Action
+                <Button type="primary" icon={<PlusOutlined />} size="large">
+                  Add Customer
                 </Button>
-                <Button size="large">Secondary Action</Button>
-                <Button size="large">View Details</Button>
+                <Button icon={<FileTextOutlined />} size="large">
+                  Generate Report
+                </Button>
+                <Button icon={<CreditCardOutlined />} size="large">
+                  Billing Overview
+                </Button>
+                <Button icon={<BookOutlined />} size="large">
+                  API Documentation
+                </Button>
               </Space>
-              <Paragraph type="secondary" style={{ marginTop: 16, marginBottom: 0 }}>
-                Current button style: <strong>{buttonVariant}</strong>
-              </Paragraph>
             </Card>
-
-            {/* Additional Dashboard Content */}
-            <Row gutter={16}>
-              <Col xs={24} lg={12}>
-                <Card title="Summary" style={{ height: '100%' }}>
-                  <Paragraph>
-                    This is a generic dashboard template that you can customize for your specific
-                    use case. Replace this content with charts, tables, or any other components
-                    relevant to your application.
-                  </Paragraph>
-                  <Paragraph>
-                    The interface adapts dynamically based on configuration, making it easy to test
-                    different layouts and features with your users.
-                  </Paragraph>
-                </Card>
-              </Col>
-              <Col xs={24} lg={12}>
-                <Card title="Getting Started" style={{ height: '100%' }}>
-                  <ul style={{ marginLeft: 20 }}>
-                    <li>
-                      <Text>Customize the UI in </Text>
-                      <code>src/App.tsx</code>
-                    </li>
-                    <li>
-                      <Text>Add your components in </Text>
-                      <code>src/components/</code>
-                    </li>
-                    <li>
-                      <Text>Update styling in </Text>
-                      <code>src/theme/</code>
-                    </li>
-                    <li>
-                      <Text>Configure features in </Text>
-                      <code>src/lib/featureFlags.ts</code>
-                    </li>
-                  </ul>
-                </Card>
-              </Col>
-            </Row>
           </Space>
         </div>
       </Content>
