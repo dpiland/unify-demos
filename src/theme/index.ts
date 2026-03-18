@@ -88,7 +88,7 @@ export const lightTheme: ThemeConfig = {
       headerColor: colors.neutral[900],
       headerHeight: 64,
       headerPadding: '0 24px',
-      siderBg: '#ffffff',
+      siderBg: colors.sidebar.bg,
       footerBg: colors.neutral[50],
       footerPadding: '24px 50px',
     },

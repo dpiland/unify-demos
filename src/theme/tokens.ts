@@ -68,6 +68,16 @@ export const colors = {
     900: '#5c0011',
   },
 
+  // Sidebar colors (dark navy for Unify-style sidebar)
+  sidebar: {
+    bg: '#1b1f3b',
+    bgHover: '#252a4a',
+    bgSelected: '#303660',
+    text: '#a0a3bd',
+    textActive: '#ffffff',
+    border: '#2d3258',
+  },
+
   // Neutral colors (grays)
   neutral: {
     50: '#fafafa',

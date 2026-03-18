@@ -1,199 +1,139 @@
 /**
- * NovaCRM — SaaS Platform Dashboard
+ * CloudBees Unify — DevSecOps Control Plane
  *
- * Admin dashboard for a fictitious SaaS software provider.
- * Showcases subscription management, revenue metrics, customer health,
- * and AI-powered insights.
- *
- * Feature flags control three key aspects:
- * 1. Boolean flag (showAIInsights) — toggle AI insights panel
- * 2. Boolean flag (enableEnterpriseDashboard) — gate enterprise analytics
- * 3. Number flag (recentEventsToShow) — control activity table row count
+ * Sidebar-based layout with state-driven page routing.
+ * Feature flags control which platform modules are available:
+ * - enableFeatureManagement (Boolean) — Feature Management module
+ * - enableApplications (Boolean) — Applications module
+ * - enableSmartTests (Boolean) — Smart Tests module
+ * - enableSecurity (Boolean) — Security module
+ * - planTier (String) — Controls support/SLA display
  */
 
-import { Button, Card, Col, Layout, Row, Space, Statistic, Typography } from 'antd';
-import {
-  CloudOutlined,
-  DollarOutlined,
-  TeamOutlined,
-  HeartOutlined,
-  CustomerServiceOutlined,
-  PlusOutlined,
-  FileTextOutlined,
-  CreditCardOutlined,
-  BookOutlined,
-  ArrowUpOutlined,
-} from '@ant-design/icons';
-import { useFeatureFlag, useFeatureFlagNumber } from './hooks/useFeatureFlag';
-import { SubscriptionActivityTable } from './components/SubscriptionActivityTable';
-import { AIInsightsPanel } from './components/AIInsightsPanel';
-import { RevenueBreakdown } from './components/RevenueBreakdown';
-import { EnterpriseDashboardCard } from './components/EnterpriseDashboardCard';
+import { useState } from 'react';
+import { Breadcrumb, Layout, Typography } from 'antd';
+import { HomeOutlined } from '@ant-design/icons';
+import { useFeatureFlag, useFeatureFlagString } from './hooks/useFeatureFlag';
+import { Sidebar } from './components/Sidebar';
+import { HomePage } from './components/pages/HomePage';
+import { ComponentsPage } from './components/pages/ComponentsPage';
+import { RunsPage } from './components/pages/RunsPage';
+import { ApplicationsPage } from './components/pages/ApplicationsPage';
+import { FeatureManagementPage } from './components/pages/FeatureManagementPage';
+import { SecurityPage } from './components/pages/SecurityPage';
+import { AuditHistoryPage } from './components/pages/AuditHistoryPage';
+import { AnalyticsPage } from './components/pages/AnalyticsPage';
+import { ConfigurationsPage } from './components/pages/ConfigurationsPage';
+import { JenkinsManagementPage } from './components/pages/JenkinsManagementPage';
+import { SmartTestsPage } from './components/pages/SmartTestsPage';
+import { ReleasesPage } from './components/pages/ReleasesPage';
 import './App.css';
 
-const { Header, Content } = Layout;
-const { Title } = Typography;
+const { Content } = Layout;
+const { Text } = Typography;
+
+const PAGE_TITLES: Record<string, string> = {
+  home: 'Home',
+  components: 'Components',
+  runs: 'Runs',
+  applications: 'Applications',
+  releases: 'Releases',
+  'feature-management': 'Feature management',
+  security: 'Security',
+  'audit-history': 'Audit history',
+  analytics: 'Analytics',
+  configurations: 'Configurations',
+  'jenkins-management': 'Jenkins management',
+  'smart-tests': 'Smart tests',
+};
 
 function App() {
-  // Boolean flag — controls visibility of the AI insights panel
-  const showAIInsights = useFeatureFlag('showAIInsights');
+  const [currentPage, setCurrentPage] = useState('home');
+  const [collapsed, setCollapsed] = useState(false);
 
-  // Boolean flag — gates enterprise-tier analytics features
-  const enableEnterprise = useFeatureFlag('enableEnterpriseDashboard');
+  // Boolean flags — gate platform modules
+  const enableFeatureManagement = useFeatureFlag('enableFeatureManagement');
+  const enableApplications = useFeatureFlag('enableApplications');
+  const enableSmartTests = useFeatureFlag('enableSmartTests');
+  const enableSecurity = useFeatureFlag('enableSecurity');
 
-  // Number flag — controls how many subscription events appear in the table
-  const eventsToShow = useFeatureFlagNumber('recentEventsToShow');
+  // String flag — controls support/SLA tier display
+  const planTier = useFeatureFlagString('planTier');
+
+  function renderPage() {
+    switch (currentPage) {
+      case 'home':
+        return <HomePage planTier={planTier} />;
+      case 'components':
+        return <ComponentsPage />;
+      case 'runs':
+        return <RunsPage />;
+      case 'applications':
+        return <ApplicationsPage />;
+      case 'releases':
+        return <ReleasesPage planTier={planTier} />;
+      case 'feature-management':
+        return <FeatureManagementPage />;
+      case 'security':
+        return <SecurityPage />;
+      case 'audit-history':
+        return <AuditHistoryPage />;
+      case 'analytics':
+        return <AnalyticsPage />;
+      case 'configurations':
+        return <ConfigurationsPage />;
+      case 'jenkins-management':
+        return <JenkinsManagementPage />;
+      case 'smart-tests':
+        return <SmartTestsPage />;
+      default:
+        return <HomePage planTier={planTier} />;
+    }
+  }
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      {/* Header */}
-      <Header
-        style={{
-          background: '#fff',
-          padding: '0 24px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        <Space>
-          <CloudOutlined style={{ fontSize: 28, color: '#1890ff' }} />
-          <Title level={3} style={{ margin: 0 }}>
-            NovaCRM
-          </Title>
-        </Space>
-      </Header>
+      <Sidebar
+        currentPage={currentPage}
+        onNavigate={setCurrentPage}
+        collapsed={collapsed}
+        onCollapse={setCollapsed}
+        enableFeatureManagement={enableFeatureManagement}
+        enableApplications={enableApplications}
+        enableSmartTests={enableSmartTests}
+        enableSecurity={enableSecurity}
+        planTier={planTier}
+      />
 
-      {/* Main Content */}
-      <Content style={{ padding: '24px', background: '#f0f2f5' }}>
-        <div style={{ maxWidth: 1400, margin: '0 auto' }}>
-          <Space direction="vertical" size="large" style={{ width: '100%' }}>
-            {/* Stats Row */}
-            <Row gutter={16}>
-              <Col xs={24} sm={12} lg={6}>
-                <Card>
-                  <Statistic
-                    title="Monthly Recurring Revenue"
-                    value={248500}
-                    prefix={<DollarOutlined />}
-                    valueStyle={{ color: '#52c41a' }}
-                    formatter={(value) => `$${Number(value).toLocaleString()}`}
-                  />
-                  <div style={{ marginTop: 8 }}>
-                    <ArrowUpOutlined style={{ color: '#52c41a', fontSize: 12 }} />
-                    <span style={{ color: '#52c41a', fontSize: 12, marginLeft: 4 }}>
-                      12.5% from last month
-                    </span>
-                  </div>
-                </Card>
-              </Col>
-              <Col xs={24} sm={12} lg={6}>
-                <Card>
-                  <Statistic
-                    title="Active Subscriptions"
-                    value={1247}
-                    prefix={<TeamOutlined />}
-                    valueStyle={{ color: '#1890ff' }}
-                  />
-                  <div style={{ marginTop: 8 }}>
-                    <ArrowUpOutlined style={{ color: '#52c41a', fontSize: 12 }} />
-                    <span style={{ color: '#52c41a', fontSize: 12, marginLeft: 4 }}>
-                      38 new this month
-                    </span>
-                  </div>
-                </Card>
-              </Col>
-              <Col xs={24} sm={12} lg={6}>
-                <Card>
-                  <Statistic
-                    title="Customer Health Score"
-                    value={87}
-                    suffix="/ 100"
-                    prefix={<HeartOutlined />}
-                    valueStyle={{ color: '#52c41a' }}
-                  />
-                  <div style={{ marginTop: 8 }}>
-                    <span style={{ color: '#8c8c8c', fontSize: 12 }}>
-                      3 accounts at risk
-                    </span>
-                  </div>
-                </Card>
-              </Col>
-              <Col xs={24} sm={12} lg={6}>
-                <Card>
-                  <Statistic
-                    title="Open Support Tickets"
-                    value={23}
-                    prefix={<CustomerServiceOutlined />}
-                    valueStyle={{ color: '#faad14' }}
-                  />
-                  <div style={{ marginTop: 8 }}>
-                    <span style={{ color: '#8c8c8c', fontSize: 12 }}>
-                      Avg. resolution: 4.2 hrs
-                    </span>
-                  </div>
-                </Card>
-              </Col>
-            </Row>
-
-            {/* Main Content — Two Column Layout */}
-            <Row gutter={24}>
-              {/* Left Column — Activity & AI Insights */}
-              <Col xs={24} lg={16}>
-                <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                  {/*
-                    NUMBER FLAG: recentEventsToShow
-                    Controls how many rows appear in the subscription activity table.
-                    Default is 10; options are 5, 10, 25, 50.
-                  */}
-                  <SubscriptionActivityTable itemCount={eventsToShow} />
-
-                  {/*
-                    BOOLEAN FLAG: showAIInsights
-                    Toggles visibility of the AI-powered insights panel.
-                    When enabled, shows churn predictions, upsell opportunities, and trends.
-                  */}
-                  {showAIInsights && <AIInsightsPanel />}
-                </Space>
-              </Col>
-
-              {/* Right Column — Revenue & Enterprise */}
-              <Col xs={24} lg={8}>
-                <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                  <RevenueBreakdown />
-
-                  {/*
-                    BOOLEAN FLAG: enableEnterpriseDashboard
-                    Gates enterprise-tier analytics features.
-                    When off, shows an upgrade prompt with locked state.
-                    When on, shows LTV, churn rate, expansion revenue, and cohort data.
-                  */}
-                  <EnterpriseDashboardCard isEnabled={enableEnterprise} />
-                </Space>
-              </Col>
-            </Row>
-
-            {/* Quick Actions */}
-            <Card title="Quick Actions">
-              <Space size="middle" wrap>
-                <Button type="primary" icon={<PlusOutlined />} size="large">
-                  Add Customer
-                </Button>
-                <Button icon={<FileTextOutlined />} size="large">
-                  Generate Report
-                </Button>
-                <Button icon={<CreditCardOutlined />} size="large">
-                  Billing Overview
-                </Button>
-                <Button icon={<BookOutlined />} size="large">
-                  API Documentation
-                </Button>
-              </Space>
-            </Card>
-          </Space>
+      <Layout>
+        {/* Breadcrumb Header */}
+        <div
+          style={{
+            background: '#fff',
+            padding: '12px 24px',
+            borderBottom: '1px solid #f0f0f0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <Breadcrumb
+            items={[
+              { title: <HomeOutlined /> },
+              ...(currentPage !== 'home'
+                ? [{ title: <Text>{PAGE_TITLES[currentPage] || currentPage}</Text> }]
+                : []),
+            ]}
+          />
         </div>
-      </Content>
+
+        {/* Content Area */}
+        <Content style={{ padding: 24, background: '#f0f2f5' }}>
+          <div style={{ maxWidth: 1400, margin: '0 auto' }}>
+            {renderPage()}
+          </div>
+        </Content>
+      </Layout>
     </Layout>
   );
 }

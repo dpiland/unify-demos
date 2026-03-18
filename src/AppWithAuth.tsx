@@ -2,7 +2,8 @@
  * AppWithAuth Component
  *
  * Wraps the main App component with authentication/user selection.
- * Shows LoginPage until a user is selected, then shows the main app.
+ * Shows LoginPage until a user is selected, then shows the main app
+ * with a user dropdown in the top-right corner.
  */
 
 import { useState, useEffect } from 'react';
@@ -27,44 +28,35 @@ export function AppWithAuth() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load user from localStorage on mount
   useEffect(() => {
     const storedUser = loadCurrentUser();
     if (storedUser) {
       setCurrentUser(storedUser);
-      // Set properties for feature flag targeting
       setUserProperties(storedUser);
     }
     setIsLoading(false);
   }, []);
 
-  // Handle user selection from login page
   const handleSelectUser = (user: User) => {
     setCurrentUser(user);
     saveCurrentUser(user);
-    // Set properties for feature flag targeting
     setUserProperties(user);
   };
 
-  // Handle logout
   const handleLogout = () => {
     clearCurrentUser();
     setCurrentUser(null);
-    // Optionally reload to reset feature flags
     window.location.reload();
   };
 
-  // Handle switching users
   const handleSwitchUser = (userId: string) => {
     const user = DEFAULT_USERS.find(u => u.id === userId);
     if (user) {
       handleSelectUser(user);
-      // Reload to apply new user properties
       window.location.reload();
     }
   };
 
-  // Build dropdown menu for user switching
   const userMenuItems: MenuProps['items'] = [
     {
       key: 'current',
@@ -73,7 +65,7 @@ export function AppWithAuth() {
           <Text strong>{currentUser?.name}</Text>
           <br />
           <Text type="secondary" style={{ fontSize: 12 }}>
-            {currentUser?.properties.strings.subscriptionTier} • {currentUser?.properties.strings.role}
+            {currentUser?.properties.strings.planTier} plan &middot; {currentUser?.properties.strings.role}
           </Text>
         </div>
       ),
@@ -105,24 +97,21 @@ export function AppWithAuth() {
     },
   ];
 
-  // Show loading state
   if (isLoading) {
-    return null; // or a loading spinner
+    return null;
   }
 
-  // Show login page if no user
   if (!currentUser) {
     return <LoginPage onSelectUser={handleSelectUser} />;
   }
 
-  // Show app with user menu
   return (
     <div style={{ position: 'relative' }}>
       {/* User menu in top-right corner */}
       <div
         style={{
           position: 'fixed',
-          top: 16,
+          top: 12,
           right: 16,
           zIndex: 1000,
         }}
@@ -130,7 +119,7 @@ export function AppWithAuth() {
         <Dropdown menu={{ items: userMenuItems }} trigger={['click']} placement="bottomRight">
           <Button
             type="default"
-            size="large"
+            size="small"
             style={{
               background: '#fff',
               boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
@@ -139,28 +128,27 @@ export function AppWithAuth() {
             <Space>
               <div
                 style={{
-                  width: 24,
-                  height: 24,
+                  width: 22,
+                  height: 22,
                   borderRadius: '50%',
                   background: '#1890ff',
                   color: '#fff',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: 12,
+                  fontSize: 11,
                   fontWeight: 600,
                 }}
               >
                 {getUserInitials(currentUser.name)}
               </div>
-              <span>{currentUser.name.split(' ')[0]}</span>
+              <span style={{ fontSize: 13 }}>{currentUser.name.split(' ')[0]}</span>
               <UserOutlined />
             </Space>
           </Button>
         </Dropdown>
       </div>
 
-      {/* Main app */}
       <App />
     </div>
   );

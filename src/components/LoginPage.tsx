@@ -1,13 +1,12 @@
 /**
- * LoginPage Component — NovaCRM
+ * LoginPage Component — CloudBees Unify
  *
- * Provides a user selector for demo purposes.
- * Users can "log in" by clicking on a persona, which sets their
- * properties for feature flag targeting.
+ * User persona selector for demos. Three personas representing
+ * Free, Team, and Enterprise plan tiers.
  */
 
 import { Card, Row, Col, Typography, Button, Space, Tag } from 'antd';
-import { SettingOutlined, CodeOutlined, CrownOutlined, RocketOutlined } from '@ant-design/icons';
+import { CodeOutlined, TeamOutlined, SafetyCertificateOutlined, CrownOutlined } from '@ant-design/icons';
 import { DEFAULT_USERS, type User } from '../lib/users';
 
 const { Title, Text, Paragraph } = Typography;
@@ -16,34 +15,28 @@ interface LoginPageProps {
   onSelectUser: (user: User) => void;
 }
 
-/**
- * Get icon for user type
- */
 function getUserIcon(userId: string) {
   const iconProps = { style: { fontSize: 32 } };
 
   switch (userId) {
-    case 'platform-admin':
-      return <SettingOutlined {...iconProps} style={{ ...iconProps.style, color: '#1890ff' }} />;
-    case 'developer-user':
-      return <CodeOutlined {...iconProps} style={{ ...iconProps.style, color: '#722ed1' }} />;
-    case 'enterprise-csm':
-      return <CrownOutlined {...iconProps} style={{ ...iconProps.style, color: '#faad14' }} />;
-    case 'trial-user':
-      return <RocketOutlined {...iconProps} style={{ ...iconProps.style, color: '#52c41a' }} />;
+    case 'free-developer':
+      return <CodeOutlined {...iconProps} style={{ ...iconProps.style, color: '#8c8c8c' }} />;
+    case 'team-lead':
+      return <TeamOutlined {...iconProps} style={{ ...iconProps.style, color: '#1890ff' }} />;
+    case 'cloudbees-admin':
+      return <CrownOutlined {...iconProps} style={{ ...iconProps.style, color: '#722ed1' }} />;
+    case 'enterprise-admin':
+      return <SafetyCertificateOutlined {...iconProps} style={{ ...iconProps.style, color: '#faad14' }} />;
     default:
-      return <SettingOutlined {...iconProps} style={{ ...iconProps.style, color: '#1890ff' }} />;
+      return <CodeOutlined {...iconProps} style={{ ...iconProps.style, color: '#8c8c8c' }} />;
   }
 }
 
-/**
- * Get color for subscription tier tag
- */
 function getTierColor(tier: string): string {
   const colorMap: Record<string, string> = {
+    free: 'default',
+    team: 'blue',
     enterprise: 'gold',
-    starter: 'blue',
-    trial: 'green',
   };
   return colorMap[tier] || 'default';
 }
@@ -53,7 +46,7 @@ export function LoginPage({ onSelectUser }: LoginPageProps) {
     <div
       style={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: 'linear-gradient(135deg, #1b1f3b 0%, #303660 50%, #1b1f3b 100%)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -63,14 +56,14 @@ export function LoginPage({ onSelectUser }: LoginPageProps) {
       <div style={{ maxWidth: 1200, width: '100%' }}>
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
           <Title level={1} style={{ color: '#fff', marginBottom: 8 }}>
-            NovaCRM
+            CloudBees Unify
           </Title>
-          <Text style={{ fontSize: 16, color: 'rgba(255, 255, 255, 0.85)' }}>
+          <Text style={{ fontSize: 16, color: 'rgba(255, 255, 255, 0.75)' }}>
             Select your account to continue
           </Text>
         </div>
 
-        <Row gutter={[24, 24]}>
+        <Row gutter={[24, 24]} justify="center">
           {DEFAULT_USERS.map((user) => (
             <Col xs={24} sm={12} lg={6} key={user.id}>
               <Card
@@ -87,7 +80,6 @@ export function LoginPage({ onSelectUser }: LoginPageProps) {
                 }}
               >
                 <Space direction="vertical" size="middle" style={{ width: '100%', flex: 1 }}>
-                  {/* Avatar */}
                   <div style={{ textAlign: 'center' }}>
                     <div
                       style={{
@@ -109,12 +101,11 @@ export function LoginPage({ onSelectUser }: LoginPageProps) {
                       {user.name}
                     </Title>
 
-                    <Tag color={getTierColor(user.properties.strings.subscriptionTier)}>
-                      {user.properties.strings.subscriptionTier}
+                    <Tag color={getTierColor(user.properties.strings.planTier)}>
+                      {user.properties.strings.planTier}
                     </Tag>
                   </div>
 
-                  {/* Description */}
                   <Paragraph
                     type="secondary"
                     style={{
@@ -127,7 +118,6 @@ export function LoginPage({ onSelectUser }: LoginPageProps) {
                     {user.description}
                   </Paragraph>
 
-                  {/* Properties Summary */}
                   <div style={{ flex: 1 }}>
                     <div
                       style={{
@@ -142,19 +132,16 @@ export function LoginPage({ onSelectUser }: LoginPageProps) {
                         <Text type="secondary">{user.properties.strings.role}</Text>
                       </div>
                       <div style={{ marginBottom: 4 }}>
-                        <Text strong>MRR:</Text>{' '}
-                        <Text type="secondary">
-                          ${user.properties.numbers.accountMRR.toLocaleString()}
-                        </Text>
+                        <Text strong>Pipelines:</Text>{' '}
+                        <Text type="secondary">{user.properties.numbers.pipelinesCount}</Text>
                       </div>
                       <div>
-                        <Text strong>Seats:</Text>{' '}
-                        <Text type="secondary">{user.properties.numbers.seatCount}</Text>
+                        <Text strong>Team Size:</Text>{' '}
+                        <Text type="secondary">{user.properties.numbers.teamSize}</Text>
                       </div>
                     </div>
                   </div>
 
-                  {/* Login Button */}
                   <Button
                     type="primary"
                     size="large"
@@ -169,19 +156,18 @@ export function LoginPage({ onSelectUser }: LoginPageProps) {
           ))}
         </Row>
 
-        {/* Info Footer */}
         <div
           style={{
             textAlign: 'center',
             marginTop: 48,
             padding: 24,
-            background: 'rgba(255, 255, 255, 0.1)',
+            background: 'rgba(255, 255, 255, 0.08)',
             borderRadius: 8,
           }}
         >
-          <Text style={{ color: 'rgba(255, 255, 255, 0.85)', fontSize: 13 }}>
-            Each account has different properties used for feature flag targeting in CloudBees.
-            Switch between accounts to see how features change dynamically.
+          <Text style={{ color: 'rgba(255, 255, 255, 0.75)', fontSize: 13 }}>
+            Each account represents a different plan tier. Switch between accounts to see
+            how platform modules unlock and support options change based on feature flag targeting.
           </Text>
         </div>
       </div>

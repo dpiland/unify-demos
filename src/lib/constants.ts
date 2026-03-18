@@ -1,37 +1,32 @@
 /**
- * Feature Flag Constants and Metadata — NovaCRM SaaS Dashboard
- *
- * Human-readable descriptions and default values for all feature flags.
+ * Feature Flag Constants — CloudBees Unify Control Plane
  */
 
-/**
- * Feature Flag Keys (for type-safe references)
- */
 export const FEATURE_FLAG_KEYS = {
-  SHOW_AI_INSIGHTS: 'showAIInsights',
-  ENABLE_ENTERPRISE_DASHBOARD: 'enableEnterpriseDashboard',
-  RECENT_EVENTS_TO_SHOW: 'recentEventsToShow',
+  ENABLE_FEATURE_MANAGEMENT: 'enableFeatureManagement',
+  ENABLE_APPLICATIONS: 'enableApplications',
+  ENABLE_SMART_TESTS: 'enableSmartTests',
+  ENABLE_SECURITY: 'enableSecurity',
+  PLAN_TIER: 'planTier',
 } as const;
 
-/**
- * Flag Descriptions
- */
 export const FLAG_DESCRIPTIONS: Record<string, string> = {
-  showAIInsights:
-    'Toggle the AI-powered insights panel showing churn predictions, upsell recommendations, and usage trend analysis.',
-  enableEnterpriseDashboard:
-    'Gate access to enterprise-tier analytics features including cohort analysis, LTV projections, and advanced segmentation.',
-  recentEventsToShow:
-    'Control how many subscription events appear in the activity feed (5, 10, 25, 50).',
+  enableFeatureManagement:
+    'Enable the Feature Management module — feature flags, experiments, rollouts, and targeting rules.',
+  enableApplications:
+    'Enable the Applications module — application registry, deployment tracking, and environment management.',
+  enableSmartTests:
+    'Enable the Smart Tests module — test intelligence, test selection optimization, and flaky test detection.',
+  enableSecurity:
+    'Enable the Security module — SAST/DAST scanning, vulnerability dashboard, and compliance reports.',
+  planTier:
+    'Controls the plan tier (free/team/enterprise) which determines support options and SLA display.',
 };
 
-/**
- * Default Flag Values
- *
- * Fallback values used when CloudBees SDK is not configured or unavailable.
- */
 export const DEFAULT_FLAG_VALUES = {
-  showAIInsights: false,
-  enableEnterpriseDashboard: false,
-  recentEventsToShow: 10,
+  enableFeatureManagement: false,
+  enableApplications: false,
+  enableSmartTests: false,
+  enableSecurity: false,
+  planTier: 'free',
 };
