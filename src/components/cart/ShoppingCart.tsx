@@ -25,6 +25,8 @@ export interface ShoppingCartProps {
   enableExpressCheckout: boolean;
   checkoutFlowVariant: 'standard' | 'express' | 'single-page';
   cartCountdownMinutes: number;
+  isBlackFriday?: boolean;
+  saleOverridePercent?: number;
 }
 
 /**
@@ -48,9 +50,13 @@ export function ShoppingCart({
   enableExpressCheckout,
   checkoutFlowVariant,
   cartCountdownMinutes,
+  isBlackFriday = false,
+  saleOverridePercent,
 }: ShoppingCartProps) {
-  // Calculate cart totals
-  const cart: Cart = calculateCart(cartItems, freeShippingThreshold);
+  // Black Friday: free shipping on all orders (threshold = 0)
+  const effectiveThreshold = isBlackFriday ? 0 : freeShippingThreshold;
+  // Calculate cart totals with override discount applied
+  const cart: Cart = calculateCart(cartItems, effectiveThreshold, saleOverridePercent || (isBlackFriday ? 20 : 0));
 
   // Countdown timer state
   const [timeRemaining, setTimeRemaining] = useState(cartCountdownMinutes * 60); // Convert to seconds
@@ -140,6 +146,26 @@ export function ShoppingCart({
 
           {/* Cart Footer (Fixed at bottom) */}
           <div style={{ borderTop: '1px solid #f0f0f0', padding: 16 }}>
+            {/* Flash Sale Alert */}
+            {saleOverridePercent && saleOverridePercent > 0 && (
+              <Alert
+                message={`Flash Sale — ${saleOverridePercent}% off applied!`}
+                type="error"
+                showIcon
+                style={{ marginBottom: 12, fontWeight: 600 }}
+              />
+            )}
+
+            {/* Black Friday Alert */}
+            {isBlackFriday && !saleOverridePercent && (
+              <Alert
+                message="Black Friday — Free Shipping on All Orders!"
+                type="success"
+                showIcon
+                style={{ marginBottom: 12, fontWeight: 600 }}
+              />
+            )}
+
             {/* Countdown Timer */}
             {timeRemaining > 0 && (
               <Alert
@@ -162,7 +188,7 @@ export function ShoppingCart({
               tax={cart.tax}
               shipping={cart.shipping}
               total={cart.total}
-              freeShippingThreshold={freeShippingThreshold}
+              freeShippingThreshold={effectiveThreshold}
             />
 
             <Divider style={{ margin: '16px 0' }} />

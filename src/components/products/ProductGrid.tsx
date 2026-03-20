@@ -16,6 +16,8 @@ export interface ProductGridProps {
   productsPerPage: number;
   onAddToCart?: (product: Product) => void;
   showWishlist?: boolean;
+  isBlackFriday?: boolean;
+  saleOverridePercent?: number;
 }
 
 /**
@@ -33,6 +35,8 @@ export function ProductGrid({
   productsPerPage,
   onAddToCart,
   showWishlist = false,
+  isBlackFriday = false,
+  saleOverridePercent,
 }: ProductGridProps) {
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -71,6 +75,8 @@ export function ProductGrid({
               displayMode="list"
               onAddToCart={onAddToCart}
               showWishlist={showWishlist}
+              isBlackFriday={isBlackFriday}
+              saleOverridePercent={saleOverridePercent}
             />
           ))}
         </div>
@@ -139,6 +145,8 @@ export function ProductGrid({
               displayMode="grid"
               onAddToCart={onAddToCart}
               showWishlist={showWishlist}
+              isBlackFriday={isBlackFriday}
+              saleOverridePercent={saleOverridePercent}
             />
           </Col>
         ))}

@@ -15,6 +15,9 @@ import Rox from 'rox-browser';
 import type { RoxSetupOptions} from './types';
 import type { User } from './users';
 
+/** Guard against duplicate Rox.register in React Strict Mode */
+let initialized = false;
+
 /**
  * Feature Flag Definitions - Ridgeline Outfitters
  *
@@ -146,6 +149,41 @@ export const flags = {
    * - Enable for users with memberSince > 6 months
    */
   enableWishlist: new Rox.Flag(),
+
+  /**
+   * 6. Enable Black Friday Deals
+   *
+   * USE CASE: Site-wide 20% off all items + free shipping (no minimum)
+   * PATTERN: if (enabled) { apply 20% discount + free shipping }
+   *
+   * BUSINESS VALUE:
+   * - Launch Black Friday instantly without code deploy
+   * - Enable 1 week early for VIP/Summit members
+   * - Disable instantly if inventory runs low
+   *
+   * TARGETING EXAMPLES:
+   * - Enable for membershipTier == "vip" (1 week early access)
+   * - Enable for all users on Black Friday
+   */
+  enableBlackFriday: new Rox.Flag(),
+
+  /**
+   * 7. Enable Flash Sale
+   *
+   * USE CASE: Time-limited tiered discounts with countdown timer
+   * Discount tiers: 40% VIP, 25% Beta, 10% Basic, 5% New
+   * PATTERN: if (enabled) { show flash sale banner + apply tier discount }
+   *
+   * BUSINESS VALUE:
+   * - Create urgency with 2-hour countdown
+   * - Reward loyal customers with higher discounts
+   * - Test conversion impact of tiered pricing
+   *
+   * TARGETING EXAMPLES:
+   * - Enable for all users during flash sale window
+   * - A/B test discount levels by segment
+   */
+  enableFlashSale: new Rox.Flag(true),
 
   // =================================================================
   // STRING FLAGS (3) - A/B Test Variants
@@ -321,7 +359,10 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
   }
 
   try {
-    Rox.register('', flags);
+    if (!initialized) {
+      Rox.register('', flags);
+      initialized = true;
+    }
 
     console.log('Initializing CloudBees Feature Flags...');
 
@@ -341,6 +382,8 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
         enableRecommendations: flags.enableRecommendations.isEnabled(),
         showLoyaltyProgram: flags.showLoyaltyProgram.isEnabled(),
         enableWishlist: flags.enableWishlist.isEnabled(),
+        enableBlackFriday: flags.enableBlackFriday.isEnabled(),
+        enableFlashSale: flags.enableFlashSale.isEnabled(),
       });
       console.log('  String Flags:', {
         productDisplayMode: flags.productDisplayMode.getValue(),

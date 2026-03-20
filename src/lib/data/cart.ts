@@ -35,9 +35,14 @@ export interface Cart {
  * @param freeShippingThreshold - Minimum order value for free shipping
  * @returns Cart with calculated totals
  */
-export function calculateCart(items: CartItem[], freeShippingThreshold: number = 50): Cart {
+export function calculateCart(items: CartItem[], freeShippingThreshold: number = 50, saleOverridePercent: number = 0): Cart {
   const subtotal = items.reduce((sum, item) => {
-    const price = item.product.salePrice || item.product.price;
+    let price: number;
+    if (saleOverridePercent > 0) {
+      price = Math.round(item.product.price * (1 - saleOverridePercent / 100) * 100) / 100;
+    } else {
+      price = item.product.salePrice || item.product.price;
+    }
     return sum + price * item.quantity;
   }, 0);
 

@@ -14,6 +14,8 @@ export const FEATURE_FLAG_KEYS = {
   ENABLE_RECOMMENDATIONS: 'enableRecommendations',
   SHOW_LOYALTY_PROGRAM: 'showLoyaltyProgram',
   ENABLE_WISHLIST: 'enableWishlist',
+  ENABLE_BLACK_FRIDAY: 'enableBlackFriday',
+  ENABLE_FLASH_SALE: 'enableFlashSale',
 
   // String flags
   PRODUCT_DISPLAY_MODE: 'productDisplayMode',
@@ -43,6 +45,10 @@ export const FLAG_DESCRIPTIONS: Record<string, string> = {
     'Display Peak Rewards loyalty program with trail credits, tier status, and redeemable rewards.',
   enableWishlist:
     'Enable gear wishlist/save-for-later feature. Let customers build wishlists for upcoming trips.',
+  enableBlackFriday:
+    'Enable Black Friday site-wide sale: 20% off all items + free shipping on every order. Enable early for VIP Summit members.',
+  enableFlashSale:
+    'Enable tiered flash sale with 2-hour countdown: 40% off Summit, 25% Trailtest, 10% Dayhiker, 5% Explorer.',
 
   // String flags
   productDisplayMode:
@@ -74,6 +80,8 @@ export const DEFAULT_FLAG_VALUES = {
   enableRecommendations: false,
   showLoyaltyProgram: false,
   enableWishlist: false,
+  enableBlackFriday: false,
+  enableFlashSale: true,
 
   // String flags - first variant is default
   productDisplayMode: 'grid',

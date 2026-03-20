@@ -32,6 +32,8 @@ import {
 import { useFeatureFlag, useFeatureFlagString, useFeatureFlagNumber } from './hooks/useFeatureFlag';
 import { HeroSection } from './components/hero/HeroSection';
 import { PromoBanner } from './components/banners/PromoBanner';
+import { BlackFridayBanner } from './components/banners/BlackFridayBanner';
+import { FlashSaleBanner } from './components/banners/FlashSaleBanner';
 import { EnvironmentalBanner } from './components/banners/EnvironmentalBanner';
 import { ProductGrid } from './components/products/ProductGrid';
 import { ShoppingCart } from './components/cart/ShoppingCart';
@@ -119,6 +121,8 @@ function App() {
   const enableRecommendations = useFeatureFlag('enableRecommendations');
   const showLoyaltyProgram = useFeatureFlag('showLoyaltyProgram');
   const enableWishlist = useFeatureFlag('enableWishlist');
+  const enableBlackFriday = useFeatureFlag('enableBlackFriday');
+  const enableFlashSale = useFeatureFlag('enableFlashSale');
 
   // String Flags - A/B testing variants
   const productDisplayMode = useFeatureFlagString('productDisplayMode') as 'grid' | 'list' | 'compact';
@@ -200,6 +204,14 @@ function App() {
     loyaltyPoints: currentUser?.properties.numbers.loyaltyPoints || 0,
     membershipTier: currentUser?.properties.strings.membershipTier || 'new',
   };
+
+  // Flash Sale tiered discounts: Summit 40%, Trailtest 25%, Dayhiker 10%, Explorer 5%
+  const flashSaleDiscountMap: Record<string, number> = { vip: 40, beta: 25, basic: 10, new: 5 };
+  const flashSaleDiscount = enableFlashSale ? flashSaleDiscountMap[userStats.membershipTier] || 5 : 0;
+
+  // Effective promo state: Flash Sale > Black Friday > Regular Promo
+  const isBlackFridayActive = enableBlackFriday && !enableFlashSale;
+  const activeSaleOverride = flashSaleDiscount > 0 ? flashSaleDiscount : undefined;
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -309,17 +321,22 @@ function App() {
         <HeroSection />
 
         {/* ============================================
-            PROMOTIONAL BANNER (Conditional)
-            PATTERN: Boolean flag controls visibility
-            FLAG: showPromoBanner
-            THEME: promoBannerTheme (string flag)
+            PROMOTIONAL BANNERS (Priority: Flash Sale > Black Friday > Regular)
+            FLAGS: enableFlashSale, enableBlackFriday, showPromoBanner
             ============================================ */}
-        {showPromoBanner && (
+        {enableFlashSale ? (
+          <FlashSaleBanner
+            discountPercent={flashSaleDiscount}
+            membershipTier={userStats.membershipTier}
+          />
+        ) : enableBlackFriday ? (
+          <BlackFridayBanner />
+        ) : showPromoBanner ? (
           <PromoBanner
             theme={promoBannerTheme}
             freeShippingThreshold={freeShippingThreshold}
           />
-        )}
+        ) : null}
 
         <div style={{ maxWidth: 1400, margin: '0 auto', padding: '48px 24px' }}>
           <Space direction="vertical" size={48} style={{ width: '100%' }}>
@@ -394,6 +411,8 @@ function App() {
                 productsPerPage={productsPerPage}
                 onAddToCart={handleAddToCart}
                 showWishlist={enableWishlist}
+                isBlackFriday={isBlackFridayActive}
+                saleOverridePercent={activeSaleOverride}
               />
             </div>
 
@@ -437,6 +456,8 @@ function App() {
         enableExpressCheckout={enableExpressCheckout}
         checkoutFlowVariant={checkoutFlowVariant}
         cartCountdownMinutes={cartCountdownMinutes}
+        isBlackFriday={isBlackFridayActive}
+        saleOverridePercent={activeSaleOverride}
       />
     </Layout>
   );

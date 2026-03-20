@@ -16,6 +16,8 @@ export interface ProductCardProps {
   displayMode: 'grid' | 'list' | 'compact';
   onAddToCart?: (product: Product) => void;
   showWishlist?: boolean;
+  isBlackFriday?: boolean;
+  saleOverridePercent?: number;
 }
 
 /**
@@ -25,12 +27,20 @@ export interface ProductCardProps {
  * USE CASE: A/B test different product layouts to optimize engagement
  * INTEGRATION: displayMode comes from productDisplayMode feature flag
  */
-export function ProductCard({ product, displayMode, onAddToCart, showWishlist = false }: ProductCardProps) {
-  const { name, description, price, salePrice, rating, reviewCount, inStock, badge, image } = product;
+export function ProductCard({ product, displayMode, onAddToCart, showWishlist = false, isBlackFriday = false, saleOverridePercent }: ProductCardProps) {
+  const { name, description, price, salePrice, rating, reviewCount, inStock, badge: originalBadge, image } = product;
+
+  // Promo pricing: saleOverridePercent (flash sale) > isBlackFriday (20%) > existing salePrice
+  const overridePercent = saleOverridePercent || (isBlackFriday ? 20 : 0);
+  const overridePrice = overridePercent > 0 ? Math.round(price * (1 - overridePercent / 100) * 100) / 100 : undefined;
+  const effectiveSalePrice = overridePrice || salePrice;
 
   // Calculate discount percentage if on sale
-  const discountPercent = salePrice ? Math.round(((price - salePrice) / price) * 100) : 0;
-  const displayPrice = salePrice || price;
+  const discountPercent = effectiveSalePrice ? Math.round(((price - effectiveSalePrice) / price) * 100) : 0;
+  const displayPrice = effectiveSalePrice || price;
+
+  // Override badge to 'sale' when promo is active
+  const badge = overridePercent > 0 ? 'sale' as const : originalBadge;
 
   // Handle add to cart
   const handleAddToCart = () => {
@@ -67,10 +77,10 @@ export function ProductCard({ product, displayMode, onAddToCart, showWishlist = 
           <div style={{ marginBottom: 8 }}>
             <Space direction="vertical" size={0}>
               <Space size={4}>
-                <Text strong style={{ fontSize: 16, color: salePrice ? '#b91c1c' : '#000' }}>
+                <Text strong style={{ fontSize: 16, color: effectiveSalePrice ? '#b91c1c' : '#000' }}>
                   ${displayPrice}
                 </Text>
-                {salePrice && (
+                {effectiveSalePrice && (
                   <Text delete type="secondary" style={{ fontSize: 12 }}>
                     ${price}
                   </Text>
@@ -144,10 +154,10 @@ export function ProductCard({ product, displayMode, onAddToCart, showWishlist = 
 
             <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <Space size={8}>
-                <Text strong style={{ fontSize: 24, color: salePrice ? '#b91c1c' : '#000' }}>
+                <Text strong style={{ fontSize: 24, color: effectiveSalePrice ? '#b91c1c' : '#000' }}>
                   ${displayPrice}
                 </Text>
-                {salePrice && (
+                {effectiveSalePrice && (
                   <Text delete type="secondary" style={{ fontSize: 16 }}>
                     ${price}
                   </Text>
@@ -214,10 +224,10 @@ export function ProductCard({ product, displayMode, onAddToCart, showWishlist = 
 
         <div style={{ marginBottom: 12 }}>
           <Space size={8}>
-            <Text strong style={{ fontSize: 20, color: salePrice ? '#b91c1c' : '#000' }}>
+            <Text strong style={{ fontSize: 20, color: effectiveSalePrice ? '#b91c1c' : '#000' }}>
               ${displayPrice}
             </Text>
-            {salePrice && (
+            {effectiveSalePrice && (
               <Text delete type="secondary" style={{ fontSize: 14 }}>
                 ${price}
               </Text>
