@@ -81,7 +81,7 @@ export const DEFAULT_FLAG_VALUES = {
   showLoyaltyProgram: false,
   enableWishlist: false,
   enableBlackFriday: false,
-  enableFlashSale: true,
+  enableFlashSale: false,
 
   // String flags - first variant is default
   productDisplayMode: 'grid',

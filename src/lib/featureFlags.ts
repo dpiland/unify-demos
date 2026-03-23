@@ -183,7 +183,7 @@ export const flags = {
    * - Enable for all users during flash sale window
    * - A/B test discount levels by segment
    */
-  enableFlashSale: new Rox.Flag(true),
+  enableFlashSale: new Rox.Flag(),
 
   // =================================================================
   // STRING FLAGS (3) - A/B Test Variants

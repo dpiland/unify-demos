@@ -54,12 +54,22 @@ export function FeatureFlagProvider({ children }: FeatureFlagProviderProps) {
   const [isInitialized, setIsInitialized] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Counter to force re-renders when Unify pushes new flag values
+  const [, setConfigVersion] = useState(0);
+
   useEffect(() => {
     let mounted = true;
 
     async function initialize() {
       try {
-        await initializeFeatureFlags();
+        await initializeFeatureFlags({
+          configurationFetchedHandler: (fetcherResults) => {
+            if (mounted && fetcherResults.hasChanges) {
+              console.log('Feature flags updated from CloudBees Unify');
+              setConfigVersion(v => v + 1);
+            }
+          },
+        });
 
         if (mounted) {
           setIsInitialized(true);
