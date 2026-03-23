@@ -11,4 +11,4 @@ availableValues:
   - "false"
   - "true"
 
-isPermanent: true
+isPermanent: false
