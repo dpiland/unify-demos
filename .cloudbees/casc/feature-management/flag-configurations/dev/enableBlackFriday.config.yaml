@@ -4,21 +4,13 @@ kind: flag-configuration
 
 flag: enableBlackFriday
 
-enabled: false
+enabled: true
 
 stickinessProperty: rox.distinct_id
 
 defaultValue: false
 
 conditions:
-  - allOf:
-      - property:
-          name: membershipTier
-          operator: in-array
-          operands:
-            - beta
-            - ""
-    flagValue: true
   - allOf:
       - property:
           name: membershipTier
