@@ -1,0 +1,21 @@
+---
+apiVersion: featuremanagement.cloudbees.io/v1alpha1
+kind: flag-configuration
+
+flag: enablePersonalizedHero
+
+enabled: true
+
+stickinessProperty: rox.distinct_id
+
+defaultValue: false
+
+conditions:
+  - allOf:
+      - property:
+          name: membershipTier
+          operator: in-array
+          operands:
+            - vip
+            - ""
+    flagValue: true

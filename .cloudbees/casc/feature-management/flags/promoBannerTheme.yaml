@@ -1,0 +1,15 @@
+---
+apiVersion: featuremanagement.cloudbees.io/v1alpha1
+kind: flag
+
+flag: promoBannerTheme
+flagType: string
+description: ""
+labels:
+
+availableValues:
+  - blue
+  - red
+  - gradient
+
+isPermanent: false

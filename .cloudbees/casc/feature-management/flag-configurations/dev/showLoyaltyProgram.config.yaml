@@ -1,0 +1,18 @@
+---
+apiVersion: featuremanagement.cloudbees.io/v1alpha1
+kind: flag-configuration
+
+flag: showLoyaltyProgram
+
+enabled: false
+
+stickinessProperty: rox.distinct_id
+
+defaultValue: false
+
+conditions:
+  - allOf:
+      - anyOf:
+          - group:
+              name: beta user
+    flagValue: true

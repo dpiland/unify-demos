@@ -1,0 +1,46 @@
+---
+apiVersion: featuremanagement.cloudbees.io/v1alpha1
+kind: flag-configuration
+
+flag: enableBlackFriday
+
+enabled: false
+
+stickinessProperty: rox.distinct_id
+
+defaultValue: false
+
+conditions:
+  - allOf:
+      - property:
+          name: membershipTier
+          operator: in-array
+          operands:
+            - beta
+            - ""
+    flagValue: true
+  - allOf:
+      - property:
+          name: membershipTier
+          operator: in-array
+          operands:
+            - vip
+            - ""
+    flagValue:
+      - percentage: 0
+        from: 2026-03-23T17:43:00Z
+      - percentage: 100
+        from: 2026-11-20T05:05:00Z
+  - allOf:
+      - property:
+          name: membershipTier
+          operator: in-array
+          operands:
+            - basic
+            - new
+            - ""
+    flagValue:
+      - percentage: 0
+        from: 2026-03-23T17:52:00Z
+      - percentage: 100
+        from: 2026-11-27T05:05:00Z

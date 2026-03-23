@@ -1,0 +1,16 @@
+---
+apiVersion: featuremanagement.cloudbees.io/v1alpha1
+kind: flag
+
+flag: freeShippingThreshold
+flagType: number
+description: ""
+labels:
+
+availableValues:
+  - "35"
+  - "50"
+  - "75"
+  - "100"
+
+isPermanent: false

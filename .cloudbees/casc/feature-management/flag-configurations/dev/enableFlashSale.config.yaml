@@ -1,0 +1,23 @@
+---
+apiVersion: featuremanagement.cloudbees.io/v1alpha1
+kind: flag-configuration
+
+flag: enableFlashSale
+
+enabled: false
+
+stickinessProperty: rox.distinct_id
+
+defaultValue: false
+
+conditions:
+  - allOf:
+      - property:
+          name: membershipTier
+          operator: in-array
+          operands:
+            - vip
+            - beta
+            - basic
+            - ""
+    flagValue: true

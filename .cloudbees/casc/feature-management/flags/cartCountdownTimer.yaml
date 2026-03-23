@@ -1,0 +1,16 @@
+---
+apiVersion: featuremanagement.cloudbees.io/v1alpha1
+kind: flag
+
+flag: cartCountdownTimer
+flagType: number
+description: ""
+labels:
+
+availableValues:
+  - "5"
+  - "10"
+  - "15"
+  - "30"
+
+isPermanent: false

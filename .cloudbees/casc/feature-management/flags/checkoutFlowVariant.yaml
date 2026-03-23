@@ -1,0 +1,15 @@
+---
+apiVersion: featuremanagement.cloudbees.io/v1alpha1
+kind: flag
+
+flag: checkoutFlowVariant
+flagType: string
+description: ""
+labels:
+
+availableValues:
+  - standard
+  - express
+  - single-page
+
+isPermanent: false

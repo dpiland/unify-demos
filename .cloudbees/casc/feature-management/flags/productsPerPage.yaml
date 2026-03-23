@@ -1,0 +1,16 @@
+---
+apiVersion: featuremanagement.cloudbees.io/v1alpha1
+kind: flag
+
+flag: productsPerPage
+flagType: number
+description: ""
+labels:
+
+availableValues:
+  - "12"
+  - "24"
+  - "36"
+  - "48"
+
+isPermanent: false

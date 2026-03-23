@@ -1,0 +1,21 @@
+---
+apiVersion: featuremanagement.cloudbees.io/v1alpha1
+kind: flag-configuration
+
+flag: testBanner
+
+enabled: false
+
+stickinessProperty: rox.distinct_id
+
+defaultValue: false
+
+conditions:
+  - allOf:
+      - property:
+          name: membershipTier
+          operator: in-array
+          operands:
+            - beta
+            - ""
+    flagValue: true
