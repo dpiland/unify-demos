@@ -16,6 +16,13 @@ conditions:
           name: membershipTier
           operator: in-array
           operands:
+            - beta
+    flagValue: true
+  - allOf:
+      - property:
+          name: membershipTier
+          operator: in-array
+          operands:
             - vip
             - ""
     flagValue:
