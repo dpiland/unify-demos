@@ -19,6 +19,7 @@ export const FEATURE_FLAG_KEYS = {
   ENABLE_EARLY_ACCESS: 'enableEarlyAccess',
   ENABLE_PERK_PREVIEW: 'enablePerkPreview',
   ENABLE_PERSONALIZED_HERO: 'enablePersonalizedHero',
+  TEST_BANNER: 'testBanner',
 
   // String flags
   PRODUCT_DISPLAY_MODE: 'productDisplayMode',
@@ -58,6 +59,8 @@ export const FLAG_DESCRIPTIONS: Record<string, string> = {
     'Show Summit perk strip: VIP members see checkmarks, others see locks with upgrade CTA. Drives membership upgrades.',
   enablePersonalizedHero:
     'Show personalized hero banner for VIP members with their name and activity-specific imagery.',
+  testBanner:
+    'Test banner with intentional UI issues — clashing colors, broken layout. Demo bad deploy + instant rollback.',
 
   // String flags
   productDisplayMode:
@@ -94,6 +97,7 @@ export const DEFAULT_FLAG_VALUES = {
   enableEarlyAccess: false,
   enablePerkPreview: false,
   enablePersonalizedHero: false,
+  testBanner: false,
 
   // String flags - first variant is default
   productDisplayMode: 'grid',

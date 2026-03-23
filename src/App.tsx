@@ -34,6 +34,7 @@ import { HeroSection } from './components/hero/HeroSection';
 import { PromoBanner } from './components/banners/PromoBanner';
 import { BlackFridayBanner } from './components/banners/BlackFridayBanner';
 import { FlashSaleBanner } from './components/banners/FlashSaleBanner';
+import { TestBanner } from './components/banners/TestBanner';
 import { EnvironmentalBanner } from './components/banners/EnvironmentalBanner';
 import { EarlyAccessCollection } from './components/collections/EarlyAccessCollection';
 import { PerkPreview } from './components/perks/PerkPreview';
@@ -128,6 +129,7 @@ function App() {
   const enableEarlyAccess = useFeatureFlag('enableEarlyAccess');
   const enablePerkPreview = useFeatureFlag('enablePerkPreview');
   const enablePersonalizedHero = useFeatureFlag('enablePersonalizedHero');
+  const testBanner = useFeatureFlag('testBanner');
 
   // String Flags - A/B testing variants
   const productDisplayMode = useFeatureFlagString('productDisplayMode') as 'grid' | 'list' | 'compact';
@@ -330,10 +332,12 @@ function App() {
         />
 
         {/* ============================================
-            PROMOTIONAL BANNERS (Priority: Flash Sale > Black Friday > Regular)
-            FLAGS: enableFlashSale, enableBlackFriday, showPromoBanner
+            PROMOTIONAL BANNERS (Priority: Test > Flash Sale > Black Friday > Regular)
+            FLAGS: testBanner, enableFlashSale, enableBlackFriday, showPromoBanner
             ============================================ */}
-        {enableFlashSale ? (
+        {testBanner ? (
+          <TestBanner />
+        ) : enableFlashSale ? (
           <FlashSaleBanner
             discountPercent={flashSaleDiscount}
             membershipTier={userStats.membershipTier}

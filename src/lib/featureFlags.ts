@@ -233,6 +233,15 @@ export const flags = {
    */
   enablePersonalizedHero: new Rox.Flag(),
 
+  /**
+   * 11. Test Banner (Intentionally Broken)
+   *
+   * USE CASE: Demo a bad deploy — banner with clashing colors, broken layout,
+   * overlapping text. Perfect for showing instant rollback via feature flags.
+   * PATTERN: if (enabled) { show broken banner }
+   */
+  testBanner: new Rox.Flag(),
+
   // =================================================================
   // STRING FLAGS (3) - A/B Test Variants
   // =================================================================
@@ -435,6 +444,7 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
         enableEarlyAccess: flags.enableEarlyAccess.isEnabled(),
         enablePerkPreview: flags.enablePerkPreview.isEnabled(),
         enablePersonalizedHero: flags.enablePersonalizedHero.isEnabled(),
+        testBanner: flags.testBanner.isEnabled(),
       });
       console.log('  String Flags:', {
         productDisplayMode: flags.productDisplayMode.getValue(),
