@@ -32,35 +32,8 @@ export interface User {
  */
 export const DEFAULT_USERS: User[] = [
   {
-    id: 'regular-shopper',
-    name: 'Riley Dayhiker',
-    email: 'riley.dayhiker@example.com',
-    description: 'Weekend hiker shopping for everyday trail gear',
-    properties: {
-      booleans: {
-        isPremiumCustomer: false,
-        isBetaTester: false,
-        isNewUser: false,
-        hasActiveCart: true,
-      },
-      strings: {
-        membershipTier: 'basic',
-        shoppingPreference: 'price-conscious',
-        region: 'us-east',
-        userId: 'regular-shopper',
-      },
-      numbers: {
-        lifetimeSpend: 450,
-        loyaltyPoints: 100,
-        memberSince: 12,
-        averageOrderValue: 85,
-        cartItemCount: 3,
-      },
-    },
-  },
-  {
     id: 'vip-shopper',
-    name: 'Jordan Summit',
+    name: 'Jordan Summit (VIP)',
     email: 'jordan.summit@example.com',
     description: 'Backcountry expert and Pro member with premium gear access',
     properties: {
@@ -77,7 +50,7 @@ export const DEFAULT_USERS: User[] = [
         userId: 'vip-shopper',
       },
       numbers: {
-        lifetimeSpend: 8500,
+        lifetimeSpend: 2500,
         loyaltyPoints: 2500,
         memberSince: 36,
         averageOrderValue: 225,
@@ -87,7 +60,7 @@ export const DEFAULT_USERS: User[] = [
   },
   {
     id: 'beta-tester',
-    name: 'Sam Trailtest',
+    name: 'Sam Trailtest (Beta)',
     email: 'sam.trailtest@example.com',
     description: 'Field tester evaluating new gear and site features',
     properties: {
@@ -113,8 +86,35 @@ export const DEFAULT_USERS: User[] = [
     },
   },
   {
+    id: 'regular-shopper',
+    name: 'Riley Dayhiker (Basic)',
+    email: 'riley.dayhiker@example.com',
+    description: 'Weekend hiker shopping for everyday trail gear',
+    properties: {
+      booleans: {
+        isPremiumCustomer: false,
+        isBetaTester: false,
+        isNewUser: false,
+        hasActiveCart: true,
+      },
+      strings: {
+        membershipTier: 'basic',
+        shoppingPreference: 'price-conscious',
+        region: 'us-east',
+        userId: 'regular-shopper',
+      },
+      numbers: {
+        lifetimeSpend: 450,
+        loyaltyPoints: 100,
+        memberSince: 12,
+        averageOrderValue: 85,
+        cartItemCount: 3,
+      },
+    },
+  },
+  {
     id: 'new-shopper',
-    name: 'Alex Explorer',
+    name: 'Alex Explorer (New)',
     email: 'alex.explorer@example.com',
     description: 'First-time visitor discovering outdoor gear',
     properties: {
@@ -153,6 +153,8 @@ export function getUserById(id: string): User | undefined {
  */
 export function getUserInitials(name: string): string {
   return name
+    .replace(/\(.*\)/, '')
+    .trim()
     .split(' ')
     .map(part => part[0])
     .join('')

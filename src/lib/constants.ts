@@ -18,6 +18,7 @@ export const FEATURE_FLAG_KEYS = {
   ENABLE_FLASH_SALE: 'enableFlashSale',
   ENABLE_EARLY_ACCESS: 'enableEarlyAccess',
   ENABLE_PERK_PREVIEW: 'enablePerkPreview',
+  ENABLE_PERSONALIZED_HERO: 'enablePersonalizedHero',
 
   // String flags
   PRODUCT_DISPLAY_MODE: 'productDisplayMode',
@@ -55,6 +56,8 @@ export const FLAG_DESCRIPTIONS: Record<string, string> = {
     'Show Early Access Collection: Summit members see exclusive new arrivals, other tiers see an upgrade teaser.',
   enablePerkPreview:
     'Show Summit perk strip: VIP members see checkmarks, others see locks with upgrade CTA. Drives membership upgrades.',
+  enablePersonalizedHero:
+    'Show personalized hero banner for VIP members with their name and activity-specific imagery.',
 
   // String flags
   productDisplayMode:
@@ -90,6 +93,7 @@ export const DEFAULT_FLAG_VALUES = {
   enableFlashSale: false,
   enableEarlyAccess: false,
   enablePerkPreview: false,
+  enablePersonalizedHero: false,
 
   // String flags - first variant is default
   productDisplayMode: 'grid',

@@ -219,6 +219,20 @@ export const flags = {
    */
   enablePerkPreview: new Rox.Flag(),
 
+  /**
+   * 10. Enable Personalized Hero
+   *
+   * USE CASE: VIP members see a personalized hero with their name and
+   * activity-specific imagery instead of the generic storefront hero
+   * PATTERN: if (enabled && VIP) { personalized hero } else { default hero }
+   *
+   * BUSINESS VALUE:
+   * - Create a premium, personalized experience for top-tier members
+   * - Increase engagement and emotional connection with the brand
+   * - Demonstrate dynamic content personalization via feature flags
+   */
+  enablePersonalizedHero: new Rox.Flag(),
+
   // =================================================================
   // STRING FLAGS (3) - A/B Test Variants
   // =================================================================
@@ -420,6 +434,7 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
         enableFlashSale: flags.enableFlashSale.isEnabled(),
         enableEarlyAccess: flags.enableEarlyAccess.isEnabled(),
         enablePerkPreview: flags.enablePerkPreview.isEnabled(),
+        enablePersonalizedHero: flags.enablePersonalizedHero.isEnabled(),
       });
       console.log('  String Flags:', {
         productDisplayMode: flags.productDisplayMode.getValue(),

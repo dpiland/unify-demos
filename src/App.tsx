@@ -127,6 +127,7 @@ function App() {
   const enableFlashSale = useFeatureFlag('enableFlashSale');
   const enableEarlyAccess = useFeatureFlag('enableEarlyAccess');
   const enablePerkPreview = useFeatureFlag('enablePerkPreview');
+  const enablePersonalizedHero = useFeatureFlag('enablePersonalizedHero');
 
   // String Flags - A/B testing variants
   const productDisplayMode = useFeatureFlagString('productDisplayMode') as 'grid' | 'list' | 'compact';
@@ -322,7 +323,11 @@ function App() {
         {/* ============================================
             HERO SECTION - Full-bleed nature imagery
             ============================================ */}
-        <HeroSection />
+        <HeroSection
+          personalized={enablePersonalizedHero}
+          userName={currentUser?.name}
+          membershipTier={userStats.membershipTier}
+        />
 
         {/* ============================================
             PROMOTIONAL BANNERS (Priority: Flash Sale > Black Friday > Regular)
