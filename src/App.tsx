@@ -36,6 +36,7 @@ import { BlackFridayBanner } from './components/banners/BlackFridayBanner';
 import { FlashSaleBanner } from './components/banners/FlashSaleBanner';
 import { EnvironmentalBanner } from './components/banners/EnvironmentalBanner';
 import { EarlyAccessCollection } from './components/collections/EarlyAccessCollection';
+import { PerkPreview } from './components/perks/PerkPreview';
 import { ProductGrid } from './components/products/ProductGrid';
 import { ShoppingCart } from './components/cart/ShoppingCart';
 import { ProductRecommendations } from './components/recommendations/ProductRecommendations';
@@ -125,6 +126,7 @@ function App() {
   const enableBlackFriday = useFeatureFlag('enableBlackFriday');
   const enableFlashSale = useFeatureFlag('enableFlashSale');
   const enableEarlyAccess = useFeatureFlag('enableEarlyAccess');
+  const enablePerkPreview = useFeatureFlag('enablePerkPreview');
 
   // String Flags - A/B testing variants
   const productDisplayMode = useFeatureFlagString('productDisplayMode') as 'grid' | 'list' | 'compact';
@@ -359,6 +361,30 @@ function App() {
             )}
 
             {/* ============================================
+                EARLY ACCESS COLLECTION (Conditional)
+                PATTERN: Boolean flag + persona-based content
+                FLAG: enableEarlyAccess
+                Summit members see exclusive products,
+                others see upgrade teaser
+                ============================================ */}
+            {enableEarlyAccess && (
+              <EarlyAccessCollection
+                isSummitMember={userStats.membershipTier === 'vip'}
+                onAddToCart={handleAddToCart}
+              />
+            )}
+
+            {/* ============================================
+                PERK PREVIEW STRIP (Conditional)
+                PATTERN: Boolean flag + persona-aware display
+                FLAG: enablePerkPreview
+                Summit sees checkmarks, others see locks
+                ============================================ */}
+            {enablePerkPreview && (
+              <PerkPreview isSummitMember={userStats.membershipTier === 'vip'} />
+            )}
+
+            {/* ============================================
                 PRODUCT GRID
                 PATTERN: Multiple flags working together
                 FLAGS:
@@ -417,20 +443,6 @@ function App() {
                 saleOverridePercent={activeSaleOverride}
               />
             </div>
-
-            {/* ============================================
-                EARLY ACCESS COLLECTION (Conditional)
-                PATTERN: Boolean flag + persona-based content
-                FLAG: enableEarlyAccess
-                Summit members see exclusive products,
-                others see upgrade teaser
-                ============================================ */}
-            {enableEarlyAccess && (
-              <EarlyAccessCollection
-                isSummitMember={userStats.membershipTier === 'vip'}
-                onAddToCart={handleAddToCart}
-              />
-            )}
 
             {/* ============================================
                 PRODUCT RECOMMENDATIONS (Conditional)

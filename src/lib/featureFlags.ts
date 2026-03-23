@@ -202,6 +202,23 @@ export const flags = {
    */
   enableEarlyAccess: new Rox.Flag(),
 
+  /**
+   * 9. Enable Perk Preview Strip
+   *
+   * USE CASE: Show Summit membership perks — locks for non-VIP, checkmarks for VIP
+   * PATTERN: if (enabled) { show perks strip with tier-aware icons }
+   *
+   * BUSINESS VALUE:
+   * - Drive membership upgrades by showing what basic users are missing
+   * - Reinforce value for Summit members (checkmarks = validation)
+   * - Visual demo impact when switching personas
+   *
+   * TARGETING EXAMPLES:
+   * - Enable for all users (different experience per tier)
+   * - Enable only for basic/new users to drive upgrades
+   */
+  enablePerkPreview: new Rox.Flag(),
+
   // =================================================================
   // STRING FLAGS (3) - A/B Test Variants
   // =================================================================
@@ -402,6 +419,7 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
         enableBlackFriday: flags.enableBlackFriday.isEnabled(),
         enableFlashSale: flags.enableFlashSale.isEnabled(),
         enableEarlyAccess: flags.enableEarlyAccess.isEnabled(),
+        enablePerkPreview: flags.enablePerkPreview.isEnabled(),
       });
       console.log('  String Flags:', {
         productDisplayMode: flags.productDisplayMode.getValue(),

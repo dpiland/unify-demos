@@ -17,6 +17,7 @@ export const FEATURE_FLAG_KEYS = {
   ENABLE_BLACK_FRIDAY: 'enableBlackFriday',
   ENABLE_FLASH_SALE: 'enableFlashSale',
   ENABLE_EARLY_ACCESS: 'enableEarlyAccess',
+  ENABLE_PERK_PREVIEW: 'enablePerkPreview',
 
   // String flags
   PRODUCT_DISPLAY_MODE: 'productDisplayMode',
@@ -52,6 +53,8 @@ export const FLAG_DESCRIPTIONS: Record<string, string> = {
     'Enable tiered flash sale with 2-hour countdown: 40% off Summit, 25% Trailtest, 10% Dayhiker, 5% Explorer.',
   enableEarlyAccess:
     'Show Early Access Collection: Summit members see exclusive new arrivals, other tiers see an upgrade teaser.',
+  enablePerkPreview:
+    'Show Summit perk strip: VIP members see checkmarks, others see locks with upgrade CTA. Drives membership upgrades.',
 
   // String flags
   productDisplayMode:
@@ -86,6 +89,7 @@ export const DEFAULT_FLAG_VALUES = {
   enableBlackFriday: false,
   enableFlashSale: false,
   enableEarlyAccess: false,
+  enablePerkPreview: false,
 
   // String flags - first variant is default
   productDisplayMode: 'grid',
