@@ -35,6 +35,7 @@ import { PromoBanner } from './components/banners/PromoBanner';
 import { BlackFridayBanner } from './components/banners/BlackFridayBanner';
 import { FlashSaleBanner } from './components/banners/FlashSaleBanner';
 import { EnvironmentalBanner } from './components/banners/EnvironmentalBanner';
+import { EarlyAccessCollection } from './components/collections/EarlyAccessCollection';
 import { ProductGrid } from './components/products/ProductGrid';
 import { ShoppingCart } from './components/cart/ShoppingCart';
 import { ProductRecommendations } from './components/recommendations/ProductRecommendations';
@@ -123,6 +124,7 @@ function App() {
   const enableWishlist = useFeatureFlag('enableWishlist');
   const enableBlackFriday = useFeatureFlag('enableBlackFriday');
   const enableFlashSale = useFeatureFlag('enableFlashSale');
+  const enableEarlyAccess = useFeatureFlag('enableEarlyAccess');
 
   // String Flags - A/B testing variants
   const productDisplayMode = useFeatureFlagString('productDisplayMode') as 'grid' | 'list' | 'compact';
@@ -415,6 +417,20 @@ function App() {
                 saleOverridePercent={activeSaleOverride}
               />
             </div>
+
+            {/* ============================================
+                EARLY ACCESS COLLECTION (Conditional)
+                PATTERN: Boolean flag + persona-based content
+                FLAG: enableEarlyAccess
+                Summit members see exclusive products,
+                others see upgrade teaser
+                ============================================ */}
+            {enableEarlyAccess && (
+              <EarlyAccessCollection
+                isSummitMember={userStats.membershipTier === 'vip'}
+                onAddToCart={handleAddToCart}
+              />
+            )}
 
             {/* ============================================
                 PRODUCT RECOMMENDATIONS (Conditional)

@@ -185,6 +185,23 @@ export const flags = {
    */
   enableFlashSale: new Rox.Flag(),
 
+  /**
+   * 8. Enable Early Access Collection
+   *
+   * USE CASE: Exclusive new arrivals for Summit (VIP) members
+   * PATTERN: Summit sees exclusive products, others see upgrade teaser
+   *
+   * BUSINESS VALUE:
+   * - Reward top-tier customers with first access to new gear
+   * - Drive upgrades to Summit membership
+   * - Create exclusivity and urgency around new drops
+   *
+   * TARGETING EXAMPLES:
+   * - Enable for membershipTier == "vip" (Summit exclusive)
+   * - Enable for all users (Summit sees products, others see teaser)
+   */
+  enableEarlyAccess: new Rox.Flag(),
+
   // =================================================================
   // STRING FLAGS (3) - A/B Test Variants
   // =================================================================
@@ -384,6 +401,7 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
         enableWishlist: flags.enableWishlist.isEnabled(),
         enableBlackFriday: flags.enableBlackFriday.isEnabled(),
         enableFlashSale: flags.enableFlashSale.isEnabled(),
+        enableEarlyAccess: flags.enableEarlyAccess.isEnabled(),
       });
       console.log('  String Flags:', {
         productDisplayMode: flags.productDisplayMode.getValue(),

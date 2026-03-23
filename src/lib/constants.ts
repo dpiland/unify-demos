@@ -16,6 +16,7 @@ export const FEATURE_FLAG_KEYS = {
   ENABLE_WISHLIST: 'enableWishlist',
   ENABLE_BLACK_FRIDAY: 'enableBlackFriday',
   ENABLE_FLASH_SALE: 'enableFlashSale',
+  ENABLE_EARLY_ACCESS: 'enableEarlyAccess',
 
   // String flags
   PRODUCT_DISPLAY_MODE: 'productDisplayMode',
@@ -49,6 +50,8 @@ export const FLAG_DESCRIPTIONS: Record<string, string> = {
     'Enable Black Friday site-wide sale: 20% off all items + free shipping on every order. Enable early for VIP Summit members.',
   enableFlashSale:
     'Enable tiered flash sale with 2-hour countdown: 40% off Summit, 25% Trailtest, 10% Dayhiker, 5% Explorer.',
+  enableEarlyAccess:
+    'Show Early Access Collection: Summit members see exclusive new arrivals, other tiers see an upgrade teaser.',
 
   // String flags
   productDisplayMode:
@@ -82,6 +85,7 @@ export const DEFAULT_FLAG_VALUES = {
   enableWishlist: false,
   enableBlackFriday: false,
   enableFlashSale: false,
+  enableEarlyAccess: false,
 
   // String flags - first variant is default
   productDisplayMode: 'grid',
