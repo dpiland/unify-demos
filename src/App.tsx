@@ -362,6 +362,7 @@ function App({ currentUser, userMenuItems }: AppProps) {
   const enableNotificationCenter = useFeatureFlag('enableNotificationCenter');
   const enableCardControls = useFeatureFlag('enableCardControls');
   const enableMortgageSimulator = useFeatureFlag('enableMortgageSimulator');
+  const showMortgageAccount = useFeatureFlag('showMortgageAccount');
   const promotionalBanner = useFeatureFlagString('promotionalBanner');
   const systemAlert = useFeatureFlagString('systemAlert');
 
@@ -417,12 +418,12 @@ function App({ currentUser, userMenuItems }: AppProps) {
           },
         ]
       : []),
-    ...(enableMortgageSimulator
+    ...((showMortgageAccount || enableMortgageSimulator)
       ? [
           {
             key: 'mortgage-simulator',
             icon: <HomeOutlined />,
-            label: 'Mortgage Simulator',
+            label: 'Mortgage',
           },
         ]
       : []),
@@ -545,12 +546,13 @@ function App({ currentUser, userMenuItems }: AppProps) {
           style={{
             background: token.colorBgContainer,
             padding: isMobile ? '0 12px' : '0 24px',
+            paddingTop: isMobile ? 'env(safe-area-inset-top)' : 0,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             borderBottom: `1px solid ${token.colorBorderSecondary}`,
-            height: isMobile ? 52 : 64,
-            paddingTop: isMobile ? 'env(safe-area-inset-top)' : 0,
+            height: isMobile ? 'auto' : 64,
+            minHeight: isMobile ? 52 : 64,
           }}
         >
           {isMobile ? (

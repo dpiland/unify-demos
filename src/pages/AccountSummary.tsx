@@ -926,7 +926,7 @@ export function AccountSummary({ currentUser }: AccountSummaryProps) {
                 <Text strong style={{ color: '#389e0d', display: 'block', marginBottom: 4 }}>Your score is up +12 pts</Text>
                 <Text type="secondary" style={{ fontSize: 12 }}>Since last month. Keep making on-time payments to maintain your excellent score.</Text>
               </Card>
-              <Button type="link" size="small" style={{ padding: 0, marginTop: 8 }}>View Full Credit Report →</Button>
+              <Button type="link" size="small" style={{ padding: 0, marginTop: 8 }} onClick={() => message.info('Redirecting to your full credit report from Experian...')}>View Full Credit Report →</Button>
             </Col>
           </Row>
         </Card>

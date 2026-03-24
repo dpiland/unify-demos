@@ -1,18 +1,25 @@
 /**
- * Mortgage Simulator Page
+ * Mortgage Page
  *
- * Payment calculator, term comparison (15 vs 30 year), amortization breakdown,
- * and pre-qualification prompt. Controlled by enableMortgageSimulator boolean flag.
+ * Two modes controlled by showMortgageAccount + enableMortgageSimulator:
+ * - Shows mortgage account overview (balance, payment, equity)
+ * - Payment calculator, term comparison (15 vs 30 year), amortization breakdown
+ * - Pre-qualification prompt for non-mortgage holders
  */
 
 import { useState } from 'react';
-import { Button, Card, Col, Divider, InputNumber, Row, Slider, Space, Statistic, Table, Tag, Typography } from 'antd';
+import { Button, Card, Col, Divider, InputNumber, Progress, Row, Slider, Space, Statistic, Table, Tag, Typography, message } from 'antd';
 import {
   HomeOutlined,
   CalculatorOutlined,
   CheckCircleOutlined,
+  DollarOutlined,
+  CalendarOutlined,
+  PercentageOutlined,
 } from '@ant-design/icons';
 import { theme as antdTheme } from 'antd';
+import { useFeatureFlag } from '../hooks/useFeatureFlag';
+import { ACCOUNTS } from '../data/mockData';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -50,7 +57,116 @@ function generateAmortization(principal: number, annualRate: number, years: numb
   return rows;
 }
 
-export function MortgageSimulator() {
+// Mortgage account overview — shows when showMortgageAccount is enabled
+function MortgageAccountOverview() {
+  const { token } = antdTheme.useToken();
+  const isDark = token.colorBgContainer !== '#ffffff';
+  const bgSubtle = isDark ? '#1f1f1f' : '#fafafa';
+
+  const mortgage = ACCOUNTS.find(a => a.type === 'mortgage');
+  if (!mortgage) return null;
+
+  const originalLoan = 350000;
+  const equityPercent = Math.round(((originalLoan - mortgage.balance) / originalLoan) * 100);
+  const homeValue = 425000;
+  const equity = homeValue - mortgage.balance;
+
+  return (
+    <Card style={{ borderLeft: '4px solid #1a3c5e' }}>
+      <Row gutter={[24, 16]}>
+        <Col xs={24} md={14}>
+          <Space style={{ marginBottom: 16 }}>
+            <HomeOutlined style={{ fontSize: 24, color: '#1a3c5e' }} />
+            <div>
+              <Text strong style={{ fontSize: 16 }}>{mortgage.name}</Text>
+              <br />
+              <Text type="secondary">Loan {mortgage.accountNumber}</Text>
+            </div>
+          </Space>
+
+          <Row gutter={[16, 16]}>
+            <Col xs={12} sm={6}>
+              <Statistic
+                title={<><DollarOutlined /> Balance</>}
+                value={mortgage.balance}
+                prefix="$"
+                precision={2}
+                valueStyle={{ fontSize: 18 }}
+              />
+            </Col>
+            <Col xs={12} sm={6}>
+              <Statistic
+                title={<><CalendarOutlined /> Payment</>}
+                value={mortgage.monthlyPayment}
+                prefix="$"
+                suffix="/mo"
+                valueStyle={{ fontSize: 18 }}
+              />
+            </Col>
+            <Col xs={12} sm={6}>
+              <Statistic
+                title={<><PercentageOutlined /> Rate</>}
+                value={mortgage.interestRate}
+                suffix="% APR"
+                precision={3}
+                valueStyle={{ fontSize: 18 }}
+              />
+            </Col>
+            <Col xs={12} sm={6}>
+              <Statistic
+                title="Next Due"
+                value={mortgage.dueDate}
+                valueStyle={{ fontSize: 16 }}
+              />
+            </Col>
+          </Row>
+        </Col>
+
+        <Col xs={24} md={10}>
+          <Card size="small" style={{ background: bgSubtle, height: '100%' }}>
+            <div style={{ textAlign: 'center', marginBottom: 8 }}>
+              <Text strong>Home Equity</Text>
+            </div>
+            <Progress
+              type="dashboard"
+              percent={equityPercent}
+              format={() => (
+                <div>
+                  <div style={{ fontSize: 18, fontWeight: 600 }}>{equityPercent}%</div>
+                  <div style={{ fontSize: 11, color: token.colorTextSecondary }}>equity</div>
+                </div>
+              )}
+              strokeColor="#1a3c5e"
+              size={100}
+            />
+            <Row gutter={8} style={{ marginTop: 8, textAlign: 'center' }}>
+              <Col span={12}>
+                <Text type="secondary" style={{ fontSize: 11 }}>Est. Home Value</Text>
+                <br />
+                <Text strong>${homeValue.toLocaleString()}</Text>
+              </Col>
+              <Col span={12}>
+                <Text type="secondary" style={{ fontSize: 11 }}>Your Equity</Text>
+                <br />
+                <Text strong style={{ color: '#52c41a' }}>${equity.toLocaleString()}</Text>
+              </Col>
+            </Row>
+          </Card>
+        </Col>
+      </Row>
+
+      <Divider style={{ margin: '16px 0 12px' }} />
+
+      <Space wrap>
+        <Button type="primary" onClick={() => message.success('Payment of $1,892.00 submitted for Apr 1, 2026.')}>Make a Payment</Button>
+        <Button onClick={() => message.info('Downloading mortgage statements for 2025-2026...')}>View Statements</Button>
+        <Button onClick={() => message.info('Current refinance rates start at 5.25% APR. A specialist will contact you.')}>Refinance Options</Button>
+      </Space>
+    </Card>
+  );
+}
+
+function SimulatorSection() {
   const { token } = antdTheme.useToken();
   const isDark = token.colorBgContainer !== '#ffffff';
   const bgSubtle = isDark ? '#1f1f1f' : '#fafafa';
@@ -99,12 +215,7 @@ export function MortgageSimulator() {
   ];
 
   return (
-    <Space direction="vertical" size="large" style={{ width: '100%' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <HomeOutlined style={{ fontSize: 24, color: '#1a3c5e' }} />
-        <Title level={3} style={{ marginBottom: 0 }}>Mortgage Simulator</Title>
-      </div>
-
+    <>
       {/* Calculator Inputs */}
       <Card title={<Space><CalculatorOutlined /><span>Loan Calculator</span></Space>}>
         <Row gutter={[32, 24]}>
@@ -209,19 +320,10 @@ export function MortgageSimulator() {
 
         <Row gutter={[16, 16]} style={{ textAlign: 'center' }}>
           <Col xs={24} sm={6}>
-            <Statistic
-              title="Loan Amount"
-              value={loanAmount}
-              prefix="$"
-              precision={0}
-            />
+            <Statistic title="Loan Amount" value={loanAmount} prefix="$" precision={0} />
           </Col>
           <Col xs={24} sm={6}>
-            <Statistic
-              title="Down Payment"
-              value={downPercent}
-              suffix="%"
-            />
+            <Statistic title="Down Payment" value={downPercent} suffix="%" />
           </Col>
           <Col xs={24} sm={6}>
             <Statistic title="30-Year Monthly" value={monthly30} prefix="$" precision={2} />
@@ -314,6 +416,26 @@ export function MortgageSimulator() {
           </Space>
         )}
       </Card>
+    </>
+  );
+}
+
+export function MortgageSimulator() {
+  // Show mortgage account details if user has a mortgage
+  const showMortgageAccount = useFeatureFlag('showMortgageAccount');
+
+  return (
+    <Space direction="vertical" size="large" style={{ width: '100%' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <HomeOutlined style={{ fontSize: 24, color: '#1a3c5e' }} />
+        <Title level={3} style={{ marginBottom: 0 }}>Mortgage</Title>
+      </div>
+
+      {/* Account overview — shows when user has a mortgage */}
+      {showMortgageAccount && <MortgageAccountOverview />}
+
+      {/* Simulator is always available */}
+      <SimulatorSection />
     </Space>
   );
 }

@@ -213,6 +213,47 @@
   }
 }
 
+/* Dark mode: Alert components */
+[data-theme="dark"] .ant-alert-error {
+  background: #2a1215 !important;
+  border-color: #58181c !important;
+}
+
+[data-theme="dark"] .ant-alert-error .ant-alert-message,
+[data-theme="dark"] .ant-alert-error .ant-alert-description {
+  color: #fafafa !important;
+}
+
+[data-theme="dark"] .ant-alert-warning {
+  background: #2b2111 !important;
+  border-color: #594214 !important;
+}
+
+[data-theme="dark"] .ant-alert-warning .ant-alert-message,
+[data-theme="dark"] .ant-alert-warning .ant-alert-description {
+  color: #fafafa !important;
+}
+
+[data-theme="dark"] .ant-alert-success {
+  background: #162312 !important;
+  border-color: #274916 !important;
+}
+
+[data-theme="dark"] .ant-alert-success .ant-alert-message,
+[data-theme="dark"] .ant-alert-success .ant-alert-description {
+  color: #fafafa !important;
+}
+
+[data-theme="dark"] .ant-alert-info {
+  background: #111a2c !important;
+  border-color: #15325b !important;
+}
+
+[data-theme="dark"] .ant-alert-info .ant-alert-message,
+[data-theme="dark"] .ant-alert-info .ant-alert-description {
+  color: #fafafa !important;
+}
+
 /* Dark mode: make link buttons readable */
 [data-theme="dark"] .ant-btn-link {
   color: #69b1ff !important;

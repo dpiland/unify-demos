@@ -590,6 +590,9 @@ export function setUserProperties(user: User): void {
     Rox.setCustomNumberProperty(key, value);
   });
 
+  // Force Rox to re-fetch flag configurations with updated properties
+  Rox.fetch();
+
   console.log('🔧 User properties set for:', user.name);
   console.log('   Properties:', {
     booleans: user.properties.booleans,

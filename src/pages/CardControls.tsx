@@ -151,7 +151,9 @@ export function CardControls({ currentUser }: { currentUser: User }) {
                     width: 80,
                     height: 80,
                     borderRadius: '50%',
-                    background: state.frozen ? '#fff2f0' : (isDark ? '#162312' : '#f6ffed'),
+                    background: state.frozen
+                      ? (isDark ? '#2a1215' : '#fff2f0')
+                      : (isDark ? '#162312' : '#f6ffed'),
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -192,7 +194,12 @@ export function CardControls({ currentUser }: { currentUser: User }) {
                 description="While frozen, all purchases, ATM withdrawals, and recurring payments will be declined."
                 type="error"
                 showIcon
-                style={{ marginTop: 16 }}
+                style={{
+                  marginTop: 16,
+                  background: isDark ? '#2a1215' : undefined,
+                  border: isDark ? '1px solid #58181c' : undefined,
+                  color: isDark ? '#fafafa' : undefined,
+                }}
               />
             )}
           </Col>
