@@ -431,7 +431,10 @@ export function AccountSummary({ currentUser }: AccountSummaryProps) {
   const isStudent = currentUser.properties.booleans.isStudent ?? false;
 
   // String flag: controls card layout arrangement
-  const dashboardLayout = useFeatureFlagString('dashboardLayout');
+  // Mobile always uses compact layout for better readability
+  const dashboardLayoutFlag = useFeatureFlagString('dashboardLayout');
+  const isMobileView = window.innerWidth < 768;
+  const dashboardLayout = isMobileView ? 'compact' : dashboardLayoutFlag;
 
   // Number flag: controls recent activity row count
   const transactionCount = useFeatureFlagNumber('recentTransactionsToShow');
@@ -791,7 +794,7 @@ export function AccountSummary({ currentUser }: AccountSummaryProps) {
       </Card>
 
       {/* Smart Budget Insights - controlled by enableSmartBudgetInsights boolean flag (kill switch demo) */}
-      {showBudgetInsights && !isStudent && (
+      {showBudgetInsights && !isStudent && !isMobileView && (
         <Card
           title={
             <Space>

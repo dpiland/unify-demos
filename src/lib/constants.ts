@@ -26,6 +26,9 @@ export const FEATURE_FLAG_KEYS = {
   ENABLE_NOTIFICATION_CENTER: 'enableNotificationCenter',
   ENABLE_BILL_PAY_SCHEDULER: 'enableBillPayScheduler',
   ENABLE_CARD_CONTROLS: 'enableCardControls',
+  ENABLE_CRYPTO_TRADING: 'enableCryptoTrading',
+  ENABLE_INVESTMENT_ADVISORY: 'enableInvestmentAdvisory',
+  ENABLE_MORTGAGE_SIMULATOR: 'enableMortgageSimulator',
 } as const;
 
 /**
@@ -72,6 +75,12 @@ export const FLAG_DESCRIPTIONS: Record<string, string> = {
     'Add Scheduled Payments tab to Transfer & Pay with recurring payment setup (progressive rollout demo)',
   enableCardControls:
     'Show Card Controls page to freeze/unfreeze cards, set spending limits, and toggle international transactions (beta rollout demo)',
+  enableCryptoTrading:
+    'Show crypto trading panel on Investments page with live prices, buy/sell, and portfolio allocation (pilot rollout demo)',
+  enableInvestmentAdvisory:
+    'Show personalized investment advisory section with risk assessment and advisor scheduling (premium entitlement demo)',
+  enableMortgageSimulator:
+    'Show Mortgage Simulator page with payment calculator, term comparison, and pre-qualification (prospect engagement demo)',
 };
 
 /**
@@ -98,4 +107,7 @@ export const DEFAULT_FLAG_VALUES = {
   enableNotificationCenter: false,
   enableBillPayScheduler: false,
   enableCardControls: false,
+  enableCryptoTrading: false,
+  enableInvestmentAdvisory: false,
+  enableMortgageSimulator: false,
 };

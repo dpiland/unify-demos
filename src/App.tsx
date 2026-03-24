@@ -5,9 +5,9 @@
  * floating chat widget, and React Router.
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
-import { Badge, Button, Card, Dropdown, FloatButton, Input, Layout, Menu, Space, Switch, Tooltip, Typography } from 'antd';
+import { Badge, Button, Card, Drawer, Dropdown, FloatButton, Input, Layout, Menu, Space, Switch, Tooltip, Typography } from 'antd';
 import {
   BankOutlined,
   BellOutlined,
@@ -34,6 +34,7 @@ import { AccountSummary } from './pages/AccountSummary';
 import { TransferPay } from './pages/TransferPay';
 import { Investments } from './pages/Investments';
 import { Rewards } from './pages/Rewards';
+import { MortgageSimulator } from './pages/MortgageSimulator';
 import { Notifications } from './pages/Notifications';
 import { CardControls } from './pages/CardControls';
 import { useThemeMode } from './contexts/ThemeContext';
@@ -47,6 +48,16 @@ interface AppProps {
   userMenuItems: MenuProps['items'];
 }
 
+function useIsMobile(breakpoint = 768) {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < breakpoint);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [breakpoint]);
+  return isMobile;
+}
+
 // Map URL paths to menu keys
 const pathToKey: Record<string, string> = {
   '/': 'accounts',
@@ -56,6 +67,7 @@ const pathToKey: Record<string, string> = {
   '/rewards': 'rewards',
   '/notifications': 'notifications',
   '/card-controls': 'card-controls',
+  '/mortgage-simulator': 'mortgage-simulator',
 };
 
 // ============================================
@@ -192,6 +204,9 @@ const CHAT_ROUTES: { keywords: string[]; path: string; label: string; response: 
   { keywords: ['account', 'balance', 'checking', 'savings', 'summary', 'transaction'], path: '/', label: 'Go to Account Summary', response: 'Let me pull up your account details right away.' },
   { keywords: ['notification', 'alert', 'bell', 'message'], path: '/notifications', label: 'Go to Notifications', response: 'Let me check your notifications for you.' },
   { keywords: ['card', 'freeze', 'lock', 'unfreeze', 'spending limit', 'international', 'contactless', 'pin', 'replacement'], path: '/card-controls', label: 'Go to Card Controls', response: 'I can help with that! Let me take you to Card Controls.' },
+  { keywords: ['crypto', 'bitcoin', 'ethereum', 'coin', 'trading'], path: '/investments', label: 'Go to Crypto Trading', response: 'Let me take you to the Investments page where you can view crypto trading.' },
+  { keywords: ['advisor', 'advisory', 'financial planner', 'risk assessment', 'consultation'], path: '/investments', label: 'Go to Investment Advisory', response: 'I\'ll take you to Investment Advisory where you can review recommendations and schedule a call.' },
+  { keywords: ['mortgage', 'home loan', 'house', 'refinance', 'pre-qual', 'prequalif', 'amortization', 'home price'], path: '/mortgage-simulator', label: 'Go to Mortgage Simulator', response: 'Let me pull up the Mortgage Simulator so you can explore your options.' },
 ];
 
 const FALLBACK_RESPONSES = [
@@ -335,18 +350,27 @@ function ChatWidget() {
 
 function App({ currentUser, userMenuItems }: AppProps) {
   const [collapsed, setCollapsed] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { token } = antdTheme.useToken();
   const { themeMode, toggleDarkMode } = useThemeMode();
+  const isMobile = useIsMobile();
 
   // Feature flags
   const showInvestmentPortfolio = useFeatureFlag('showInvestmentPortfolio');
-  const enableChatSupport = useFeatureFlag('enableChatSupport');
   const enableNotificationCenter = useFeatureFlag('enableNotificationCenter');
   const enableCardControls = useFeatureFlag('enableCardControls');
+  const enableMortgageSimulator = useFeatureFlag('enableMortgageSimulator');
   const promotionalBanner = useFeatureFlagString('promotionalBanner');
   const systemAlert = useFeatureFlagString('systemAlert');
+
+  // Mobile-aware flag defaults:
+  // - Chat support OFF on mobile (covers too much screen)
+  // - Notifications ON on mobile (push-style alerts are expected)
+  // - Card controls ON on mobile (freeze card on the go)
+  const enableChatSupportFlag = useFeatureFlag('enableChatSupport');
+  const enableChatSupport = enableChatSupportFlag && !isMobile;
 
   const selectedKey = pathToKey[location.pathname] || 'accounts';
 
@@ -393,51 +417,117 @@ function App({ currentUser, userMenuItems }: AppProps) {
           },
         ]
       : []),
+    ...(enableMortgageSimulator
+      ? [
+          {
+            key: 'mortgage-simulator',
+            icon: <HomeOutlined />,
+            label: 'Mortgage Simulator',
+          },
+        ]
+      : []),
   ];
 
+  // Bottom tab bar items for mobile (core pages only, "More" opens drawer)
+  const bottomTabs = [
+    { key: 'accounts', icon: <HomeOutlined />, label: 'Accounts' },
+    { key: 'transfers', icon: <SwapOutlined />, label: 'Transfers' },
+    { key: 'rewards', icon: <GiftOutlined />, label: 'Rewards' },
+    { key: 'more', icon: <MenuUnfoldOutlined />, label: 'More' },
+  ];
+
+  const routes: Record<string, string> = {
+    accounts: '/',
+    transfers: '/transfers',
+    investments: '/investments',
+    rewards: '/rewards',
+    notifications: '/notifications',
+    'card-controls': '/card-controls',
+    'mortgage-simulator': '/mortgage-simulator',
+  };
+
   const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
-    const routes: Record<string, string> = {
-      accounts: '/',
-      transfers: '/transfers',
-      investments: '/investments',
-      rewards: '/rewards',
-      notifications: '/notifications',
-      'card-controls': '/card-controls',
-    };
     navigate(routes[key] || '/');
+    if (isMobile) setDrawerOpen(false);
+  };
+
+  const handleBottomTabClick = (key: string) => {
+    if (key === 'more') {
+      setDrawerOpen(true);
+    } else {
+      navigate(routes[key] || '/');
+    }
   };
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      {/* Left Sidebar */}
-      <Sider
-        collapsible
-        collapsed={collapsed}
-        onCollapse={setCollapsed}
-        trigger={null}
-        width={240}
-        style={{
-          background: token.colorBgContainer,
-          borderRight: `1px solid ${token.colorBorderSecondary}`,
-        }}
-        breakpoint="lg"
-        collapsedWidth={80}
-      >
-        <div className="sider-logo">
-          <BankOutlined style={{ fontSize: collapsed ? 24 : 28, color: themeMode === 'dark' ? '#ffffff' : '#1a3c5e' }} />
-          {!collapsed && (
-            <span className="sider-logo-text">Horizon Bank</span>
-          )}
-        </div>
+      {/* Left Sidebar - Desktop only */}
+      {!isMobile && (
+        <Sider
+          collapsible
+          collapsed={collapsed}
+          onCollapse={setCollapsed}
+          trigger={null}
+          width={240}
+          style={{
+            background: token.colorBgContainer,
+            borderRight: `1px solid ${token.colorBorderSecondary}`,
+          }}
+          breakpoint="lg"
+          collapsedWidth={80}
+        >
+          <div className="sider-logo">
+            <BankOutlined style={{ fontSize: collapsed ? 24 : 28, color: themeMode === 'dark' ? '#ffffff' : '#1a3c5e' }} />
+            {!collapsed && (
+              <span className="sider-logo-text">Horizon Bank</span>
+            )}
+          </div>
 
-        <Menu
-          mode="inline"
-          selectedKeys={[selectedKey]}
-          onClick={handleMenuClick}
-          items={menuItems}
-          style={{ border: 'none' }}
-        />
-      </Sider>
+          <Menu
+            mode="inline"
+            selectedKeys={[selectedKey]}
+            onClick={handleMenuClick}
+            items={menuItems}
+            style={{ border: 'none' }}
+          />
+        </Sider>
+      )}
+
+      {/* Mobile Drawer for "More" menu */}
+      {isMobile && (
+        <Drawer
+          title={
+            <Space>
+              <BankOutlined style={{ color: '#1a3c5e' }} />
+              <span>Horizon Bank</span>
+            </Space>
+          }
+          placement="left"
+          onClose={() => setDrawerOpen(false)}
+          open={drawerOpen}
+          width={280}
+          styles={{ body: { padding: 0 } }}
+        >
+          <Menu
+            mode="inline"
+            selectedKeys={[selectedKey]}
+            onClick={handleMenuClick}
+            items={menuItems}
+            style={{ border: 'none' }}
+          />
+          <div style={{ padding: '16px 24px', borderTop: `1px solid ${token.colorBorderSecondary}` }}>
+            <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+              <Text type="secondary">Dark Mode</Text>
+              <Switch
+                checked={themeMode === 'dark'}
+                onChange={() => toggleDarkMode()}
+                checkedChildren="🌙"
+                unCheckedChildren="☀️"
+              />
+            </Space>
+          </div>
+        </Drawer>
+      )}
 
       <Layout>
         {/* System Alert - controlled by systemAlert string flag (ops demo) */}
@@ -454,60 +544,78 @@ function App({ currentUser, userMenuItems }: AppProps) {
         <Header
           style={{
             background: token.colorBgContainer,
-            padding: '0 24px',
+            padding: isMobile ? '0 12px' : '0 24px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             borderBottom: `1px solid ${token.colorBorderSecondary}`,
+            height: isMobile ? 52 : 64,
+            paddingTop: isMobile ? 'env(safe-area-inset-top)' : 0,
           }}
         >
-          <Button
-            type="text"
-            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            onClick={() => setCollapsed(!collapsed)}
-            style={{ fontSize: 16 }}
-          />
+          {isMobile ? (
+            <Space>
+              <BankOutlined style={{ fontSize: 20, color: themeMode === 'dark' ? '#ffffff' : '#1a3c5e' }} />
+              <Text strong style={{ fontSize: 16 }}>Horizon Bank</Text>
+            </Space>
+          ) : (
+            <Button
+              type="text"
+              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+              onClick={() => setCollapsed(!collapsed)}
+              style={{ fontSize: 16 }}
+            />
+          )}
 
-          <Space size="middle">
-            <Tooltip title={themeMode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
-              <Switch
-                checked={themeMode === 'dark'}
-                onChange={() => toggleDarkMode()}
-                checkedChildren="🌙"
-                unCheckedChildren="☀️"
-                style={{ marginTop: 2 }}
-              />
-            </Tooltip>
+          <Space size={isMobile ? 'small' : 'middle'}>
+            {!isMobile && (
+              <Tooltip title={themeMode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
+                <Switch
+                  checked={themeMode === 'dark'}
+                  onChange={() => toggleDarkMode()}
+                  checkedChildren="🌙"
+                  unCheckedChildren="☀️"
+                  style={{ marginTop: 2 }}
+                />
+              </Tooltip>
+            )}
 
-          <Dropdown menu={{ items: userMenuItems }} trigger={['click']} placement="bottomRight">
-            <Button type="text" size="large">
-              <Space>
-                <div
-                  style={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: '50%',
-                    background: '#1a3c5e',
-                    color: '#fff',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 12,
-                    fontWeight: 600,
-                  }}
-                >
-                  {getUserInitials(currentUser.name)}
-                </div>
-                <Text>{currentUser.name}</Text>
-                <UserOutlined />
-              </Space>
-            </Button>
-          </Dropdown>
+            <Dropdown menu={{ items: userMenuItems }} trigger={['click']} placement="bottomRight">
+              <Button type="text" size={isMobile ? 'middle' : 'large'}>
+                <Space>
+                  <div
+                    style={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: '50%',
+                      background: '#1a3c5e',
+                      color: '#fff',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 12,
+                      fontWeight: 600,
+                    }}
+                  >
+                    {getUserInitials(currentUser.name)}
+                  </div>
+                  {!isMobile && <Text>{currentUser.name}</Text>}
+                  <UserOutlined />
+                </Space>
+              </Button>
+            </Dropdown>
           </Space>
         </Header>
 
         {/* Page Content */}
-        <Content style={{ padding: 24, background: token.colorBgLayout, overflow: 'auto' }}>
+        <Content
+          style={{
+            padding: isMobile ? 12 : 24,
+            paddingBottom: isMobile ? 72 : 24,
+            background: token.colorBgLayout,
+            overflow: 'auto',
+          }}
+        >
           <div style={{ maxWidth: 1200, margin: '0 auto' }}>
             <Routes>
               <Route path="/" element={<AccountSummary currentUser={currentUser} />} />
@@ -517,11 +625,28 @@ function App({ currentUser, userMenuItems }: AppProps) {
               <Route path="/rewards" element={<Rewards />} />
               <Route path="/notifications" element={<Notifications />} />
               <Route path="/card-controls" element={<CardControls currentUser={currentUser} />} />
+              <Route path="/mortgage-simulator" element={<MortgageSimulator />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </div>
         </Content>
       </Layout>
+
+      {/* Mobile Bottom Tab Bar */}
+      {isMobile && (
+        <div className="mobile-bottom-tabs">
+          {bottomTabs.map(tab => (
+            <div
+              key={tab.key}
+              className={`mobile-tab ${selectedKey === tab.key ? 'mobile-tab-active' : ''}`}
+              onClick={() => handleBottomTabClick(tab.key)}
+            >
+              <span className="mobile-tab-icon">{tab.icon}</span>
+              <span className="mobile-tab-label">{tab.label}</span>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Chat Support Widget - controlled by enableChatSupport boolean flag */}
       {enableChatSupport && <ChatWidget />}
