@@ -121,6 +121,98 @@
   color: #ffffff !important;
 }
 
+/* ============================================
+   Mobile Bottom Tab Bar
+   ============================================ */
+
+.mobile-bottom-tabs {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  background: var(--ant-color-bg-container, #fff);
+  border-top: 1px solid var(--ant-color-border-secondary, #f0f0f0);
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index: 1000;
+}
+
+.mobile-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 4px;
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.45);
+  transition: color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-tab-active {
+  color: #1a3c5e;
+}
+
+.mobile-tab-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.mobile-tab-label {
+  font-size: 10px;
+  margin-top: 2px;
+}
+
+[data-theme="dark"] .mobile-bottom-tabs {
+  background: #141414 !important;
+  border-color: #434343 !important;
+}
+
+[data-theme="dark"] .mobile-tab {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+[data-theme="dark"] .mobile-tab-active {
+  color: #69b1ff;
+}
+
+/* ============================================
+   Mobile Responsive Overrides
+   ============================================ */
+
+@media (max-width: 767px) {
+  /* Tighter card padding */
+  .ant-card-body {
+    padding: 12px !important;
+  }
+
+  /* Smaller titles */
+  .ant-typography h3 {
+    font-size: 18px !important;
+  }
+
+  /* Stack stat cards better */
+  .ant-statistic-title {
+    font-size: 12px !important;
+  }
+
+  .ant-statistic-content {
+    font-size: 20px !important;
+  }
+
+  /* Compact tables */
+  .ant-table-cell {
+    padding: 8px 8px !important;
+    font-size: 13px !important;
+  }
+
+  /* Smaller form elements */
+  .ant-tabs-nav {
+    margin-bottom: 12px !important;
+  }
+}
+
 /* Dark mode: make link buttons readable */
 [data-theme="dark"] .ant-btn-link {
   color: #69b1ff !important;

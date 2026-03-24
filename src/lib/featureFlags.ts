@@ -15,6 +15,7 @@
  */
 
 import Rox from 'rox-browser';
+import { Capacitor } from '@capacitor/core';
 import type { RoxSetupOptions} from './types';
 import type { User } from './users';
 
@@ -347,6 +348,57 @@ export const flags = {
    *   Enable IF isBetaTester == true OR isPremiumCustomer == true
    */
   enableCardControls: new Rox.Flag(),
+
+  /**
+   * Boolean Flag - Enable Crypto Trading
+   *
+   * PATTERN: Conditional rendering of new section on Investments page
+   * USE CASE: Show a crypto trading panel with live prices for Bitcoin,
+   * Ethereum, and other popular cryptocurrencies. Includes buy/sell
+   * buttons and portfolio allocation.
+   *
+   * DEMO NARRATIVE:
+   *   "We're piloting crypto trading for select customers. Enable the
+   *    flag and the crypto section appears on the Investments page."
+   *
+   * TARGETING EXAMPLE:
+   *   Enable IF isBetaTester == true OR (isPremiumCustomer == true AND region == "us-west")
+   */
+  enableCryptoTrading: new Rox.Flag(),
+
+  /**
+   * Boolean Flag - Enable Investment Advisory
+   *
+   * PATTERN: Conditional rendering of advisory section
+   * USE CASE: Show a personalized investment advisory panel with
+   * risk assessment, recommended portfolio changes, and an option
+   * to schedule a call with a financial advisor.
+   *
+   * DEMO NARRATIVE:
+   *   "Investment Advisory is a premium feature. Premier customers
+   *    get AI-driven insights; standard users see an upgrade prompt."
+   *
+   * TARGETING EXAMPLE:
+   *   Enable IF isPremiumCustomer == true OR hasInvestmentAccount == true
+   */
+  enableInvestmentAdvisory: new Rox.Flag(),
+
+  /**
+   * Boolean Flag - Enable Mortgage Simulator
+   *
+   * PATTERN: Conditional rendering of nav item + page
+   * USE CASE: Show a Mortgage Simulator page where users can estimate
+   * monthly payments, compare loan terms (15 vs 30 year), see
+   * amortization breakdowns, and check pre-qualification.
+   *
+   * DEMO NARRATIVE:
+   *   "We're launching a mortgage calculator for homeowner prospects.
+   *    Flip the flag and a new page appears in the sidebar."
+   *
+   * TARGETING EXAMPLE:
+   *   Enable IF hasMortgage == true OR customerSegment == "homeowner"
+   */
+  enableMortgageSimulator: new Rox.Flag(),
 };
 
 /**
@@ -399,6 +451,12 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
     Rox.setCustomBooleanProperty('isStudent', false);
     Rox.setCustomBooleanProperty('hasMortgage', false);
 
+    // Platform properties - detect native mobile vs web browser
+    const platform = Capacitor.getPlatform(); // 'ios', 'android', or 'web'
+    const isNativeMobile = Capacitor.isNativePlatform();
+    Rox.setCustomStringProperty('platform', platform);
+    Rox.setCustomBooleanProperty('isMobile', isNativeMobile);
+
     // String properties
     Rox.setCustomStringProperty('accountType', 'checking');
     Rox.setCustomStringProperty('customerSegment', 'checking-savings');
@@ -447,6 +505,9 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
         enableNotificationCenter: flags.enableNotificationCenter.isEnabled(),
         enableBillPayScheduler: flags.enableBillPayScheduler.isEnabled(),
         enableCardControls: flags.enableCardControls.isEnabled(),
+        enableCryptoTrading: flags.enableCryptoTrading.isEnabled(),
+        enableInvestmentAdvisory: flags.enableInvestmentAdvisory.isEnabled(),
+        enableMortgageSimulator: flags.enableMortgageSimulator.isEnabled(),
       });
     }
   } catch (error) {
