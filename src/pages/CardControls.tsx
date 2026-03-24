@@ -12,8 +12,6 @@ import {
   Button,
   Card,
   Col,
-  Divider,
-  InputNumber,
   List,
   Row,
   Slider,
