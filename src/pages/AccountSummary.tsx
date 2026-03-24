@@ -352,7 +352,7 @@ function SpendingBreakdown({ transactions }: { transactions: Transaction[] }) {
                   <Cell key={entry.name} fill={CATEGORY_COLORS[entry.name] || '#8c8c8c'} />
                 ))}
               </Pie>
-              <Tooltip formatter={(value: number) => `$${value.toFixed(2)}`} />
+              <Tooltip formatter={(value) => `$${Number(value).toFixed(2)}`} />
               <Legend />
             </PieChart>
           </ResponsiveContainer>
