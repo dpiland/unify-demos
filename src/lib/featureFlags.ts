@@ -120,6 +120,233 @@ export const flags = {
    *   Enable IF isPremiumCustomer == true OR userTier == "premier"
    */
   enableChatSupport: new Rox.Flag(),
+
+  /**
+   * Boolean Flag - Show Student Loans
+   *
+   * PATTERN: Conditional rendering of entire section
+   * USE CASE: Display a student loan summary card on the Account Summary
+   * with loan balance, monthly payment, interest rate, and repayment progress.
+   * Targeted at student segment customers.
+   *
+   * TARGETING EXAMPLE:
+   *   Show IF customerSegment == "student" OR isStudent == true
+   */
+  showStudentLoans: new Rox.Flag(),
+
+  /**
+   * Boolean Flag - Show Mortgage Account
+   *
+   * PATTERN: Conditional filtering of account cards
+   * USE CASE: Show or hide the mortgage account card on the Account Summary.
+   * Only relevant for mortgage holders and admin users.
+   *
+   * TARGETING EXAMPLE:
+   *   Show IF customerSegment == "mortgage" OR customerSegment == "admin"
+   */
+  showMortgageAccount: new Rox.Flag(),
+
+  /**
+   * String Flag - Welcome Experience Variant
+   *
+   * PATTERN: Layout switching based on customer segment
+   * USE CASE: Display a completely different welcome/hero section based on the
+   * customer's segment. Creates the most dramatic visual difference when
+   * switching personas during demos.
+   * - 'standard': Simple greeting with quick actions (default)
+   * - 'student-focused': Financial wellness tips, savings goal, student resources
+   * - 'wealth-management': Portfolio snapshot, market indices, advisor CTA
+   * - 'homeowner': Home value estimate, equity percentage, refinance comparison
+   *
+   * TARGETING EXAMPLE:
+   *   Set "student-focused" IF isStudent == true
+   *   Set "wealth-management" IF isPremiumCustomer == true AND hasInvestmentAccount == true
+   *   Set "homeowner" IF hasMortgage == true
+   */
+  welcomeExperience: new Rox.RoxString('standard', ['standard', 'student-focused', 'wealth-management', 'homeowner']),
+
+  /**
+   * Boolean Flag - Enable Smart Budget Insights
+   *
+   * PATTERN: Conditional rendering of entire section (kill switch)
+   * USE CASE: Show AI-powered budget insights card on Account Summary.
+   * Perfect for demonstrating the "kill switch" pattern — if the feature
+   * has a bug or shows incorrect data, disable it instantly without a deploy.
+   *
+   * DEMO NARRATIVE:
+   *   "We just shipped this AI feature, but it's showing incorrect calculations.
+   *    Watch — I disable it in CloudBees, and it's gone instantly. No deploy needed."
+   *
+   * TARGETING EXAMPLE:
+   *   Enable for all users, then disable instantly if issues arise
+   */
+  enableSmartBudgetInsights: new Rox.Flag(),
+
+  /**
+   * Boolean Flag - Enable Redesigned Account Cards
+   *
+   * PATTERN: A/B testing with visual variant
+   * USE CASE: Toggle between the classic vertical account cards and a new
+   * horizontal card design. Demonstrates A/B testing capability where
+   * you can show different UI variants to different user segments.
+   *
+   * DEMO NARRATIVE:
+   *   "We're testing a redesigned card layout with 20% of users.
+   *    Let me show you both variants — and shift the percentage in real time."
+   *
+   * TARGETING EXAMPLE:
+   *   Enable for 20% of users via percentage rollout
+   */
+  enableRedesignedAccountCards: new Rox.Flag(),
+
+  /**
+   * Boolean Flag - Enable Rewards Redemption
+   *
+   * PATTERN: Regional/progressive rollout
+   * USE CASE: Control whether users can redeem rewards or see a "coming soon"
+   * message. Demonstrates geographic rollout — west coast users get it first,
+   * east coast sees "coming soon".
+   *
+   * DEMO NARRATIVE:
+   *   "We're rolling out self-service redemption region by region.
+   *    West coast has it, east coast sees 'coming soon'. One click to expand."
+   *
+   * TARGETING EXAMPLE:
+   *   Enable IF region == "us-west"
+   */
+  enableRewardsRedemption: new Rox.Flag(),
+
+  /**
+   * String Flag - System Alert Banner
+   *
+   * PATTERN: Operational/infrastructure messaging
+   * USE CASE: Display system-wide alert banners for maintenance windows,
+   * degraded services, or incident communication. Ops teams can push
+   * alerts to all users instantly without a deploy.
+   * - 'none': No alert shown
+   * - 'maintenance-scheduled': Scheduled maintenance notice
+   * - 'zelle-degraded': Zelle service degradation warning
+   * - 'rate-limit-active': Rate limiting / high traffic notice
+   *
+   * DEMO NARRATIVE:
+   *   "Ops just detected Zelle is experiencing degraded performance.
+   *    They flip a flag — every user sees the warning instantly."
+   *
+   * TARGETING EXAMPLE:
+   *   Set globally — no targeting needed (all users see ops alerts)
+   */
+  systemAlert: new Rox.RoxString('none', ['none', 'maintenance-scheduled', 'zelle-degraded', 'rate-limit-active']),
+
+  /**
+   * Number Flag - Daily Transfer Limit
+   *
+   * PATTERN: Business rule configuration via numeric flag
+   * USE CASE: Control the maximum daily transfer amount shown in the
+   * Transfer & Pay page. Demonstrates how business rules (not just UI)
+   * can be managed through flags.
+   * - 2500: Standard account limit
+   * - 5000: Elevated limit
+   * - 10000: Premium limit
+   * - 25000: VIP/premier limit
+   *
+   * DEMO NARRATIVE:
+   *   "Compliance just approved raising the daily limit for premier
+   *    customers from $5K to $25K. One change, no deploy."
+   *
+   * TARGETING EXAMPLE:
+   *   Set 25000 IF isPremiumCustomer == true
+   *   Set 5000 IF customerTenureMonths > 12
+   *   Default: 2500
+   */
+  dailyTransferLimit: new Rox.RoxNumber(2500, [2500, 5000, 10000, 25000]),
+
+  /**
+   * Boolean Flag - Show Credit Score Dashboard
+   *
+   * PATTERN: Entitlement gating (premium vs upsell)
+   * USE CASE: Premier customers see their credit score dashboard with
+   * score gauge, factors, and tips. Standard customers see an upsell
+   * card encouraging them to upgrade. Same flag, two different UIs.
+   *
+   * DEMO NARRATIVE:
+   *   "Premier customers get Credit Insights included. Standard users
+   *    see an upgrade prompt. One flag controls the entitlement."
+   *
+   * TARGETING EXAMPLE:
+   *   Enable IF isPremiumCustomer == true OR userTier == "premier"
+   */
+  showCreditScore: new Rox.Flag(),
+
+  /**
+   * String Flag - Theme Mode
+   *
+   * PATTERN: Visual theme switching
+   * USE CASE: Control the app's visual theme for accessibility testing,
+   * user preference rollouts, or dramatic demo impact. The entire app
+   * transforms visually.
+   * - 'light': Standard light theme (default)
+   * - 'dark': Dark mode
+   * - 'high-contrast': High contrast for accessibility
+   *
+   * DEMO NARRATIVE:
+   *   "We're rolling out dark mode to beta testers first. One flag
+   *    change, and the entire app transforms."
+   *
+   * TARGETING EXAMPLE:
+   *   Set "dark" IF isBetaTester == true
+   */
+  themeMode: new Rox.RoxString('light', ['light', 'dark', 'high-contrast']),
+
+  /**
+   * Boolean Flag - Enable Notification Center
+   *
+   * PATTERN: Conditional rendering of nav item + page
+   * USE CASE: Show/hide the Notifications page with transaction alerts,
+   * security notices, and account updates. Bell icon with badge count
+   * appears in the sidebar and header.
+   *
+   * DEMO NARRATIVE:
+   *   "We're rolling out our new notification center to premium customers
+   *    first. One flag enables the entire feature — nav, bell icon, page."
+   *
+   * TARGETING EXAMPLE:
+   *   Enable IF isPremiumCustomer == true OR isBetaTester == true
+   */
+  enableNotificationCenter: new Rox.Flag(),
+
+  /**
+   * Boolean Flag - Enable Bill Pay Scheduler
+   *
+   * PATTERN: Progressive feature rollout (new tab in existing page)
+   * USE CASE: Add a "Scheduled Payments" tab to Transfer & Pay with
+   * recurring payment setup and management. Demonstrates adding
+   * functionality to an existing page without disrupting it.
+   *
+   * DEMO NARRATIVE:
+   *   "We built scheduled payments but want to roll it out gradually.
+   *    Enable the flag and a new tab appears — disable and it's gone."
+   *
+   * TARGETING EXAMPLE:
+   *   Enable IF customerTenureMonths > 6 AND accountType != "basic"
+   */
+  enableBillPayScheduler: new Rox.Flag(),
+
+  /**
+   * Boolean Flag - Enable Card Controls
+   *
+   * PATTERN: Conditional rendering of nav item + page
+   * USE CASE: Show/hide the Card Controls page where users can
+   * freeze/unfreeze cards, set spending limits, toggle international
+   * transactions, and manage card security settings.
+   *
+   * DEMO NARRATIVE:
+   *   "Card Controls is our newest self-service feature. We're testing
+   *    it with beta users before a full launch."
+   *
+   * TARGETING EXAMPLE:
+   *   Enable IF isBetaTester == true OR isPremiumCustomer == true
+   */
+  enableCardControls: new Rox.Flag(),
 };
 
 /**
@@ -163,6 +390,28 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
     // Empty string means default namespace (recommended for simplicity)
     Rox.register('', flags);
 
+    // Register custom properties so they appear in CloudBees Unify targeting UI
+    // Boolean properties
+    Rox.setCustomBooleanProperty('isPremiumCustomer', false);
+    Rox.setCustomBooleanProperty('isBetaTester', false);
+    Rox.setCustomBooleanProperty('isNewUser', false);
+    Rox.setCustomBooleanProperty('hasInvestmentAccount', false);
+    Rox.setCustomBooleanProperty('isStudent', false);
+    Rox.setCustomBooleanProperty('hasMortgage', false);
+
+    // String properties
+    Rox.setCustomStringProperty('accountType', 'checking');
+    Rox.setCustomStringProperty('customerSegment', 'checking-savings');
+    Rox.setCustomStringProperty('userTier', 'standard');
+    Rox.setCustomStringProperty('region', 'us-east');
+    Rox.setCustomStringProperty('userId', '');
+
+    // Number properties
+    Rox.setCustomNumberProperty('accountBalance', 0);
+    Rox.setCustomNumberProperty('customerTenureMonths', 0);
+    Rox.setCustomNumberProperty('creditScore', 0);
+    Rox.setCustomNumberProperty('monthlyTransactions', 0);
+
     console.log('🚀 Initializing CloudBees Feature Flags...');
 
     // Connect to CloudBees and fetch flag configurations
@@ -185,6 +434,19 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
         showFraudAlerts: flags.showFraudAlerts.isEnabled(),
         promotionalBanner: flags.promotionalBanner.getValue(),
         enableChatSupport: flags.enableChatSupport.isEnabled(),
+        showStudentLoans: flags.showStudentLoans.isEnabled(),
+        showMortgageAccount: flags.showMortgageAccount.isEnabled(),
+        welcomeExperience: flags.welcomeExperience.getValue(),
+        enableSmartBudgetInsights: flags.enableSmartBudgetInsights.isEnabled(),
+        enableRedesignedAccountCards: flags.enableRedesignedAccountCards.isEnabled(),
+        enableRewardsRedemption: flags.enableRewardsRedemption.isEnabled(),
+        systemAlert: flags.systemAlert.getValue(),
+        dailyTransferLimit: flags.dailyTransferLimit.getValue(),
+        showCreditScore: flags.showCreditScore.isEnabled(),
+        themeMode: flags.themeMode.getValue(),
+        enableNotificationCenter: flags.enableNotificationCenter.isEnabled(),
+        enableBillPayScheduler: flags.enableBillPayScheduler.isEnabled(),
+        enableCardControls: flags.enableCardControls.isEnabled(),
       });
     }
   } catch (error) {

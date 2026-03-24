@@ -1,53 +1,54 @@
 /**
  * LoginPage Component
  *
- * Provides a user selector for demo purposes.
- * Users can "log in" by clicking on a persona, which sets their
- * properties for feature flag targeting.
+ * Realistic bank login screen with email/password fields and
+ * quick-select persona buttons for demo purposes.
  */
 
-import { Card, Row, Col, Typography, Button, Space, Tag } from 'antd';
-import { UserOutlined, CrownOutlined, ExperimentOutlined, SmileOutlined } from '@ant-design/icons';
+import { useState } from 'react';
+import { Button, Input, Typography, Space, Tag } from 'antd';
+import { BankOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
 import { DEFAULT_USERS, type User } from '../lib/users';
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
 
 interface LoginPageProps {
   onSelectUser: (user: User) => void;
 }
 
-/**
- * Get icon for user type
- */
-function getUserIcon(userId: string) {
-  const iconProps = { style: { fontSize: 32 } };
+const PERSONA_COLORS: Record<string, string> = {
+  student: '#52c41a',
+  mortgage: '#fa8c16',
+  'financial-planning': '#faad14',
+  'checking-savings': '#1890ff',
+  admin: '#722ed1',
+};
 
-  switch (userId) {
-    case 'premier-customer':
-      return <CrownOutlined {...iconProps} style={{ ...iconProps.style, color: '#faad14' }} />;
-    case 'beta-banker':
-      return <ExperimentOutlined {...iconProps} style={{ ...iconProps.style, color: '#722ed1' }} />;
-    case 'new-member':
-      return <SmileOutlined {...iconProps} style={{ ...iconProps.style, color: '#52c41a' }} />;
-    default:
-      return <UserOutlined {...iconProps} style={{ ...iconProps.style, color: '#1a3c5e' }} />;
-  }
-}
-
-/**
- * Get color for user tier tag
- */
-function getTierColor(tier: string): string {
-  const colorMap: Record<string, string> = {
-    premier: 'gold',
-    beta: 'purple',
-    new: 'green',
-    standard: 'blue',
-  };
-  return colorMap[tier] || 'default';
-}
+const PERSONA_LABELS: Record<string, string> = {
+  student: 'Student',
+  mortgage: 'Mortgage',
+  'financial-planning': 'Wealth',
+  'checking-savings': 'Everyday',
+  admin: 'Admin',
+};
 
 export function LoginPage({ onSelectUser }: LoginPageProps) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleLogin = () => {
+    // Match email to a persona, or default to first user
+    const matched = DEFAULT_USERS.find(u => u.email === email);
+    onSelectUser(matched || DEFAULT_USERS[0]);
+  };
+
+  const handleQuickSelect = (user: User) => {
+    setEmail(user.email);
+    setPassword('••••••');
+    // Brief delay so user sees the fields fill in
+    setTimeout(() => onSelectUser(user), 300);
+  };
+
   return (
     <div
       style={{
@@ -56,130 +57,110 @@ export function LoginPage({ onSelectUser }: LoginPageProps) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '24px',
+        padding: 24,
       }}
     >
-      <div style={{ maxWidth: 1200, width: '100%' }}>
-        <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <Title level={1} style={{ color: '#fff', marginBottom: 8 }}>
+      <div
+        style={{
+          width: '100%',
+          maxWidth: 420,
+          background: '#fff',
+          borderRadius: 16,
+          padding: '48px 40px 40px',
+          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+        }}
+      >
+        {/* Bank Branding */}
+        <div style={{ textAlign: 'center', marginBottom: 40 }}>
+          <BankOutlined style={{ fontSize: 40, color: '#1a3c5e', marginBottom: 12 }} />
+          <Title level={2} style={{ color: '#1a3c5e', marginBottom: 4, fontWeight: 700 }}>
             Horizon Bank
           </Title>
-          <Text style={{ fontSize: 16, color: 'rgba(255, 255, 255, 0.85)' }}>
-            Select an account profile to continue
-          </Text>
+          <Text type="secondary">Your trusted banking partner</Text>
         </div>
 
-        <Row gutter={[24, 24]}>
-          {DEFAULT_USERS.map((user) => (
-            <Col xs={24} sm={12} lg={6} key={user.id}>
-              <Card
-                hoverable
-                style={{
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}
-                bodyStyle={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  height: '100%',
-                }}
-              >
-                <Space direction="vertical" size="middle" style={{ width: '100%', flex: 1 }}>
-                  {/* Avatar */}
-                  <div style={{ textAlign: 'center' }}>
-                    <div
-                      style={{
-                        width: 80,
-                        height: 80,
-                        borderRadius: '50%',
-                        background: '#f0f0f0',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        margin: '0 auto',
-                        marginBottom: 16,
-                      }}
-                    >
-                      {getUserIcon(user.id)}
-                    </div>
+        {/* Login Form */}
+        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+          <div>
+            <Input
+              size="large"
+              placeholder="Email"
+              prefix={<MailOutlined style={{ color: '#bfbfbf' }} />}
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              onPressEnter={handleLogin}
+              style={{ borderRadius: 8 }}
+            />
+          </div>
 
-                    <Title level={4} style={{ marginBottom: 4 }}>
-                      {user.name}
-                    </Title>
+          <div>
+            <Input.Password
+              size="large"
+              placeholder="Password"
+              prefix={<LockOutlined style={{ color: '#bfbfbf' }} />}
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              onPressEnter={handleLogin}
+              style={{ borderRadius: 8 }}
+            />
+          </div>
 
-                    <Tag color={getTierColor(user.properties.strings.userTier)}>
-                      {user.properties.strings.userTier}
-                    </Tag>
-                  </div>
+          <Button
+            type="primary"
+            size="large"
+            block
+            onClick={handleLogin}
+            style={{
+              height: 48,
+              borderRadius: 8,
+              fontSize: 16,
+              fontWeight: 600,
+              background: '#1a3c5e',
+              borderColor: '#1a3c5e',
+            }}
+          >
+            Login
+          </Button>
+        </Space>
 
-                  {/* Description */}
-                  <Paragraph
-                    type="secondary"
-                    style={{
-                      textAlign: 'center',
-                      marginBottom: 0,
-                      minHeight: 40,
-                      fontSize: 13,
-                    }}
-                  >
-                    {user.description}
-                  </Paragraph>
-
-                  {/* Properties Summary */}
-                  <div style={{ flex: 1 }}>
-                    <div
-                      style={{
-                        background: '#fafafa',
-                        padding: 12,
-                        borderRadius: 4,
-                        fontSize: 12,
-                      }}
-                    >
-                      <div style={{ marginBottom: 4 }}>
-                        <Text strong>Account Type:</Text>{' '}
-                        <Text type="secondary">{user.properties.strings.accountType}</Text>
-                      </div>
-                      <div style={{ marginBottom: 4 }}>
-                        <Text strong>Region:</Text>{' '}
-                        <Text type="secondary">{user.properties.strings.region}</Text>
-                      </div>
-                      <div>
-                        <Text strong>Member Since:</Text>{' '}
-                        <Text type="secondary">{user.properties.numbers.customerTenureMonths} months</Text>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Login Button */}
-                  <Button
-                    type="primary"
-                    size="large"
-                    block
-                    onClick={() => onSelectUser(user)}
-                  >
-                    Continue as {user.name.split(' ')[0]}
-                  </Button>
-                </Space>
-              </Card>
-            </Col>
-          ))}
-        </Row>
-
-        {/* Info Footer */}
+        {/* Demo Quick-Select */}
         <div
           style={{
+            marginTop: 32,
+            padding: 20,
+            border: '2px solid #52c41a',
+            borderRadius: 12,
             textAlign: 'center',
-            marginTop: 48,
-            padding: 24,
-            background: 'rgba(255, 255, 255, 0.1)',
-            borderRadius: 8,
           }}
         >
-          <Text style={{ color: 'rgba(255, 255, 255, 0.85)', fontSize: 13 }}>
-            Each customer profile has different account attributes used for personalized banking
-            features. Switch between profiles to see how the experience changes.
+          <Text type="secondary" style={{ fontSize: 13, display: 'block', marginBottom: 12 }}>
+            Demo accounts:
           </Text>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
+            {DEFAULT_USERS.map(user => {
+              const segment = user.properties.strings.customerSegment;
+              const color = PERSONA_COLORS[segment] || '#1890ff';
+              const label = PERSONA_LABELS[segment] || segment;
+
+              return (
+                <Tag
+                  key={user.id}
+                  color={color}
+                  onClick={() => handleQuickSelect(user)}
+                  style={{
+                    cursor: 'pointer',
+                    fontSize: 14,
+                    padding: '4px 16px',
+                    borderRadius: 20,
+                    fontWeight: 600,
+                    margin: 0,
+                  }}
+                >
+                  {label}
+                </Tag>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>

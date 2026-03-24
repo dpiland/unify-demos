@@ -36,110 +36,152 @@ export interface User {
  * Horizon Bank User Personas
  *
  * These represent different banking customer segments for demonstrations.
- * Each persona has properties that can be used for feature flag targeting.
+ * Each persona has properties that can be used for feature flag targeting
+ * via the `customerSegment` string property in CloudBees Unify.
  */
 export const DEFAULT_USERS: User[] = [
   {
-    id: 'standard-checking',
-    name: 'Sarah Everyday',
-    email: 'sarah.everyday@horizonbank.com',
-    description: 'Standard checking account holder with everyday banking needs',
-    properties: {
-      booleans: {
-        isPremiumCustomer: false,
-        isBetaTester: false,
-        isNewUser: false,
-        hasInvestmentAccount: false,
-      },
-      strings: {
-        accountType: 'checking',
-        userTier: 'standard',
-        region: 'us-east',
-        userId: 'standard-checking',
-      },
-      numbers: {
-        accountBalance: 4250,
-        customerTenureMonths: 18,
-        creditScore: 710,
-        monthlyTransactions: 35,
-      },
-    },
-  },
-  {
-    id: 'premier-customer',
-    name: 'Marcus Premier',
-    email: 'marcus.premier@horizonbank.com',
-    description: 'Premier banking customer with investment accounts and high balances',
-    properties: {
-      booleans: {
-        isPremiumCustomer: true,
-        isBetaTester: false,
-        isNewUser: false,
-        hasInvestmentAccount: true,
-      },
-      strings: {
-        accountType: 'premier',
-        userTier: 'premier',
-        region: 'us-west',
-        userId: 'premier-customer',
-      },
-      numbers: {
-        accountBalance: 187500,
-        customerTenureMonths: 72,
-        creditScore: 805,
-        monthlyTransactions: 85,
-      },
-    },
-  },
-  {
-    id: 'beta-banker',
-    name: 'Dev Tester',
-    email: 'dev.tester@horizonbank.com',
-    description: 'Internal beta tester with access to experimental banking features',
-    properties: {
-      booleans: {
-        isPremiumCustomer: false,
-        isBetaTester: true,
-        isNewUser: false,
-        hasInvestmentAccount: true,
-      },
-      strings: {
-        accountType: 'checking',
-        userTier: 'beta',
-        region: 'us-west',
-        userId: 'beta-banker',
-      },
-      numbers: {
-        accountBalance: 12800,
-        customerTenureMonths: 30,
-        creditScore: 745,
-        monthlyTransactions: 50,
-      },
-    },
-  },
-  {
-    id: 'new-member',
-    name: 'Priya Newmember',
-    email: 'priya.new@horizonbank.com',
-    description: 'New customer who recently opened a checking account',
+    id: 'student',
+    name: 'Jamie Chen (Student)',
+    email: 'jamie.chen@horizonbank.com',
+    description: 'College junior managing student finances and building credit',
     properties: {
       booleans: {
         isPremiumCustomer: false,
         isBetaTester: false,
         isNewUser: true,
         hasInvestmentAccount: false,
+        isStudent: true,
+        hasMortgage: false,
+      },
+      strings: {
+        accountType: 'student',
+        customerSegment: 'student',
+        userTier: 'standard',
+        region: 'us-east',
+        userId: 'student',
+      },
+      numbers: {
+        accountBalance: 1820,
+        customerTenureMonths: 8,
+        creditScore: 670,
+        monthlyTransactions: 22,
+      },
+    },
+  },
+  {
+    id: 'mortgage',
+    name: 'Pat Holloway (Mortgage)',
+    email: 'pat.holloway@horizonbank.com',
+    description: 'Homeowner with an active mortgage and checking account',
+    properties: {
+      booleans: {
+        isPremiumCustomer: false,
+        isBetaTester: false,
+        isNewUser: false,
+        hasInvestmentAccount: false,
+        isStudent: false,
+        hasMortgage: true,
+      },
+      strings: {
+        accountType: 'mortgage',
+        customerSegment: 'mortgage',
+        userTier: 'standard',
+        region: 'us-east',
+        userId: 'mortgage',
+      },
+      numbers: {
+        accountBalance: 11400,
+        customerTenureMonths: 48,
+        creditScore: 740,
+        monthlyTransactions: 40,
+      },
+    },
+  },
+  {
+    id: 'financial-planning',
+    name: 'Morgan Whitfield (Financial Planning)',
+    email: 'morgan.whitfield@horizonbank.com',
+    description: 'Wealth management client with investment and premier accounts',
+    properties: {
+      booleans: {
+        isPremiumCustomer: true,
+        isBetaTester: false,
+        isNewUser: false,
+        hasInvestmentAccount: true,
+        isStudent: false,
+        hasMortgage: false,
+      },
+      strings: {
+        accountType: 'premier',
+        customerSegment: 'financial-planning',
+        userTier: 'premier',
+        region: 'us-west',
+        userId: 'financial-planning',
+      },
+      numbers: {
+        accountBalance: 245000,
+        customerTenureMonths: 84,
+        creditScore: 810,
+        monthlyTransactions: 75,
+      },
+    },
+  },
+  {
+    id: 'checking-savings',
+    name: 'Alex Rivera (Checking/Savings)',
+    email: 'alex.rivera@horizonbank.com',
+    description: 'Everyday checking and savings customer',
+    properties: {
+      booleans: {
+        isPremiumCustomer: false,
+        isBetaTester: false,
+        isNewUser: false,
+        hasInvestmentAccount: false,
+        isStudent: false,
+        hasMortgage: false,
       },
       strings: {
         accountType: 'checking',
-        userTier: 'new',
-        region: 'us-east',
-        userId: 'new-member',
+        customerSegment: 'checking-savings',
+        userTier: 'standard',
+        region: 'us-west',
+        userId: 'checking-savings',
       },
       numbers: {
-        accountBalance: 1500,
-        customerTenureMonths: 2,
-        creditScore: 680,
-        monthlyTransactions: 12,
+        accountBalance: 5600,
+        customerTenureMonths: 24,
+        creditScore: 720,
+        monthlyTransactions: 38,
+      },
+    },
+  },
+  {
+    id: 'admin',
+    name: 'Dana Admin (Admin)',
+    email: 'dana.admin@horizonbank.com',
+    description: 'Internal admin with visibility into all features and modules',
+    properties: {
+      booleans: {
+        isPremiumCustomer: true,
+        isBetaTester: true,
+        isNewUser: false,
+        hasInvestmentAccount: true,
+        isStudent: false,
+        hasMortgage: true,
+      },
+      strings: {
+        accountType: 'admin',
+        customerSegment: 'admin',
+        userTier: 'admin',
+        region: 'us-east',
+        userId: 'admin',
+      },
+      numbers: {
+        accountBalance: 100000,
+        customerTenureMonths: 120,
+        creditScore: 850,
+        monthlyTransactions: 100,
       },
     },
   },
@@ -156,7 +198,8 @@ export function getUserById(id: string): User | undefined {
  * Get user initials for avatar display
  */
 export function getUserInitials(name: string): string {
-  return name
+  const baseName = name.replace(/\s*\(.*\)$/, '');
+  return baseName
     .split(' ')
     .map(part => part[0])
     .join('')

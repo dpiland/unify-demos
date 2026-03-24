@@ -41,13 +41,12 @@ export function AppWithAuth() {
     setUserProperties(user);
   };
 
-  const handleLogout = () => {
+  const handleSwitchAccount = () => {
     clearCurrentUser();
     setCurrentUser(null);
-    window.location.reload();
   };
 
-  const handleSwitchUser = (userId: string) => {
+  const handleQuickSwitch = (userId: string) => {
     const user = DEFAULT_USERS.find(u => u.id === userId);
     if (user) {
       handleSelectUser(user);
@@ -74,22 +73,22 @@ export function AppWithAuth() {
         { type: 'divider' as const },
         {
           key: 'switch',
-          label: 'Switch User',
+          label: 'Quick Switch',
           icon: <SwapOutlined />,
           children: DEFAULT_USERS.map(user => ({
             key: user.id,
             label: user.name,
-            onClick: () => handleSwitchUser(user.id),
+            onClick: () => handleQuickSwitch(user.id),
             disabled: user.id === currentUser.id,
           })),
         },
         { type: 'divider' as const },
         {
           key: 'logout',
-          label: 'Logout',
+          label: 'Switch Account',
           icon: <LogoutOutlined />,
           danger: true,
-          onClick: handleLogout,
+          onClick: handleSwitchAccount,
         },
       ]
     : [];

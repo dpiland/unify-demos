@@ -23,14 +23,14 @@
   align-items: center;
   gap: 12px;
   padding: 16px 24px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--ant-color-border-secondary, #f0f0f0);
   height: 64px;
 }
 
 .sider-logo-text {
   font-size: 18px;
   font-weight: 700;
-  color: #1a3c5e;
+  color: var(--ant-color-primary, #1a3c5e);
   white-space: nowrap;
   overflow: hidden;
 }
@@ -39,4 +39,93 @@
 .ant-layout-sider-collapsed .sider-logo {
   justify-content: center;
   padding: 16px;
+}
+
+/* Dark mode overrides for hardcoded inline backgrounds */
+[data-theme="dark"] .ant-card {
+  background: #1f1f1f !important;
+  border-color: #434343 !important;
+}
+
+[data-theme="dark"] .ant-card .ant-card {
+  background: #262626 !important;
+}
+
+[data-theme="dark"] .ant-card .ant-card-head {
+  border-color: #434343 !important;
+}
+
+[data-theme="dark"] .ant-table-thead > tr > th,
+[data-theme="dark"] .ant-table-thead > tr > td {
+  background: #262626 !important;
+}
+
+[data-theme="dark"] .ant-modal-content {
+  background: #1f1f1f !important;
+}
+
+[data-theme="dark"] .ant-modal-header {
+  background: #1f1f1f !important;
+}
+
+[data-theme="dark"] .ant-segmented {
+  background: #262626 !important;
+}
+
+[data-theme="dark"] .ant-select-dropdown,
+[data-theme="dark"] .ant-dropdown-menu {
+  background: #1f1f1f !important;
+}
+
+[data-theme="dark"] .ant-input,
+[data-theme="dark"] .ant-input-number,
+[data-theme="dark"] .ant-select-selector {
+  background: #262626 !important;
+  border-color: #434343 !important;
+  color: #fafafa !important;
+}
+
+[data-theme="dark"] .ant-upload-drag {
+  background: #262626 !important;
+  border-color: #434343 !important;
+}
+
+[data-theme="dark"] .ant-tabs-nav::before {
+  border-color: #434343 !important;
+}
+
+[data-theme="dark"] .ant-list-item {
+  border-color: #434343 !important;
+}
+
+/* Dark mode: white logo text */
+[data-theme="dark"] .sider-logo-text {
+  color: #ffffff !important;
+}
+
+/* Dark mode: brighter selected menu item */
+[data-theme="dark"] .ant-menu-item-selected {
+  background: rgba(24, 144, 255, 0.25) !important;
+  color: #69b1ff !important;
+}
+
+[data-theme="dark"] .ant-menu-item-selected .anticon {
+  color: #69b1ff !important;
+}
+
+[data-theme="dark"] .ant-menu-item {
+  color: rgba(255, 255, 255, 0.65) !important;
+}
+
+[data-theme="dark"] .ant-menu-item:hover {
+  color: #ffffff !important;
+}
+
+/* Dark mode: make link buttons readable */
+[data-theme="dark"] .ant-btn-link {
+  color: #69b1ff !important;
+}
+
+[data-theme="dark"] .ant-btn-link:hover {
+  color: #91caff !important;
 }

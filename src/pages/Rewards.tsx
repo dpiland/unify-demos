@@ -6,19 +6,22 @@
  */
 
 import { useState } from 'react';
-import { Button, Card, Col, Divider, List, Modal, Row, Segmented, Space, Statistic, Tag, Typography, message } from 'antd';
+import { Button, Card, Col, Divider, List, Modal, Row, Segmented, Space, Statistic, Tag, Typography, message, theme as antdTheme } from 'antd';
 import {
   ArrowLeftOutlined,
+  BellOutlined,
   CreditCardOutlined,
   DollarOutlined,
   GiftOutlined,
   GlobalOutlined,
+  LockOutlined,
   PieChartOutlined,
   ShoppingOutlined,
   StarOutlined,
   TrophyOutlined,
   UnorderedListOutlined,
 } from '@ant-design/icons';
+import { useFeatureFlag } from '../hooks/useFeatureFlag';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { REWARDS_DATA, REWARD_CATEGORIES, OFFERS, REDEEM_OPTIONS } from '../data/mockData.tsx';
 
@@ -74,6 +77,14 @@ const REDEEM_CONTENT: Record<string, { icon: React.ReactNode; description: strin
 };
 
 export function Rewards() {
+  const { token } = antdTheme.useToken();
+  const isDark = token.colorBgContainer !== '#ffffff';
+  const bgSubtle = isDark ? '#262626' : '#fafafa';
+  const bgMuted = isDark ? '#1f1f1f' : '#f5f5f5';
+
+  // Boolean flag: enable rewards redemption (regional rollout demo)
+  const canRedeem = useFeatureFlag('enableRewardsRedemption');
+
   const [categoryView, setCategoryView] = useState<string>('list');
   const [selectedRedeem, setSelectedRedeem] = useState<string | null>(null);
   const [confirmModal, setConfirmModal] = useState<{ label: string; points: number } | null>(null);
@@ -127,7 +138,7 @@ export function Rewards() {
             title={
               <Space>
                 <CreditCardOutlined />
-                <span>Active Cash Earning Categories</span>
+                <span>Horizon Cash Rewards Earning Categories</span>
               </Space>
             }
             extra={
@@ -173,120 +184,148 @@ export function Rewards() {
                 </PieChart>
               </ResponsiveContainer>
             )}
-            <div style={{ marginTop: 12, padding: 12, background: '#f6ffed', borderRadius: 4 }}>
-              <Text type="secondary">
-                Earn unlimited cash back on every purchase with your Active Cash card.
+            <div style={{ marginTop: 12, padding: 12, background: isDark ? 'rgba(82, 196, 26, 0.2)' : 'rgba(82, 196, 26, 0.1)', borderRadius: 4 }}>
+              <Text style={{ color: isDark ? '#b7eb8f' : '#389e0d' }}>
+                Earn unlimited cash back on every purchase with your Horizon Cash Rewards card.
                 No caps on how much you can earn.
               </Text>
             </div>
           </Card>
         </Col>
 
-        {/* Redeem */}
+        {/* Redeem - controlled by enableRewardsRedemption boolean flag (regional rollout demo) */}
         <Col xs={24} lg={12}>
-          <Card
-            title={
-              <Space>
-                {selectedRedeem ? (
-                  <Button
-                    type="text"
-                    size="small"
-                    icon={<ArrowLeftOutlined />}
-                    onClick={() => setSelectedRedeem(null)}
-                    style={{ marginRight: 4 }}
-                  />
-                ) : (
-                  <GiftOutlined />
-                )}
-                <span>{selectedRedeem || 'Redeem Your Rewards'}</span>
-              </Space>
-            }
-          >
-            <Paragraph type="secondary" style={{ marginBottom: 16 }}>
-              You have <Text strong style={{ color: '#faad14' }}>{REWARDS_DATA.points.toLocaleString()} points</Text> available to redeem.
-            </Paragraph>
-
-            {!selectedRedeem ? (
-              <Row gutter={[12, 12]}>
-                {REDEEM_OPTIONS.map((option) => (
-                  <Col xs={12} key={option}>
-                    <Button
-                      block
-                      style={{ height: 'auto', padding: '16px', textAlign: 'center' }}
-                      onClick={() => setSelectedRedeem(option)}
-                    >
-                      <Space direction="vertical" size={4}>
-                        {REDEEM_CONTENT[option]?.icon}
-                        <Text strong>{option}</Text>
-                      </Space>
-                    </Button>
-                  </Col>
-                ))}
-              </Row>
-            ) : (
-              <div>
-                <div style={{ textAlign: 'center', marginBottom: 16 }}>
-                  {REDEEM_CONTENT[selectedRedeem]?.icon}
-                </div>
-                <Paragraph type="secondary" style={{ textAlign: 'center' }}>
-                  {REDEEM_CONTENT[selectedRedeem]?.description}
-                </Paragraph>
-                <Divider />
-                <List
-                  dataSource={REDEEM_CONTENT[selectedRedeem]?.options || []}
-                  renderItem={(item) => (
-                    <List.Item
-                      actions={[
-                        <Button
-                          type="primary"
-                          size="small"
-                          disabled={REWARDS_DATA.points < item.points}
-                          onClick={() => setConfirmModal(item)}
-                        >
-                          Redeem
-                        </Button>,
-                      ]}
-                    >
-                      <List.Item.Meta
-                        title={item.label}
-                        description={
-                          <Text type={REWARDS_DATA.points >= item.points ? 'secondary' : 'danger'}>
-                            {item.points.toLocaleString()} points
-                          </Text>
-                        }
+          {canRedeem ? (
+            <>
+              <Card
+                title={
+                  <Space>
+                    {selectedRedeem ? (
+                      <Button
+                        type="text"
+                        size="small"
+                        icon={<ArrowLeftOutlined />}
+                        onClick={() => setSelectedRedeem(null)}
+                        style={{ marginRight: 4 }}
                       />
-                    </List.Item>
-                  )}
-                />
-              </div>
-            )}
-          </Card>
+                    ) : (
+                      <GiftOutlined />
+                    )}
+                    <span>{selectedRedeem || 'Redeem Your Rewards'}</span>
+                  </Space>
+                }
+              >
+                <Paragraph type="secondary" style={{ marginBottom: 16 }}>
+                  You have <Text strong style={{ color: '#faad14' }}>{REWARDS_DATA.points.toLocaleString()} points</Text> available to redeem.
+                </Paragraph>
 
-          {/* Confirmation Modal */}
-          <Modal
-            title="Confirm Redemption"
-            open={!!confirmModal}
-            onOk={() => {
-              setConfirmModal(null);
-              setSelectedRedeem(null);
-            }}
-            onCancel={() => setConfirmModal(null)}
-            okText="Confirm Redemption"
-          >
-            {confirmModal && (
-              <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-                <Paragraph>
-                  You are about to redeem <Text strong>{confirmModal.points.toLocaleString()} points</Text> for:
+                {!selectedRedeem ? (
+                  <Row gutter={[12, 12]}>
+                    {REDEEM_OPTIONS.map((option) => (
+                      <Col xs={12} key={option}>
+                        <Button
+                          block
+                          style={{ height: 'auto', padding: '16px', textAlign: 'center' }}
+                          onClick={() => setSelectedRedeem(option)}
+                        >
+                          <Space direction="vertical" size={4}>
+                            {REDEEM_CONTENT[option]?.icon}
+                            <Text strong>{option}</Text>
+                          </Space>
+                        </Button>
+                      </Col>
+                    ))}
+                  </Row>
+                ) : (
+                  <div>
+                    <div style={{ textAlign: 'center', marginBottom: 16 }}>
+                      {REDEEM_CONTENT[selectedRedeem]?.icon}
+                    </div>
+                    <Paragraph type="secondary" style={{ textAlign: 'center' }}>
+                      {REDEEM_CONTENT[selectedRedeem]?.description}
+                    </Paragraph>
+                    <Divider />
+                    <List
+                      dataSource={REDEEM_CONTENT[selectedRedeem]?.options || []}
+                      renderItem={(item) => (
+                        <List.Item
+                          actions={[
+                            <Button
+                              type="primary"
+                              size="small"
+                              disabled={REWARDS_DATA.points < item.points}
+                              onClick={() => setConfirmModal(item)}
+                            >
+                              Redeem
+                            </Button>,
+                          ]}
+                        >
+                          <List.Item.Meta
+                            title={item.label}
+                            description={
+                              <Text type={REWARDS_DATA.points >= item.points ? 'secondary' : 'danger'}>
+                                {item.points.toLocaleString()} points
+                              </Text>
+                            }
+                          />
+                        </List.Item>
+                      )}
+                    />
+                  </div>
+                )}
+              </Card>
+
+              {/* Confirmation Modal */}
+              <Modal
+                title="Confirm Redemption"
+                open={!!confirmModal}
+                onOk={() => {
+                  setConfirmModal(null);
+                  setSelectedRedeem(null);
+                }}
+                onCancel={() => setConfirmModal(null)}
+                okText="Confirm Redemption"
+              >
+                {confirmModal && (
+                  <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                    <Paragraph>
+                      You are about to redeem <Text strong>{confirmModal.points.toLocaleString()} points</Text> for:
+                    </Paragraph>
+                    <Card size="small" style={{ background: bgSubtle, textAlign: 'center' }}>
+                      <Title level={4} style={{ marginBottom: 0 }}>{confirmModal.label}</Title>
+                    </Card>
+                    <Paragraph type="secondary">
+                      Remaining balance after redemption: <Text strong>{(REWARDS_DATA.points - confirmModal.points).toLocaleString()} points</Text>
+                    </Paragraph>
+                  </Space>
+                )}
+              </Modal>
+            </>
+          ) : (
+            <Card
+              title={
+                <Space>
+                  <GiftOutlined />
+                  <span>Redeem Your Rewards</span>
+                </Space>
+              }
+            >
+              <div style={{ textAlign: 'center', padding: '32px 16px' }}>
+                <LockOutlined style={{ fontSize: 48, color: '#d9d9d9', marginBottom: 16 }} />
+                <Title level={4} style={{ color: '#8c8c8c' }}>Coming Soon to Your Region</Title>
+                <Paragraph type="secondary" style={{ maxWidth: 360, margin: '0 auto 24px' }}>
+                  Self-service rewards redemption is currently available in select markets
+                  and will be expanding to your area soon.
                 </Paragraph>
-                <Card size="small" style={{ background: '#fafafa', textAlign: 'center' }}>
-                  <Title level={4} style={{ marginBottom: 0 }}>{confirmModal.label}</Title>
-                </Card>
-                <Paragraph type="secondary">
-                  Remaining balance after redemption: <Text strong>{(REWARDS_DATA.points - confirmModal.points).toLocaleString()} points</Text>
+                <Paragraph type="secondary" style={{ marginBottom: 24 }}>
+                  You have <Text strong style={{ color: '#faad14' }}>{REWARDS_DATA.points.toLocaleString()} points</Text> ready to redeem when it launches.
                 </Paragraph>
-              </Space>
-            )}
-          </Modal>
+                <Button type="primary" icon={<BellOutlined />} onClick={() => message.success('You\'ll be notified when rewards redemption is available in your region!')}>
+                  Notify Me When Available
+                </Button>
+              </div>
+            </Card>
+          )}
         </Col>
       </Row>
 
@@ -304,7 +343,7 @@ export function Rewards() {
             <Col xs={24} sm={8} key={offer.id}>
               <Card
                 size="small"
-                style={{ height: '100%', background: '#fafafa' }}
+                style={{ height: '100%', background: bgSubtle }}
               >
                 <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                   <Title level={5} style={{ marginBottom: 0 }}>{offer.title}</Title>
@@ -337,7 +376,7 @@ export function Rewards() {
         {selectedOffer === 'o1' && (
           <Space direction="vertical" size="middle" style={{ width: '100%' }}>
             <Paragraph>{OFFERS[0].description}</Paragraph>
-            <Card size="small" style={{ background: '#f5f5f5' }}>
+            <Card size="small" style={{ background: bgMuted }}>
               <Space direction="vertical" size="small">
                 <Text strong>Offer Details</Text>
                 <Text type="secondary">Earn 5x points on flights, hotels, and car rentals booked through our travel portal from June 1 - August 31, 2026.</Text>
@@ -356,16 +395,16 @@ export function Rewards() {
         {selectedOffer === 'o2' && (
           <Space direction="vertical" size="middle" style={{ width: '100%' }}>
             <Paragraph>{OFFERS[1].description}</Paragraph>
-            <Card size="small" style={{ background: '#f5f5f5' }}>
+            <Card size="small" style={{ background: bgMuted }}>
               <Space direction="vertical" size="small">
                 <Text strong>How to Qualify</Text>
-                <Text type="secondary">Open a new Way2Save Savings account, deposit $25,000 or more within 30 days, and maintain the balance for 90 days.</Text>
+                <Text type="secondary">Open a new Horizon Savings Savings account, deposit $25,000 or more within 30 days, and maintain the balance for 90 days.</Text>
               </Space>
             </Card>
             <div>
               <Text strong>Terms:</Text>
               <ul style={{ marginTop: 4, paddingLeft: 20, color: '#8c8c8c' }}>
-                <li>New Way2Save accounts only</li>
+                <li>New Horizon Savings accounts only</li>
                 <li>$25,000 minimum opening deposit required</li>
                 <li>Bonus deposited within 10 days of qualifying</li>
                 <li>Limit one bonus per customer</li>
@@ -376,7 +415,7 @@ export function Rewards() {
         {selectedOffer === 'o3' && (
           <Space direction="vertical" size="middle" style={{ width: '100%' }}>
             <Paragraph>{OFFERS[2].description}</Paragraph>
-            <Card size="small" style={{ background: '#f5f5f5' }}>
+            <Card size="small" style={{ background: bgMuted }}>
               <Space direction="vertical" size="small">
                 <Text strong>Current Rates</Text>
                 <Row gutter={[16, 8]} style={{ marginTop: 8 }}>
