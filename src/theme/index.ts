@@ -195,6 +195,42 @@ export const darkTheme: ThemeConfig = {
 };
 
 /**
+ * High contrast theme for accessibility
+ */
+export const highContrastTheme: ThemeConfig = {
+  ...lightTheme,
+  token: {
+    ...lightTheme.token,
+
+    colorPrimary: '#0050b3',
+    colorSuccess: '#237804',
+    colorWarning: '#ad6800',
+    colorError: '#a8071a',
+
+    colorBgContainer: '#ffffff',
+    colorBgLayout: '#f0f0f0',
+
+    colorText: '#000000',
+    colorTextSecondary: '#262626',
+    colorTextTertiary: '#434343',
+
+    colorBorder: '#595959',
+    colorBorderSecondary: '#8c8c8c',
+
+    fontSize: 15,
+  },
+
+  components: {
+    ...lightTheme.components,
+
+    Button: {
+      ...lightTheme.components?.Button,
+      fontWeight: 600,
+    },
+  },
+};
+
+/**
  * Default theme (light mode)
  */
 export const theme = lightTheme;

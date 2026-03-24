@@ -121,7 +121,7 @@ export const TRANSACTIONS: Transaction[] = [
 export const ACCOUNTS: Account[] = [
   {
     id: 'checking',
-    name: 'Everyday Checking',
+    name: 'Horizon Checking',
     type: 'checking',
     accountNumber: '****4523',
     balance: 12458.32,
@@ -130,7 +130,7 @@ export const ACCOUNTS: Account[] = [
   },
   {
     id: 'savings',
-    name: 'Way2Save Savings',
+    name: 'Horizon Savings',
     type: 'savings',
     accountNumber: '****7891',
     balance: 34891.50,
@@ -144,7 +144,7 @@ export const ACCOUNTS: Account[] = [
   },
   {
     id: 'credit',
-    name: 'Active Cash Credit Card',
+    name: 'Horizon Cash Rewards Card',
     type: 'credit',
     accountNumber: '****3456',
     balance: 2145.67,
@@ -207,11 +207,11 @@ export const UPCOMING_BILLS: Bill[] = [
 // ============================================
 
 export const RECENT_TRANSFERS: Transfer[] = [
-  { id: 'tr1', date: '2026-03-14', from: 'Everyday Checking', to: 'Way2Save Savings', amount: 500.00, type: 'standard', status: 'completed' },
-  { id: 'tr2', date: '2026-03-10', from: 'Everyday Checking', to: 'Active Cash Credit Card', amount: 200.00, type: 'instant', status: 'completed' },
-  { id: 'tr3', date: '2026-03-05', from: 'Way2Save Savings', to: 'Everyday Checking', amount: 1000.00, type: 'standard', status: 'completed' },
-  { id: 'tr4', date: '2026-03-01', from: 'Everyday Checking', to: 'Way2Save Savings', amount: 500.00, type: 'standard', status: 'completed' },
-  { id: 'tr5', date: '2026-02-25', from: 'Everyday Checking', to: 'Active Cash Credit Card', amount: 350.00, type: 'instant', status: 'completed' },
+  { id: 'tr1', date: '2026-03-14', from: 'Horizon Checking', to: 'Horizon Savings', amount: 500.00, type: 'standard', status: 'completed' },
+  { id: 'tr2', date: '2026-03-10', from: 'Horizon Checking', to: 'Horizon Cash Rewards Card', amount: 200.00, type: 'instant', status: 'completed' },
+  { id: 'tr3', date: '2026-03-05', from: 'Horizon Savings', to: 'Horizon Checking', amount: 1000.00, type: 'standard', status: 'completed' },
+  { id: 'tr4', date: '2026-03-01', from: 'Horizon Checking', to: 'Horizon Savings', amount: 500.00, type: 'standard', status: 'completed' },
+  { id: 'tr5', date: '2026-02-25', from: 'Horizon Checking', to: 'Horizon Cash Rewards Card', amount: 350.00, type: 'instant', status: 'completed' },
 ];
 
 // ============================================
@@ -242,7 +242,7 @@ export const OFFERS: Offer[] = [
   {
     id: 'o2',
     title: '$200 Savings Bonus',
-    description: 'Open a new Way2Save account with $25,000+ and earn a $200 bonus after 90 days.',
+    description: 'Open a new Horizon Savings account with $25,000+ and earn a $200 bonus after 90 days.',
     cta: 'Open Account',
   },
   {
