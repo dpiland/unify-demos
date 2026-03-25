@@ -29,6 +29,7 @@ export const FEATURE_FLAG_KEYS = {
   ENABLE_CRYPTO_TRADING: 'enableCryptoTrading',
   ENABLE_INVESTMENT_ADVISORY: 'enableInvestmentAdvisory',
   ENABLE_MORTGAGE_SIMULATOR: 'enableMortgageSimulator',
+  ENABLE_TOP_BANNER: 'enableTopBanner',
 } as const;
 
 /**
@@ -81,6 +82,8 @@ export const FLAG_DESCRIPTIONS: Record<string, string> = {
     'Show personalized investment advisory section with risk assessment and advisor scheduling (premium entitlement demo)',
   enableMortgageSimulator:
     'Show Mortgage Simulator page with payment calculator, term comparison, and pre-qualification (prospect engagement demo)',
+  enableTopBanner:
+    'Display promotional top banner — INTENTIONALLY BUGGY: discount percentage climbs out of control (kill switch demo — disable instantly when bug is noticed)',
 };
 
 /**
@@ -90,7 +93,7 @@ export const DEFAULT_FLAG_VALUES = {
   enableInstantTransfers: false,
   showInvestmentPortfolio: false,
   dashboardLayout: 'classic',
-  recentTransactionsToShow: 10,
+  recentTransactionsToShow: 5,
   showFraudAlerts: false,
   promotionalBanner: 'none',
   enableChatSupport: false,
@@ -110,4 +113,5 @@ export const DEFAULT_FLAG_VALUES = {
   enableCryptoTrading: false,
   enableInvestmentAdvisory: false,
   enableMortgageSimulator: false,
+  enableTopBanner: false,
 };

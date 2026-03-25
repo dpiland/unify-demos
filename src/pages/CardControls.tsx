@@ -6,7 +6,7 @@
  * Controlled by enableCardControls boolean flag.
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Alert,
   Button,
@@ -69,7 +69,13 @@ const INITIAL_CARDS: Record<string, CardState> = {
   },
 };
 
-export function CardControls({ currentUser }: { currentUser: User }) {
+interface CardControlsProps {
+  currentUser: User;
+  creditCardFrozen?: boolean;
+  setCreditCardFrozen?: (frozen: boolean) => void;
+}
+
+export function CardControls({ currentUser, creditCardFrozen, setCreditCardFrozen }: CardControlsProps) {
   const { token } = antdTheme.useToken();
   const isDark = token.colorBgContainer !== '#ffffff';
   const bgSubtle = isDark ? '#262626' : '#fafafa';
@@ -81,6 +87,16 @@ export function CardControls({ currentUser }: { currentUser: User }) {
 
   const [cards, setCards] = useState(INITIAL_CARDS);
   const [selectedCard, setSelectedCard] = useState<string>('checking');
+
+  // Sync credit card frozen state from parent (e.g. fraud alert lock)
+  useEffect(() => {
+    if (creditCardFrozen && !cards.credit.frozen) {
+      setCards(prev => ({
+        ...prev,
+        credit: { ...prev.credit, frozen: true },
+      }));
+    }
+  }, [creditCardFrozen]);
 
   const cardAccounts = ACCOUNTS.filter(a =>
     a.type === 'checking' || (!isStudent && a.type === 'credit')
@@ -98,6 +114,9 @@ export function CardControls({ currentUser }: { currentUser: User }) {
   const toggleFreeze = () => {
     const newFrozen = !state.frozen;
     updateCard('frozen', newFrozen);
+    if (selectedCard === 'credit') {
+      setCreditCardFrozen?.(newFrozen);
+    }
     if (newFrozen) {
       message.warning('Card has been frozen. No transactions will be processed.');
     } else {

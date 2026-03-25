@@ -10,7 +10,7 @@
  */
 
 import { useMemo, useState } from 'react';
-import { Alert, Button, Card, Col, Modal, Row, Space, Statistic, Table, Tag, Typography, Upload, message, theme as antdTheme } from 'antd';
+import { Alert, Button, Card, Col, Modal, Row, Select, Space, Statistic, Table, Tag, Typography, Upload, message, theme as antdTheme } from 'antd';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import {
   BankOutlined,
@@ -43,6 +43,7 @@ const { Title, Text } = Typography;
 
 interface AccountSummaryProps {
   currentUser: User;
+  onLockCard?: () => void;
 }
 
 const ACCOUNT_ICONS: Record<string, React.ReactNode> = {
@@ -391,7 +392,7 @@ function SpendingBreakdown({ transactions }: { transactions: Transaction[] }) {
   );
 }
 
-export function AccountSummary({ currentUser }: AccountSummaryProps) {
+export function AccountSummary({ currentUser, onLockCard }: AccountSummaryProps) {
   const navigate = useNavigate();
   const [depositModalOpen, setDepositModalOpen] = useState(false);
   const [fraudDismissed, setFraudDismissed] = useState(false);
@@ -436,8 +437,11 @@ export function AccountSummary({ currentUser }: AccountSummaryProps) {
   const isMobileView = window.innerWidth < 768;
   const dashboardLayout = isMobileView ? 'compact' : dashboardLayoutFlag;
 
-  // Number flag: controls recent activity row count
-  const transactionCount = useFeatureFlagNumber('recentTransactionsToShow');
+  // Number flag: controls recent activity row count (default)
+  const transactionCountDefault = useFeatureFlagNumber('recentTransactionsToShow');
+  const [transactionCount, setTransactionCount] = useState<number | null>(null);
+  const [showAllTransactions, setShowAllTransactions] = useState(false);
+  const effectiveCount = showAllTransactions ? TRANSACTIONS.length : (transactionCount ?? transactionCountDefault);
 
   const isCompact = dashboardLayout === 'compact';
   const isModern = dashboardLayout === 'modern';
@@ -641,6 +645,7 @@ export function AccountSummary({ currentUser }: AccountSummaryProps) {
                 <Button type="primary" danger size="small" onClick={() => {
                   message.success('Transaction reported as fraud. Your card has been locked. A new card will be mailed to you.');
                   setFraudDismissed(true);
+                  onLockCard?.();
                 }}>
                   This wasn't me — Lock Card
                 </Button>
@@ -852,12 +857,38 @@ export function AccountSummary({ currentUser }: AccountSummaryProps) {
       {/* Recent Activity + Spending Breakdown */}
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={16}>
-          <Card title="Recent Activity" size={isCompact ? 'small' : 'default'} style={{ height: '100%' }}>
+          <Card
+            title="Recent Activity"
+            size={isCompact ? 'small' : 'default'}
+            style={{ height: '100%' }}
+            extra={
+              <Space size="small">
+                <Select
+                  value={showAllTransactions ? 'all' : String(transactionCount ?? transactionCountDefault)}
+                  onChange={(val) => {
+                    if (val === 'all') {
+                      setShowAllTransactions(true);
+                    } else {
+                      setShowAllTransactions(false);
+                      setTransactionCount(Number(val));
+                    }
+                  }}
+                  size="small"
+                  style={{ width: 90 }}
+                  options={[
+                    { label: '5', value: '5' },
+                    { label: '10', value: '10' },
+                    { label: 'All', value: 'all' },
+                  ]}
+                />
+              </Space>
+            }
+          >
             <Table
               dataSource={
                 isStudent
-                  ? TRANSACTIONS.filter(t => !t.description.toLowerCase().includes('payroll')).slice(0, transactionCount)
-                  : TRANSACTIONS.slice(0, transactionCount)
+                  ? TRANSACTIONS.filter(t => !t.description.toLowerCase().includes('payroll')).slice(0, effectiveCount)
+                  : TRANSACTIONS.slice(0, effectiveCount)
               }
               columns={TRANSACTION_COLUMNS}
               rowKey="id"
@@ -865,15 +896,20 @@ export function AccountSummary({ currentUser }: AccountSummaryProps) {
               size={isCompact ? 'small' : 'middle'}
               scroll={{ x: 600 }}
             />
-            <div style={{ marginTop: 12 }}>
+            <div style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Text type="secondary">
-                Showing <strong>{transactionCount}</strong> of {TRANSACTIONS.length} transactions
+                Showing <strong>{showAllTransactions ? TRANSACTIONS.length : effectiveCount}</strong> of {TRANSACTIONS.length} transactions
               </Text>
+              {!showAllTransactions && (
+                <Button type="link" size="small" style={{ padding: 0 }} onClick={() => setShowAllTransactions(true)}>
+                  View All Transactions →
+                </Button>
+              )}
             </div>
           </Card>
         </Col>
         <Col xs={24} lg={8}>
-          <SpendingBreakdown transactions={TRANSACTIONS.slice(0, transactionCount)} />
+          <SpendingBreakdown transactions={TRANSACTIONS.slice(0, effectiveCount)} />
         </Col>
       </Row>
 

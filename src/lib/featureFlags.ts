@@ -77,7 +77,7 @@ export const flags = {
    * TARGETING EXAMPLE:
    *   Show 50 for premier customers, 10 for standard, 5 for new users
    */
-  recentTransactionsToShow: new Rox.RoxNumber(10, [5, 10, 25, 50]),
+  recentTransactionsToShow: new Rox.RoxNumber(5, [5, 10, 25, 50]),
 
   /**
    * Boolean Flag - Show Fraud Alerts
@@ -399,6 +399,25 @@ export const flags = {
    *   Enable IF hasMortgage == true OR customerSegment == "homeowner"
    */
   enableMortgageSimulator: new Rox.Flag(),
+
+  /**
+   * Boolean Flag - Enable Top Banner (BUGGY — Kill Switch Demo)
+   *
+   * PATTERN: Kill switch for a broken feature
+   * USE CASE: Displays a promotional top banner that has an intentional bug —
+   * the discount percentage rapidly climbs out of control due to a runaway
+   * setInterval. This is the flagship kill switch demo: turn the flag on to
+   * "ship" the buggy feature, then instantly disable it in CloudBees.
+   *
+   * DEMO NARRATIVE:
+   *   "Marketing just shipped a new promo banner. But there's a bug — look,
+   *    the discount keeps climbing! Instead of rolling back a deploy, we just
+   *    flip the kill switch in CloudBees and it's gone. Crisis averted."
+   *
+   * TARGETING EXAMPLE:
+   *   Enable globally, then disable instantly when the bug is noticed
+   */
+  enableTopBanner: new Rox.Flag(),
 };
 
 /**
@@ -508,6 +527,7 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
         enableCryptoTrading: flags.enableCryptoTrading.isEnabled(),
         enableInvestmentAdvisory: flags.enableInvestmentAdvisory.isEnabled(),
         enableMortgageSimulator: flags.enableMortgageSimulator.isEnabled(),
+        enableTopBanner: flags.enableTopBanner.isEnabled(),
       });
     }
   } catch (error) {
