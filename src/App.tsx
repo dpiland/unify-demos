@@ -71,6 +71,44 @@ const pathToKey: Record<string, string> = {
 };
 
 // ============================================
+// Buggy Top Banner (Kill Switch Demo)
+// ============================================
+
+function BuggyTopBanner() {
+  const [discount, setDiscount] = useState(10);
+  const [color, setColor] = useState(0);
+
+  // "Bug": runaway setInterval that keeps incrementing the discount
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDiscount(prev => prev + Math.floor(Math.random() * 3) + 1);
+      setColor(prev => (prev + 1) % 360);
+    }, 150);
+    return () => clearInterval(interval);
+  }, []);
+
+  const bgColor = `hsl(${color}, 80%, 45%)`;
+
+  return (
+    <div
+      style={{
+        background: bgColor,
+        padding: '12px 24px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 12,
+        transition: 'background 0.1s',
+      }}
+    >
+      <Text strong style={{ color: '#fff', fontSize: 15 }}>
+        🎉 LIMITED TIME: Save {discount}% on all Horizon Bank services! Use code HORIZON{discount}
+      </Text>
+    </div>
+  );
+}
+
+// ============================================
 // System Alert Banner Component
 // ============================================
 
@@ -351,6 +389,7 @@ function ChatWidget() {
 function App({ currentUser, userMenuItems }: AppProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [creditCardFrozen, setCreditCardFrozen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { token } = antdTheme.useToken();
@@ -370,8 +409,10 @@ function App({ currentUser, userMenuItems }: AppProps) {
   // - Chat support OFF on mobile (covers too much screen)
   // - Notifications ON on mobile (push-style alerts are expected)
   // - Card controls ON on mobile (freeze card on the go)
+  const enableTopBanner = useFeatureFlag('enableTopBanner');
   const enableChatSupportFlag = useFeatureFlag('enableChatSupport');
   const enableChatSupport = enableChatSupportFlag && !isMobile;
+  const isStudent = currentUser.properties.booleans.isStudent ?? false;
 
   const selectedKey = pathToKey[location.pathname] || 'accounts';
 
@@ -395,11 +436,15 @@ function App({ currentUser, userMenuItems }: AppProps) {
           },
         ]
       : []),
-    {
-      key: 'rewards',
-      icon: <GiftOutlined />,
-      label: 'Rewards & Offers',
-    },
+    ...(!isStudent
+      ? [
+          {
+            key: 'rewards',
+            icon: <GiftOutlined />,
+            label: 'Rewards & Offers',
+          },
+        ]
+      : []),
     ...(enableNotificationCenter
       ? [
           {
@@ -433,7 +478,7 @@ function App({ currentUser, userMenuItems }: AppProps) {
   const bottomTabs = [
     { key: 'accounts', icon: <HomeOutlined />, label: 'Accounts' },
     { key: 'transfers', icon: <SwapOutlined />, label: 'Transfers' },
-    { key: 'rewards', icon: <GiftOutlined />, label: 'Rewards' },
+    ...(!isStudent ? [{ key: 'rewards', icon: <GiftOutlined />, label: 'Rewards' }] : []),
     { key: 'more', icon: <MenuUnfoldOutlined />, label: 'More' },
   ];
 
@@ -531,6 +576,9 @@ function App({ currentUser, userMenuItems }: AppProps) {
       )}
 
       <Layout>
+        {/* Buggy Top Banner - kill switch demo */}
+        {enableTopBanner && <BuggyTopBanner />}
+
         {/* System Alert - controlled by systemAlert string flag (ops demo) */}
         {systemAlert !== 'none' && (
           <SystemAlertBanner alertType={systemAlert} />
@@ -620,13 +668,13 @@ function App({ currentUser, userMenuItems }: AppProps) {
         >
           <div style={{ maxWidth: 1200, margin: '0 auto' }}>
             <Routes>
-              <Route path="/" element={<AccountSummary currentUser={currentUser} />} />
-              <Route path="/accounts" element={<AccountSummary currentUser={currentUser} />} />
+              <Route path="/" element={<AccountSummary currentUser={currentUser} onLockCard={() => setCreditCardFrozen(true)} />} />
+              <Route path="/accounts" element={<AccountSummary currentUser={currentUser} onLockCard={() => setCreditCardFrozen(true)} />} />
               <Route path="/transfers" element={<TransferPay />} />
               <Route path="/investments" element={<Investments />} />
               <Route path="/rewards" element={<Rewards />} />
               <Route path="/notifications" element={<Notifications />} />
-              <Route path="/card-controls" element={<CardControls currentUser={currentUser} />} />
+              <Route path="/card-controls" element={<CardControls currentUser={currentUser} creditCardFrozen={creditCardFrozen} setCreditCardFrozen={setCreditCardFrozen} />} />
               <Route path="/mortgage-simulator" element={<MortgageSimulator />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
