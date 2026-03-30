@@ -73,7 +73,7 @@ export function AppWithAuth() {
           <Text strong>{currentUser?.name}</Text>
           <br />
           <Text type="secondary" style={{ fontSize: 12 }}>
-            {currentUser?.properties.strings.userTier} • {currentUser?.properties.strings.region}
+            {currentUser?.properties.strings.membershipTier} • {currentUser?.properties.strings.region}
           </Text>
         </div>
       ),
@@ -118,43 +118,44 @@ export function AppWithAuth() {
   // Show app with user menu
   return (
     <div style={{ position: 'relative' }}>
-      {/* User menu in top-right corner */}
+      {/* User menu - fixed top-right, offset to avoid cart/search overlap */}
       <div
         style={{
           position: 'fixed',
-          top: 16,
-          right: 16,
+          top: 34,
+          right: 150,
           zIndex: 1000,
         }}
       >
         <Dropdown menu={{ items: userMenuItems }} trigger={['click']} placement="bottomRight">
           <Button
-            type="default"
-            size="large"
+            type="text"
+            size="small"
             style={{
-              background: '#fff',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+              height: 48,
+              padding: '0 12px',
             }}
           >
-            <Space>
+            <Space size={8}>
               <div
                 style={{
-                  width: 24,
-                  height: 24,
+                  width: 28,
+                  height: 28,
                   borderRadius: '50%',
-                  background: '#1890ff',
+                  background: '#1a2744',
                   color: '#fff',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: 12,
+                  fontSize: 11,
                   fontWeight: 600,
                 }}
               >
                 {getUserInitials(currentUser.name)}
               </div>
-              <span>{currentUser.name.split(' ')[0]}</span>
-              <UserOutlined />
+              <span style={{ fontSize: 13, fontWeight: 500, color: '#1a1a2e' }}>
+                {currentUser.name.split(' ')[0]}
+              </span>
             </Space>
           </Button>
         </Dropdown>

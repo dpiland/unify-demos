@@ -1,7 +1,7 @@
 /**
- * App-specific styles
+ * App-specific styles - Ridgeline Outfitters
  *
- * Minimal styles - Ant Design handles most styling
+ * Patagonia-inspired minimal styling with earth-tone palette.
  */
 
 /* Ensure proper layout */
@@ -10,10 +10,168 @@
   min-height: 100vh;
 }
 
+/* Global font override */
+body {
+  font-family: "Helvetica Neue", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
 /* Smooth transitions for flag changes */
 .ant-alert,
 .ant-card,
 .ant-list,
 .ant-statistic {
   transition: all 0.3s ease;
+}
+
+/* Announcement bar */
+.announcement-bar {
+  background: #1a1a2e;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  padding: 8px 16px;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+/* Section headers - uppercase, letter-spaced */
+.section-header {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #1a1a2e;
+}
+
+/* Product section header layout */
+.product-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 24px;
+  padding: 0 4px;
+}
+
+/* ===== Mega Navigation ===== */
+.mega-nav {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  gap: 0;
+  position: relative;
+}
+
+.mega-nav-item {
+  position: relative;
+  padding: 0 14px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.mega-nav-item .nav-label {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #434038;
+  white-space: nowrap;
+  transition: color 0.15s ease;
+  padding-bottom: 2px;
+  border-bottom: 2px solid transparent;
+}
+
+.mega-nav-item:hover .nav-label,
+.mega-nav-item.active .nav-label {
+  color: #1a1a2e;
+  border-bottom-color: #1a1a2e;
+}
+
+/* Dropdown overlay */
+.mega-dropdown-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 99;
+}
+
+/* Dropdown panel */
+.mega-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  border-top: 1px solid #e8e5df;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  padding: 32px 40px;
+  min-width: 640px;
+  z-index: 100;
+  display: flex;
+  gap: 48px;
+  animation: megaFadeIn 0.15s ease;
+}
+
+@keyframes megaFadeIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(-4px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.mega-dropdown-column {
+  min-width: 140px;
+}
+
+.mega-dropdown-column h4 {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #1a1a2e;
+  margin: 0 0 16px 0;
+  white-space: nowrap;
+}
+
+.mega-dropdown-column ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mega-dropdown-column li {
+  margin-bottom: 10px;
+}
+
+.mega-dropdown-column li a {
+  font-size: 14px;
+  color: #5c574f;
+  text-decoration: none;
+  transition: color 0.15s ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.mega-dropdown-column li a:hover {
+  color: #1a1a2e;
+}
+
+/* Hero section responsive */
+@media (max-width: 768px) {
+  .announcement-bar {
+    font-size: 11px;
+    padding: 6px 12px;
+  }
+
+  .mega-nav {
+    display: none;
+  }
+
+  .mega-dropdown {
+    min-width: 100vw;
+    left: 0;
+    transform: none;
+    padding: 24px;
+    flex-wrap: wrap;
+    gap: 24px;
+  }
 }
