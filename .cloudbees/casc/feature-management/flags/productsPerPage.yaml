@@ -4,13 +4,9 @@ kind: flag
 
 flag: productsPerPage
 flagType: number
-description: ""
+description: Control pagination size for gear listings. Test optimal page size for browsing outdoor gear. Balance performance vs. content visibility. Personalize based on customer tier or device
 labels:
 
 availableValues:
-  - "12"
-  - "24"
-  - "36"
-  - "48"
 
 isPermanent: false
