@@ -411,23 +411,8 @@ export function AccountSummary({ currentUser, onLockCard }: AccountSummaryProps)
   const progressTrack = isDark ? '#434343' : '#f0f0f0';
 
   // Boolean flag: show fraud alert banner with client-side 50/50 split
-  const fraudAlertsEnabled = useFeatureFlag('fraudAlerts');
-
-  // Client-side sticky bucketing: hash userId to determine variant
-  const showFraudAlerts = useMemo(() => {
-    if (!fraudAlertsEnabled) return false;
-
-    // Simple hash function for deterministic bucketing
-    const userId = currentUser.properties.strings.userId;
-    let hash = 0;
-    for (let i = 0; i < userId.length; i++) {
-      hash = ((hash << 5) - hash) + userId.charCodeAt(i);
-      hash = hash & hash; // Convert to 32bit integer
-    }
-
-    // Use hash to determine 50/50 split
-    return Math.abs(hash) % 2 === 0;
-  }, [fraudAlertsEnabled, currentUser.properties.strings.userId]);
+  // Fraud alerts flag - controlled entirely by CloudBees UI (no client-side bucketing)
+  const showFraudAlerts = useFeatureFlag('fraudAlerts');
 
   // Boolean flag: show student loan summary
   const showStudentLoans = useFeatureFlag('showStudentLoans');
