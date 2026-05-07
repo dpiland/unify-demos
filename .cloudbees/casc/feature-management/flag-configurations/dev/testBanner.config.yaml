@@ -4,7 +4,7 @@ kind: flag-configuration
 
 flag: testBanner
 
-enabled: false
+enabled: true
 
 stickinessProperty: rox.distinct_id
 
@@ -16,6 +16,5 @@ conditions:
           name: membershipTier
           operator: in-array
           operands:
-            - beta
-            - ""
+            - vip
     flagValue: true
