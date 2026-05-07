@@ -3,13 +3,12 @@ apiVersion: featuremanagement.cloudbees.io/v1alpha1
 kind: flag
 
 flag: checkoutFlowVariant
-flagType: string
-description: ""
+flagType: boolean
+description: Test different checkout user experiences. Optimize checkout conversion rate. Test multi-step vs single-page checkout. Personalize flow based on customer tier.
 labels:
 
 availableValues:
-  - standard
-  - express
-  - single-page
+  - "true"
+  - "false"
 
 isPermanent: false
