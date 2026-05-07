@@ -19,7 +19,6 @@ import {
   CameraOutlined,
   CloseOutlined,
   CreditCardOutlined,
-  CrownOutlined,
   DollarOutlined,
   DownOutlined,
   ExclamationCircleOutlined,
