@@ -4,4 +4,4 @@ kind: flag-properties
 
 name: cartItemCount
 type: Number
-description: "Current number of items in the shopping cart"
+description: ""
