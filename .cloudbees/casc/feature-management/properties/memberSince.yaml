@@ -4,4 +4,4 @@ kind: flag-properties
 
 name: memberSince
 type: Number
-description: "Number of months the customer has been a member"
+description: ""
