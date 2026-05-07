@@ -4,11 +4,11 @@ kind: flag
 
 flag: enableEarlyAccess
 flagType: boolean
-description: ""
+description: Exclusive new arrivals for Summit (VIP) members. Summit sees exclusive products, others see upgrade teaser. Reward top-tier customers with first access to new gear. Drive upgrades to Summit membership. Create exclusivity and urgency around new drops.
 labels:
 
 availableValues:
-  - "false"
   - "true"
+  - "false"
 
 isPermanent: false
