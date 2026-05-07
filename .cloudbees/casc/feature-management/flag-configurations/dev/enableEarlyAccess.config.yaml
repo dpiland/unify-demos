@@ -17,5 +17,5 @@ conditions:
           operator: in-array
           operands:
             - vip
-            - beta
+            - ""
     flagValue: true
