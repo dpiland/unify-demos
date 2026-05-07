@@ -4,11 +4,11 @@ kind: flag
 
 flag: enablePersonalizedHero
 flagType: boolean
-description: ""
+description: VIP members see a personalized hero with their name and activity-specific imagery instead of the generic storefront hero. Create a premium, personalized experience for top-tier members. Increase engagement and emotional connection with the brand. Demonstrate dynamic content personalization via feature flags.
 labels:
 
 availableValues:
-  - "false"
   - "true"
+  - "false"
 
 isPermanent: false
