@@ -4,11 +4,11 @@ kind: flag
 
 flag: testBanner
 flagType: boolean
-description: ""
+description: Demo a bad deploy - banner with clashing colors, broken layout, overlapping text. Perfect for showing instant rollback via feature flags. Used for demonstrating risk mitigation and instant rollback capabilities.
 labels:
 
 availableValues:
-  - "false"
   - "true"
+  - "false"
 
 isPermanent: false
