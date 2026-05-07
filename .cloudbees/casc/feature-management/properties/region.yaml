@@ -4,4 +4,4 @@ kind: flag-properties
 
 name: region
 type: String
-description: "Geographic region for regional rollouts and shipping"
+description: ""
