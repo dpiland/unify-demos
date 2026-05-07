@@ -4,11 +4,11 @@ kind: flag
 
 flag: showPromoBanner
 flagType: boolean
-description: ""
+description: Toggle seasonal outdoor campaign banner (end-of-season sale, Worn Wear events). Launch seasonal clearance instantly without code deploy. Test impact of outdoor campaign messaging on conversion. Target campaigns to specific regions or customer segments.
 labels:
 
 availableValues:
-  - "false"
   - "true"
+  - "false"
 
 isPermanent: false
