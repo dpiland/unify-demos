@@ -4,12 +4,9 @@ kind: flag
 
 flag: promoBannerTheme
 flagType: string
-description: ""
+description: A/B test different banner themes for outdoor campaigns. Test which nature-inspired theme gets more clicks. Optimize promotional banner effectiveness. Match seasonal outdoor themes.
 labels:
 
 availableValues:
-  - blue
-  - red
-  - gradient
 
 isPermanent: false
