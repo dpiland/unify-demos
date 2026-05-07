@@ -4,4 +4,4 @@ kind: flag-properties
 
 name: isNewUser
 type: Boolean
-description: "True for first-time visitors who have never made a purchase"
+description: ""
