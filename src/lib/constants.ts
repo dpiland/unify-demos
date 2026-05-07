@@ -87,6 +87,8 @@ export const FLAG_DESCRIPTIONS: Record<string, string> = {
     'Display promotional top banner — INTENTIONALLY BUGGY: discount percentage climbs out of control (kill switch demo — disable instantly when bug is noticed)',
   showRecurringSubscriptions:
     'Display recurring subscription tracker with monthly cost aggregation and individual subscription details (financial wellness feature)',
+  topBannerFix:
+    'Display FIXED promotional top banner without the runaway discount bug — demonstrates progressive rollout of bug fixes (roll out to beta → 25% → all)',
 };
 
 /**
