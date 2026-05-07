@@ -17,6 +17,7 @@ import {
   BookOutlined,
   BulbOutlined,
   CameraOutlined,
+  CloseOutlined,
   CreditCardOutlined,
   CrownOutlined,
   DollarOutlined,
@@ -395,9 +396,12 @@ function SpendingBreakdown({ transactions }: { transactions: Transaction[] }) {
 export function AccountSummary({ currentUser, onLockCard }: AccountSummaryProps) {
   const navigate = useNavigate();
   const [depositModalOpen, setDepositModalOpen] = useState(false);
-  const [fraudDismissed, setFraudDismissed] = useState(false);
   const [studentLoanModal, setStudentLoanModal] = useState<'payment' | 'repayment' | 'forgiveness' | null>(null);
   const [mortgageModal, setMortgageModal] = useState<'payment' | 'amortization' | 'refinance' | null>(null);
+  const [subscriptionModal, setSubscriptionModal] = useState<'unused' | 'limit' | 'cancel' | 'price-review' | null>(null);
+  const [cancelledSubscriptions, setCancelledSubscriptions] = useState<Record<string, string>>({}); // key: subscription name, value: cancellation date
+  const [reviewedPriceChanges, setReviewedPriceChanges] = useState<string[]>([]); // subscriptions whose price changes have been reviewed
+  const [fraudAlertDismissed, setFraudAlertDismissed] = useState(false);
   const { token } = antdTheme.useToken();
 
   // Theme-aware helper colors
@@ -407,8 +411,24 @@ export function AccountSummary({ currentUser, onLockCard }: AccountSummaryProps)
   const borderSubtle = isDark ? '#434343' : '#f0f0f0';
   const progressTrack = isDark ? '#434343' : '#f0f0f0';
 
-  // Boolean flag: show fraud detection alerts
-  const showFraudAlerts = useFeatureFlag('showFraudAlerts');
+  // Boolean flag: show fraud alert banner with client-side 50/50 split
+  const fraudAlertsEnabled = useFeatureFlag('fraudAlerts');
+
+  // Client-side sticky bucketing: hash userId to determine variant
+  const showFraudAlerts = useMemo(() => {
+    if (!fraudAlertsEnabled) return false;
+
+    // Simple hash function for deterministic bucketing
+    const userId = currentUser.properties.strings.userId;
+    let hash = 0;
+    for (let i = 0; i < userId.length; i++) {
+      hash = ((hash << 5) - hash) + userId.charCodeAt(i);
+      hash = hash & hash; // Convert to 32bit integer
+    }
+
+    // Use hash to determine 50/50 split
+    return Math.abs(hash) % 2 === 0;
+  }, [fraudAlertsEnabled, currentUser.properties.strings.userId]);
 
   // Boolean flag: show student loan summary
   const showStudentLoans = useFeatureFlag('showStudentLoans');
@@ -427,6 +447,9 @@ export function AccountSummary({ currentUser, onLockCard }: AccountSummaryProps)
 
   // Boolean flag: show credit score (entitlement gating demo)
   const showCreditScore = useFeatureFlag('showCreditScore');
+
+  // Boolean flag: show recurring subscriptions tracker
+  const showRecurringSubscriptions = useFeatureFlag('showRecurringSubscriptions');
 
   // Student persona: no credit card, lower balances
   const isStudent = currentUser.properties.booleans.isStudent ?? false;
@@ -611,60 +634,129 @@ export function AccountSummary({ currentUser, onLockCard }: AccountSummaryProps)
         </div>
       )}
 
-      {/* Fraud Alert - controlled by showFraudAlerts boolean flag */}
-      {showFraudAlerts && !fraudDismissed && (
-        <Alert
-          type="error"
-          showIcon
-          icon={<ExclamationCircleOutlined />}
-          message={
-            <Text strong style={isDark ? { color: '#ff7875' } : undefined}>Suspicious Activity Detected</Text>
-          }
-          description={
-            <div>
-              <Text style={isDark ? { color: '#f0f0f0' } : undefined}>
-                We noticed an unusual transaction on your Horizon Cash Rewards Card:
-              </Text>
-              <div style={{
-                margin: '12px 0',
-                padding: 12,
-                background: isDark ? '#3a1515' : '#fff1f0',
-                borderRadius: 4,
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}>
-                <div>
-                  <Text strong style={isDark ? { color: '#f0f0f0' } : undefined}>Electronics Plus - Miami, FL</Text>
-                  <br />
-                  <Text style={isDark ? { color: '#a0a0a0' } : { color: undefined }} type="secondary">March 16, 2026 at 2:47 AM</Text>
+      {/* Fraud Alert Banner - controlled by fraudAlerts boolean flag */}
+      {showFraudAlerts && !fraudAlertDismissed && (
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #ff4d4f 0%, #cf1322 100%)',
+            borderRadius: 8,
+            padding: 20,
+            marginBottom: 24,
+            position: 'relative',
+            overflow: 'hidden',
+            boxShadow: '0 4px 12px rgba(207, 19, 34, 0.3)',
+          }}
+        >
+          {/* Background pattern/icon */}
+          <div
+            style={{
+              position: 'absolute',
+              right: -20,
+              top: -20,
+              fontSize: 180,
+              opacity: 0.1,
+              transform: 'rotate(-15deg)',
+            }}
+          >
+            🚨
+          </div>
+
+          <Row gutter={[16, 16]} align="middle">
+            <Col xs={24} md={16}>
+              <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                <Space>
+                  <ExclamationCircleOutlined style={{ fontSize: 24, color: '#fff' }} />
+                  <Text strong style={{ color: '#fff', fontSize: 18 }}>
+                    Suspicious Activity Detected
+                  </Text>
+                </Space>
+                <Text style={{ color: 'rgba(255, 255, 255, 0.95)', fontSize: 14 }}>
+                  We detected an unusual transaction on your Horizon Cash Rewards Card
+                </Text>
+                <div
+                  style={{
+                    background: 'rgba(0, 0, 0, 0.2)',
+                    borderRadius: 6,
+                    padding: '12px 16px',
+                    marginTop: 8,
+                  }}
+                >
+                  <Row justify="space-between" align="middle">
+                    <Col>
+                      <Text strong style={{ color: '#fff', fontSize: 15 }}>
+                        Electronics Plus - Miami, FL
+                      </Text>
+                      <br />
+                      <Text style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: 12 }}>
+                        May 7, 2026 at 2:47 AM
+                      </Text>
+                    </Col>
+                    <Col>
+                      <Text strong style={{ color: '#fff', fontSize: 22 }}>
+                        $1,247.99
+                      </Text>
+                    </Col>
+                  </Row>
                 </div>
-                <Text strong style={{ color: '#ff4d4f', fontSize: 18 }}>$1,247.99</Text>
-              </div>
-              <Space>
-                <Button type="primary" danger size="small" onClick={() => {
-                  message.success('Transaction reported as fraud. Your card has been locked. A new card will be mailed to you.');
-                  setFraudDismissed(true);
-                  onLockCard?.();
-                }}>
-                  This wasn't me — Lock Card
+              </Space>
+            </Col>
+            <Col xs={24} md={8} style={{ textAlign: 'right' }}>
+              <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                <Button
+                  type="primary"
+                  danger
+                  size="large"
+                  icon={<LockOutlined />}
+                  style={{
+                    width: '100%',
+                    background: '#fff',
+                    borderColor: '#fff',
+                    color: '#cf1322',
+                    fontWeight: 600,
+                    height: 44,
+                  }}
+                  onClick={() => {
+                    message.success('Card frozen successfully. A new card will be mailed within 3-5 business days.');
+                    setFraudAlertDismissed(true);
+                    onLockCard?.();
+                  }}
+                >
+                  Freeze Card Now
                 </Button>
-                <Button size="small" onClick={() => {
-                  message.info('Thank you for confirming. No further action needed.');
-                  setFraudDismissed(true);
-                }}>
-                  Yes, this was me
+                <Button
+                  size="middle"
+                  style={{
+                    width: '100%',
+                    background: 'rgba(255, 255, 255, 0.15)',
+                    borderColor: 'rgba(255, 255, 255, 0.3)',
+                    color: '#fff',
+                  }}
+                  onClick={() => {
+                    message.info('Thank you for confirming. No action needed.');
+                    setFraudAlertDismissed(true);
+                  }}
+                >
+                  This was me
                 </Button>
               </Space>
-            </div>
-          }
-          closable
-          onClose={() => setFraudDismissed(true)}
-          style={{
-            border: isDark ? '1px solid #5c2020' : '1px solid #ffa39e',
-            background: isDark ? '#2a1215' : undefined,
-          }}
-        />
+            </Col>
+          </Row>
+
+          {/* Close button */}
+          <Button
+            type="text"
+            size="small"
+            icon={<CloseOutlined />}
+            style={{
+              position: 'absolute',
+              top: 12,
+              right: 12,
+              color: '#fff',
+              opacity: 0.7,
+            }}
+            onClick={() => setFraudAlertDismissed(true)}
+          />
+        </div>
       )}
 
       {/* Student Loans - controlled by showStudentLoans boolean flag */}
@@ -732,6 +824,9 @@ export function AccountSummary({ currentUser, onLockCard }: AccountSummaryProps)
           .filter(account => {
             if (account.type === 'mortgage' && !showMortgageAccount) return false;
             if (account.type === 'credit' && isStudent) return false;
+            // Hide checking account for wealth management customers (they use premier accounts)
+            const customerSegment = currentUser.properties.strings.customerSegment || '';
+            if (account.type === 'checking' && customerSegment === 'financial-planning') return false;
             return true;
           })
           .map(account => {
@@ -909,80 +1004,323 @@ export function AccountSummary({ currentUser, onLockCard }: AccountSummaryProps)
           </Card>
         </Col>
         <Col xs={24} lg={8}>
-          <SpendingBreakdown transactions={TRANSACTIONS.slice(0, effectiveCount)} />
+          {showCreditScore && !isStudent ? (
+            <Card
+              hoverable
+              onClick={() => navigate('/rewards')}
+              style={{
+                cursor: 'pointer',
+                height: '100%',
+                border: `2px solid ${isDark ? '#389e0d' : '#52c41a'}`,
+                background: isDark
+                  ? 'linear-gradient(135deg, #0a2e0a 0%, #1a4a1a 100%)'
+                  : 'linear-gradient(135deg, #f6ffed 0%, #e6fffb 100%)',
+              }}
+            >
+              <div style={{ textAlign: 'center' }}>
+                <div style={{
+                  width: 120,
+                  height: 120,
+                  borderRadius: '50%',
+                  border: '8px solid #52c41a',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 16px',
+                  background: isDark ? '#0a2e0a' : '#ffffff',
+                  boxShadow: '0 4px 12px rgba(82, 196, 26, 0.3)',
+                }}>
+                  <Text strong style={{ fontSize: 42, lineHeight: 1, color: '#52c41a' }}>782</Text>
+                  <Text type="secondary" style={{ fontSize: 12, marginTop: 4 }}>Excellent</Text>
+                </div>
+
+                <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                  <Space size={8} style={{ justifyContent: 'center' }}>
+                    <SafetyCertificateOutlined style={{ color: '#52c41a', fontSize: 20 }} />
+                    <Text strong style={{ fontSize: 18 }}>Credit Score</Text>
+                  </Space>
+                  <Tag color="gold" style={{ fontSize: 10 }}>PREMIER</Tag>
+
+                  <div style={{ marginTop: 12, padding: '12px 16px', background: isDark ? '#0a2e0a' : '#f6ffed', borderRadius: 8 }}>
+                    <Text strong style={{ color: '#52c41a', fontSize: 16, display: 'block' }}>↑ +12 points</Text>
+                    <Text type="secondary" style={{ fontSize: 12 }}>since last month</Text>
+                  </div>
+
+                  <Button
+                    type="primary"
+                    size="large"
+                    style={{
+                      marginTop: 16,
+                      width: '100%',
+                      background: '#52c41a',
+                      borderColor: '#52c41a',
+                      fontWeight: 600,
+                    }}
+                  >
+                    View Full Details →
+                  </Button>
+                </Space>
+              </div>
+            </Card>
+          ) : (
+            <SpendingBreakdown transactions={TRANSACTIONS.slice(0, effectiveCount)} />
+          )}
         </Col>
       </Row>
 
-      {/* Credit Score - controlled by showCreditScore boolean flag (entitlement gating demo) */}
-      {showCreditScore && !isStudent ? (
-        <Card
+      {/* Recurring Subscriptions Tracker - controlled by showRecurringSubscriptions boolean flag */}
+      {showRecurringSubscriptions && currentUser.properties.strings.customerSegment !== 'mortgage' && (
+      <Row gutter={[16, 16]}>
+        <Col xs={24} lg={16}>
+          {(() => {
+            // Base subscriptions everyone gets (streaming services)
+            const baseSubscriptions = [
+              { service: 'Netflix Premium', amount: 22.99, category: 'Entertainment', nextCharge: 'May 12', icon: '🎬', originalPrice: null },
+              { service: 'Spotify Family', amount: 16.99, category: 'Entertainment', nextCharge: 'May 8', icon: '🎵', originalPrice: null },
+              { service: 'Hulu (No Ads)', amount: 17.99, category: 'Entertainment', nextCharge: 'May 10', icon: '📺', originalPrice: 14.99 },
+            ];
+
+            // Student-specific subscriptions
+            const studentSubscriptions = [
+              { service: 'Adobe Creative Cloud', amount: 54.99, category: 'Software', nextCharge: 'May 18', icon: '🎨', originalPrice: null },
+              { service: 'Dropbox Plus', amount: 11.99, category: 'Technology', nextCharge: 'May 28', icon: '💾', originalPrice: null },
+              { service: 'ChatGPT Plus', amount: 20.00, category: 'Technology', nextCharge: 'May 14', icon: '🤖', originalPrice: null },
+              { service: 'Notion Pro', amount: 10.00, category: 'Productivity', nextCharge: 'May 20', icon: '📝', originalPrice: null },
+            ];
+
+            // Everyday person subscriptions
+            const everydaySubscriptions = [
+              { service: 'Amazon Prime', amount: 14.99, category: 'Shopping', nextCharge: 'May 15', icon: '📦', originalPrice: null },
+              { service: 'LA Fitness', amount: 49.99, category: 'Health', nextCharge: 'May 1', icon: '💪', originalPrice: null },
+              { service: 'HelloFresh Meal Kit', amount: 71.02, category: 'Groceries', nextCharge: 'May 7', icon: '🥗', originalPrice: null },
+              { service: 'Apple iCloud Storage', amount: 9.99, category: 'Technology', nextCharge: 'May 6', icon: '☁️', originalPrice: null },
+            ];
+
+            // Wealth/premium subscriptions
+            const wealthSubscriptions = [
+              { service: 'WSJ Digital Access', amount: 39.99, category: 'News', nextCharge: 'May 18', icon: '📰', originalPrice: null },
+              { service: 'The Economist', amount: 29.99, category: 'News', nextCharge: 'May 22', icon: '📊', originalPrice: null },
+              { service: 'Bloomberg Terminal', amount: 199.00, category: 'Finance', nextCharge: 'May 5', icon: '💹', originalPrice: null },
+              { service: 'NYT Digital Subscription', amount: 17.00, category: 'News', nextCharge: 'May 22', icon: '📰', originalPrice: 15.00 },
+              { service: 'Peloton All-Access', amount: 44.00, category: 'Health', nextCharge: 'May 11', icon: '🚴', originalPrice: null },
+            ];
+
+            // Build subscription list based on user segment
+            const customerSegment = currentUser.properties.strings.customerSegment || 'checking-savings';
+            let subscriptions = [...baseSubscriptions];
+
+            if (customerSegment === 'student') {
+              subscriptions = [...subscriptions, ...studentSubscriptions];
+            } else if (customerSegment === 'financial-planning') {
+              subscriptions = [...subscriptions, ...wealthSubscriptions];
+            } else {
+              // checking-savings, mortgage, or default
+              subscriptions = [...subscriptions, ...everydaySubscriptions];
+            }
+
+            const originalTotal = subscriptions.reduce((sum, sub) => sum + sub.amount, 0);
+            const totalAmount = subscriptions.reduce((sum, sub) =>
+              cancelledSubscriptions[sub.service] ? sum : sum + sub.amount, 0
+            );
+            const cancelledCount = Object.keys(cancelledSubscriptions).length;
+
+            return (
+            <Card
           title={
             <Space>
-              <SafetyCertificateOutlined style={{ color: '#52c41a' }} />
-              <span>Credit Score Insights</span>
-              <Tag color="gold" style={{ fontSize: 11 }}>Premier</Tag>
+              <RiseOutlined style={{ color: '#722ed1' }} />
+              <span>Recurring Subscriptions</span>
+              <Tag color="purple" style={{ fontSize: 11, marginLeft: 4 }}>Track Spending</Tag>
+              {cancelledCount > 0 && (
+                <Tag color="green" style={{ fontSize: 11 }}>
+                  {cancelledCount} Cancelled
+                </Tag>
+              )}
             </Space>
           }
           size={isCompact ? 'small' : 'default'}
+          extra={
+            <Text type="secondary">
+              Total: <Text strong style={{ fontSize: 16, color: '#722ed1' }}>${totalAmount.toFixed(2)}/mo</Text>
+              {cancelledCount > 0 && (
+                <>
+                  <br />
+                  <Text type="secondary" style={{ fontSize: 12, color: '#52c41a' }}>
+                    Saving ${(originalTotal - totalAmount).toFixed(2)}/mo
+                  </Text>
+                </>
+              )}
+            </Text>
+          }
         >
-          <Row gutter={[24, 16]} align="middle">
-            <Col xs={24} sm={6} style={{ textAlign: 'center' }}>
-              <div style={{
-                width: 120,
-                height: 120,
-                borderRadius: '50%',
-                border: '8px solid #52c41a',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: '0 auto',
-              }}>
-                <Text strong style={{ fontSize: 32, lineHeight: 1 }}>782</Text>
-                <Text type="secondary" style={{ fontSize: 11 }}>Excellent</Text>
-              </div>
-            </Col>
-            <Col xs={24} sm={10}>
-              <Text strong style={{ marginBottom: 8, display: 'block' }}>Score Factors</Text>
-              {[
-                { label: 'Payment History', value: 'Excellent', color: '#52c41a' },
-                { label: 'Credit Utilization', value: '18%', color: '#52c41a' },
-                { label: 'Length of History', value: '7 years', color: '#1890ff' },
-                { label: 'Credit Mix', value: 'Good', color: '#1890ff' },
-                { label: 'New Inquiries', value: '1 in 6 months', color: '#52c41a' },
-              ].map(factor => (
-                <div key={factor.label} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: `1px solid ${borderSubtle}` }}>
-                  <Text type="secondary" style={{ fontSize: 13 }}>{factor.label}</Text>
-                  <Text style={{ fontSize: 13, color: factor.color }}>{factor.value}</Text>
+          <Space direction="vertical" size="small" style={{ width: '100%' }}>
+            {subscriptions
+            .sort((a, b) => {
+              // Sort: price increases first (unreviewed), then active subs, then cancelled
+              const aHasPriceChange = a.originalPrice && !reviewedPriceChanges.includes(a.service);
+              const bHasPriceChange = b.originalPrice && !reviewedPriceChanges.includes(b.service);
+              const aCancelled = !!cancelledSubscriptions[a.service];
+              const bCancelled = !!cancelledSubscriptions[b.service];
+
+              if (aHasPriceChange && !bHasPriceChange) return -1;
+              if (!aHasPriceChange && bHasPriceChange) return 1;
+              if (aCancelled && !bCancelled) return 1;
+              if (!aCancelled && bCancelled) return -1;
+              return 0;
+            })
+            .map((sub, i) => {
+              const hasPriceChange = sub.originalPrice && sub.originalPrice !== sub.amount;
+              const priceChangePercent = hasPriceChange ? Math.round(((sub.amount - sub.originalPrice) / sub.originalPrice) * 100) : 0;
+              const isPriceChangeReviewed = reviewedPriceChanges.includes(sub.service);
+              const isCancelled = cancelledSubscriptions[sub.service];
+              const showPriceAlert = hasPriceChange && !isPriceChangeReviewed && !isCancelled;
+
+              return (
+                <div key={i}>
+                  {showPriceAlert && (
+                    <div
+                      style={{
+                        padding: '10px 14px',
+                        background: isDark ? 'linear-gradient(135deg, #2d1b0f 0%, #3d2817 100%)' : 'linear-gradient(135deg, #fff7e6 0%, #ffe7ba 100%)',
+                        borderRadius: 8,
+                        borderLeft: `3px solid #fa8c16`,
+                        marginBottom: 8,
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                        <Space>
+                          <ExclamationCircleOutlined style={{ color: '#fa8c16', fontSize: 16 }} />
+                          <div>
+                            <Text strong style={{ color: '#fa8c16' }}>Price Increase Detected</Text>
+                            <br />
+                            <Text style={{ fontSize: 12 }}>
+                              {sub.service} increased from ${sub.originalPrice?.toFixed(2)} to ${sub.amount.toFixed(2)} (+{priceChangePercent}%)
+                            </Text>
+                          </div>
+                        </Space>
+                        <Button
+                          size="small"
+                          type="primary"
+                          style={{ background: '#fa8c16', borderColor: '#fa8c16' }}
+                          onClick={() => setSubscriptionModal('price-review')}
+                        >
+                          Review
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 12,
+                      padding: '12px 16px',
+                      background: isCancelled ? (isDark ? '#1f1f1f' : '#fafafa') : (showPriceAlert ? (isDark ? '#2d2520' : '#fffaf0') : bgSubtle),
+                      borderRadius: 8,
+                      borderLeft: `3px solid ${isCancelled ? '#8c8c8c' : (showPriceAlert ? '#fa8c16' : '#722ed1')}`,
+                      opacity: isCancelled ? 0.6 : 1,
+                    }}
+                  >
+                    <span style={{ fontSize: 24, lineHeight: '24px', filter: isCancelled ? 'grayscale(100%)' : 'none' }}>{sub.icon}</span>
+                    <div style={{ flex: 1 }}>
+                      <Text strong style={{ textDecoration: isCancelled ? 'line-through' : 'none' }}>
+                        {sub.service}
+                      </Text>
+                      {isCancelled && (
+                        <Tag color="red" style={{ marginLeft: 8, fontSize: 10 }}>CANCELLED</Tag>
+                      )}
+                      {hasPriceChange && !isCancelled && (
+                        <Tag color="orange" style={{ marginLeft: 8, fontSize: 10 }}>
+                          {isPriceChangeReviewed ? 'PRICE REVIEWED' : `+${priceChangePercent}%`}
+                        </Tag>
+                      )}
+                      <br />
+                      <Text type="secondary" style={{ fontSize: 12 }}>
+                        {isCancelled ? `Cancelled on ${isCancelled}` : `${sub.category} • Next charge: ${sub.nextCharge}`}
+                      </Text>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <Text strong style={{ fontSize: 16, color: isCancelled ? '#8c8c8c' : (showPriceAlert ? '#fa8c16' : '#722ed1'), textDecoration: isCancelled ? 'line-through' : 'none' }}>
+                        ${sub.amount.toFixed(2)}
+                      </Text>
+                      {hasPriceChange && !isCancelled && (
+                        <>
+                          <br />
+                          <Text type="secondary" style={{ fontSize: 10, textDecoration: 'line-through' }}>
+                            was ${sub.originalPrice?.toFixed(2)}
+                          </Text>
+                        </>
+                      )}
+                      <br />
+                      <Text type="secondary" style={{ fontSize: 11 }}>per month</Text>
+                    </div>
+                  </div>
                 </div>
-              ))}
-            </Col>
-            <Col xs={24} sm={8}>
-              <Card size="small" style={{ background: isDark ? '#0a2e0a' : '#f6ffed', border: isDark ? '1px solid #1a5a1a' : '1px solid #b7eb8f' }}>
-                <Text strong style={{ color: '#389e0d', display: 'block', marginBottom: 4 }}>Your score is up +12 pts</Text>
-                <Text type="secondary" style={{ fontSize: 12 }}>Since last month. Keep making on-time payments to maintain your excellent score.</Text>
-              </Card>
-              <Button type="link" size="small" style={{ padding: 0, marginTop: 8 }} onClick={() => message.info('Redirecting to your full credit report from Experian...')}>View Full Credit Report →</Button>
-            </Col>
-          </Row>
-        </Card>
-      ) : (
-        <Card
-          size={isCompact ? 'small' : 'default'}
-          style={{ background: isDark ? 'linear-gradient(135deg, #0d1b2e 0%, #1a0a2e 100%)' : 'linear-gradient(135deg, #f0f5ff 0%, #f9f0ff 100%)', border: isDark ? '1px solid #2a3a5e' : '1px solid #d6e4ff' }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}>
-            <LockOutlined style={{ fontSize: 36, color: '#bfbfbf' }} />
-            <div style={{ flex: 1 }}>
-              <Text strong style={{ fontSize: 16 }}>Unlock Credit Score Insights</Text>
-              <br />
-              <Text type="secondary">Upgrade to Premier Banking to access your credit score, key factors, and personalized tips — updated monthly.</Text>
+              );
+            })}
+            {!cancelledSubscriptions['Hulu (No Ads)'] && !cancelledSubscriptions['Adobe Creative Cloud'] && (
+              <div
+                style={{
+                  marginTop: 8,
+                  padding: '12px 16px',
+                  background: isDark ? 'linear-gradient(135deg, #1a1027 0%, #2d1b4e 100%)' : 'linear-gradient(135deg, #f9f0ff 0%, #efdbff 100%)',
+                  borderRadius: 8,
+                  borderLeft: `3px solid #faad14`,
+                }}
+              >
+                <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+                  <Space>
+                    <ExclamationCircleOutlined style={{ color: '#faad14', fontSize: 16 }} />
+                    <Text strong style={{ color: '#faad14' }}>Savings Opportunity</Text>
+                  </Space>
+                </Space>
+                <Text style={{ fontSize: 13, display: 'block', marginTop: 6 }}>
+                  You haven't used Hulu or Adobe Creative Cloud in over 60 days. Canceling these could save you <Text strong style={{ color: '#52c41a' }}>$72.98/month</Text> ($875.76/year).
+                </Text>
+                <Button
+                  type="link"
+                  size="small"
+                  style={{ padding: 0, marginTop: 4, color: '#722ed1' }}
+                  onClick={() => setSubscriptionModal('unused')}
+                >
+                  Review Unused Subscriptions →
+                </Button>
+              </div>
+            )}
+            <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
+              <Button
+                size="small"
+                type="primary"
+                style={{ background: '#722ed1', borderColor: '#722ed1' }}
+                onClick={() => setSubscriptionModal('limit')}
+              >
+                Set Spending Limit
+              </Button>
+              <Button
+                size="small"
+                onClick={() => {
+                  message.success('Subscription data exported to subscriptions.csv');
+                }}
+              >
+                Export to CSV
+              </Button>
+              <Button
+                size="small"
+                onClick={() => setSubscriptionModal('cancel')}
+              >
+                Cancel a Subscription
+              </Button>
             </div>
-            <Button type="primary" icon={<CrownOutlined />} onClick={() => message.info('Contact your branch to upgrade to Premier Banking.')}>
-              Upgrade to Premier
-            </Button>
-          </div>
-        </Card>
+          </Space>
+            </Card>
+            );
+          })()}
+        </Col>
+        <Col xs={24} lg={8}>
+          {/* Placeholder for additional widgets */}
+        </Col>
+      </Row>
       )}
 
       {/* Deposit Check Modal */}
@@ -1310,6 +1648,284 @@ export function AccountSummary({ currentUser, onLockCard }: AccountSummaryProps)
           <Button type="primary" block>
             Talk to a Mortgage Specialist
           </Button>
+        </Space>
+      </Modal>
+
+      {/* Subscription - Review Unused Modal */}
+      <Modal
+        title="Review Unused Subscriptions"
+        open={subscriptionModal === 'unused'}
+        onCancel={() => setSubscriptionModal(null)}
+        footer={[
+          <Button key="cancel" onClick={() => setSubscriptionModal(null)}>Close</Button>,
+          <Button
+            key="cancel-subs"
+            type="primary"
+            danger
+            onClick={() => {
+              const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+              setCancelledSubscriptions(prev => ({
+                ...prev,
+                'Hulu (No Ads)': today,
+                'Adobe Creative Cloud': today,
+              }));
+              message.success('Hulu and Adobe Creative Cloud subscriptions have been canceled. You\'ll save $72.98/month!');
+              setSubscriptionModal(null);
+            }}
+          >
+            Cancel Unused Subscriptions
+          </Button>,
+        ]}
+        width={600}
+      >
+        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+          <Alert
+            message="Potential Savings: $72.98/month ($875.76/year)"
+            type="warning"
+            showIcon
+          />
+          <Text>The following subscriptions haven't been used in over 60 days:</Text>
+
+          <Card size="small">
+            <Space direction="vertical" size="small" style={{ width: '100%' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0' }}>
+                <Space>
+                  <span style={{ fontSize: 20 }}>📺</span>
+                  <div>
+                    <Text strong>Hulu (No Ads)</Text>
+                    <br />
+                    <Text type="secondary" style={{ fontSize: 12 }}>Last used: March 2, 2026 (64 days ago)</Text>
+                  </div>
+                </Space>
+                <Text strong style={{ color: '#faad14' }}>$17.99/mo</Text>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderTop: '1px solid #f0f0f0' }}>
+                <Space>
+                  <span style={{ fontSize: 20 }}>🎨</span>
+                  <div>
+                    <Text strong>Adobe Creative Cloud</Text>
+                    <br />
+                    <Text type="secondary" style={{ fontSize: 12 }}>Last used: February 28, 2026 (67 days ago)</Text>
+                  </div>
+                </Space>
+                <Text strong style={{ color: '#faad14' }}>$54.99/mo</Text>
+              </div>
+            </Space>
+          </Card>
+
+          <Text type="secondary" style={{ fontSize: 13 }}>
+            💡 Tip: You can always resubscribe later if you need these services again.
+          </Text>
+        </Space>
+      </Modal>
+
+      {/* Subscription - Set Spending Limit Modal */}
+      <Modal
+        title="Set Monthly Subscription Limit"
+        open={subscriptionModal === 'limit'}
+        onCancel={() => setSubscriptionModal(null)}
+        footer={[
+          <Button key="cancel" onClick={() => setSubscriptionModal(null)}>Cancel</Button>,
+          <Button
+            key="save"
+            type="primary"
+            onClick={() => {
+              message.success('Monthly subscription spending limit set to $300');
+              setSubscriptionModal(null);
+            }}
+          >
+            Save Limit
+          </Button>,
+        ]}
+      >
+        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+          <div>
+            <Text>Current total: <Text strong style={{ fontSize: 18, color: '#722ed1' }}>$287.94/month</Text></Text>
+          </div>
+
+          <div>
+            <Text strong style={{ display: 'block', marginBottom: 8 }}>Set spending limit:</Text>
+            <Select
+              defaultValue="300"
+              style={{ width: '100%' }}
+              size="large"
+              options={[
+                { label: '$200/month', value: '200' },
+                { label: '$250/month', value: '250' },
+                { label: '$300/month', value: '300' },
+                { label: '$350/month', value: '350' },
+                { label: '$400/month', value: '400' },
+                { label: '$500/month', value: '500' },
+                { label: 'No limit', value: 'none' },
+              ]}
+            />
+          </div>
+
+          <Alert
+            message="You'll receive a notification when you're within $20 of your limit"
+            type="info"
+            showIcon
+          />
+        </Space>
+      </Modal>
+
+      {/* Subscription - Cancel a Subscription Modal */}
+      <Modal
+        title="Cancel a Subscription"
+        open={subscriptionModal === 'cancel'}
+        onCancel={() => setSubscriptionModal(null)}
+        footer={[
+          <Button key="cancel" onClick={() => setSubscriptionModal(null)}>Close</Button>,
+        ]}
+      >
+        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+          <Text>Select a subscription to cancel:</Text>
+
+          <Select
+            placeholder="Choose a subscription..."
+            style={{ width: '100%' }}
+            size="large"
+            onChange={(value) => {
+              Modal.confirm({
+                title: 'Cancel Subscription?',
+                content: `Are you sure you want to cancel ${value}? You'll lose access at the end of your current billing cycle.`,
+                okText: 'Yes, Cancel',
+                okType: 'danger',
+                onOk: () => {
+                  const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                  setCancelledSubscriptions(prev => ({
+                    ...prev,
+                    [value]: today,
+                  }));
+                  message.success(`${value} has been canceled`);
+                  setSubscriptionModal(null);
+                },
+              });
+            }}
+            options={[
+              { label: '🎬 Netflix Premium - $22.99/mo', value: 'Netflix Premium' },
+              { label: '🎵 Spotify Family - $16.99/mo', value: 'Spotify Family' },
+              { label: '📦 Amazon Prime - $14.99/mo', value: 'Amazon Prime' },
+              { label: '☁️ Apple iCloud Storage - $9.99/mo', value: 'Apple iCloud Storage' },
+              { label: '🎨 Adobe Creative Cloud - $54.99/mo', value: 'Adobe Creative Cloud' },
+              { label: '💪 LA Fitness - $49.99/mo', value: 'LA Fitness' },
+              { label: '📰 NYT Digital - $17.00/mo', value: 'NYT Digital' },
+              { label: '📺 Hulu (No Ads) - $17.99/mo', value: 'Hulu' },
+              { label: '💾 Dropbox Plus - $11.99/mo', value: 'Dropbox Plus' },
+              { label: '🥗 HelloFresh - $71.02/mo', value: 'HelloFresh' },
+            ]}
+          />
+
+          <Alert
+            message="Cancellations take effect at the end of your current billing period"
+            type="info"
+            showIcon
+          />
+        </Space>
+      </Modal>
+
+      {/* Subscription - Price Change Review Modal */}
+      <Modal
+        title="Review Price Changes"
+        open={subscriptionModal === 'price-review'}
+        onCancel={() => setSubscriptionModal(null)}
+        footer={[
+          <Button key="cancel" onClick={() => setSubscriptionModal(null)}>Close</Button>,
+          <Button
+            key="acknowledge"
+            type="primary"
+            onClick={() => {
+              setReviewedPriceChanges(['Hulu (No Ads)', 'NYT Digital Subscription']);
+              message.success('Price changes acknowledged');
+              setSubscriptionModal(null);
+            }}
+          >
+            Acknowledge Changes
+          </Button>,
+        ]}
+        width={600}
+      >
+        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+          <Alert
+            message="2 subscriptions have increased their prices"
+            description="Review the changes below and decide whether to keep or cancel these subscriptions."
+            type="warning"
+            showIcon
+          />
+
+          <Card size="small" style={{ background: isDark ? '#1f1f1f' : '#fffaf0' }}>
+            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+              <div style={{ padding: '8px 0' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                  <Space>
+                    <span style={{ fontSize: 20 }}>📺</span>
+                    <Text strong>Hulu (No Ads)</Text>
+                  </Space>
+                  <Tag color="orange">+20%</Tag>
+                </div>
+                <Space split={<Text type="secondary">→</Text>} style={{ marginBottom: 8 }}>
+                  <Text type="secondary" style={{ textDecoration: 'line-through' }}>$14.99/month</Text>
+                  <Text strong style={{ color: '#fa8c16', fontSize: 16 }}>$17.99/month</Text>
+                </Space>
+                <div>
+                  <Text type="secondary" style={{ fontSize: 12 }}>
+                    Price increased on April 28, 2026. Effective next billing cycle (May 10).
+                  </Text>
+                </div>
+                <div style={{ marginTop: 12 }}>
+                  <Button
+                    size="small"
+                    danger
+                    onClick={() => {
+                      const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                      setCancelledSubscriptions(prev => ({ ...prev, 'Hulu (No Ads)': today }));
+                      message.success('Hulu subscription cancelled');
+                      setSubscriptionModal(null);
+                    }}
+                  >
+                    Cancel This Subscription
+                  </Button>
+                </div>
+              </div>
+
+              <div style={{ padding: '8px 0', borderTop: `1px solid ${borderSubtle}` }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                  <Space>
+                    <span style={{ fontSize: 20 }}>📰</span>
+                    <Text strong>NYT Digital Subscription</Text>
+                  </Space>
+                  <Tag color="orange">+13%</Tag>
+                </div>
+                <Space split={<Text type="secondary">→</Text>} style={{ marginBottom: 8 }}>
+                  <Text type="secondary" style={{ textDecoration: 'line-through' }}>$15.00/month</Text>
+                  <Text strong style={{ color: '#fa8c16', fontSize: 16 }}>$17.00/month</Text>
+                </Space>
+                <div>
+                  <Text type="secondary" style={{ fontSize: 12 }}>
+                    Price increased on April 15, 2026. Effective next billing cycle (May 22).
+                  </Text>
+                </div>
+                <div style={{ marginTop: 12 }}>
+                  <Button
+                    size="small"
+                    danger
+                    onClick={() => {
+                      const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                      setCancelledSubscriptions(prev => ({ ...prev, 'NYT Digital Subscription': today }));
+                      message.success('NYT Digital subscription cancelled');
+                      setSubscriptionModal(null);
+                    }}
+                  >
+                    Cancel This Subscription
+                  </Button>
+                </div>
+              </div>
+            </Space>
+          </Card>
+
+          <Text type="secondary" style={{ fontSize: 13 }}>
+            💡 Annual impact: These price increases will cost you an additional $52.80/year combined.
+          </Text>
         </Space>
       </Modal>
     </Space>
