@@ -4,7 +4,7 @@ kind: flag-configuration
 
 flag: enableBlackFriday
 
-enabled: true
+enabled: false
 
 stickinessProperty: rox.distinct_id
 
