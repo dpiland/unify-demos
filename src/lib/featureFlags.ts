@@ -438,6 +438,32 @@ export const flags = {
    *   Enable IF customerTenureMonths > 6 (engaged customers)
    */
   showRecurringSubscriptions: new Rox.Flag(true), // Default: true for local development
+
+  /**
+   * Boolean Flag - Top Banner Fix (FIXED VERSION)
+   *
+   * PATTERN: Progressive rollout of a bug fix
+   * USE CASE: Displays a properly working promotional banner without the
+   * runaway discount bug. Use this after demonstrating the kill switch with
+   * enableTopBanner. This shows how to progressively roll out the fixed
+   * version to confidence rings (beta testers → standard → all).
+   *
+   * DEMO NARRATIVE:
+   *   "Engineering fixed the discount bug overnight. Now we can progressively
+   *    roll out the corrected banner — first to beta testers to verify the fix,
+   *    then to 25% of users, then everyone. No big bang deploy needed."
+   *
+   * BUSINESS VALUE:
+   *   - Demonstrate safe rollout of bug fixes
+   *   - Test fixes with small audiences before full rollout
+   *   - Reduce risk of reintroducing issues
+   *
+   * TARGETING EXAMPLES:
+   *   Phase 1: Enable IF isBetaTester == true (beta verification)
+   *   Phase 2: Enable for 25% of standard users (canary rollout)
+   *   Phase 3: Enable for all users (full rollout)
+   */
+  topBannerFix: new Rox.Flag(), // Controlled by CloudBees - no local default
 };
 
 /**
@@ -549,6 +575,7 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
         enableMortgageSimulator: flags.enableMortgageSimulator.isEnabled(),
         enableTopBanner: flags.enableTopBanner.isEnabled(),
         showRecurringSubscriptions: flags.showRecurringSubscriptions.isEnabled(),
+        topBannerFix: flags.topBannerFix.isEnabled(),
       });
     }
   } catch (error) {

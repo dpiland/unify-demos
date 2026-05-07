@@ -109,6 +109,35 @@ function BuggyTopBanner() {
 }
 
 // ============================================
+// FIXED Top Banner Component (topBannerFix flag)
+// ============================================
+/**
+ * Fixed version of the promotional banner without the runaway discount bug.
+ * Shows a static 10% discount instead of the incrementing bug.
+ * Used to demonstrate progressive rollout of bug fixes.
+ */
+function FixedTopBanner() {
+  const discount = 10; // Fixed at 10% — no runaway bug!
+
+  return (
+    <div
+      style={{
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        padding: '12px 24px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 12,
+      }}
+    >
+      <Text strong style={{ color: '#fff', fontSize: 15 }}>
+        🎉 LIMITED TIME: Save {discount}% on all Horizon Bank services! Use code HORIZON{discount}
+      </Text>
+    </div>
+  );
+}
+
+// ============================================
 // System Alert Banner Component
 // ============================================
 
@@ -410,6 +439,7 @@ function App({ currentUser, userMenuItems }: AppProps) {
   // - Notifications ON on mobile (push-style alerts are expected)
   // - Card controls ON on mobile (freeze card on the go)
   const enableTopBanner = useFeatureFlag('enableTopBanner');
+  const topBannerFix = useFeatureFlag('topBannerFix');
   const enableChatSupportFlag = useFeatureFlag('enableChatSupport');
   const enableChatSupport = enableChatSupportFlag && !isMobile;
   const isStudent = currentUser.properties.booleans.isStudent ?? false;
@@ -580,8 +610,14 @@ function App({ currentUser, userMenuItems }: AppProps) {
       )}
 
       <Layout>
-        {/* Buggy Top Banner - kill switch demo (A/B test across all user segments) */}
-        {enableTopBanner && <BuggyTopBanner />}
+        {/* Top Banner - Progressive rollout demo:
+            1. enableTopBanner (buggy) - show runaway discount bug, then kill switch it
+            2. topBannerFix (fixed) - roll out the fix progressively (beta → 25% → all) */}
+        {topBannerFix ? (
+          <FixedTopBanner />
+        ) : enableTopBanner ? (
+          <BuggyTopBanner />
+        ) : null}
 
         {/* System Alert - controlled by systemAlert string flag (ops demo) */}
         {systemAlert !== 'none' && (
