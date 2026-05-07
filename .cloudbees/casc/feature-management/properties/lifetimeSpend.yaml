@@ -4,4 +4,4 @@ kind: flag-properties
 
 name: lifetimeSpend
 type: Number
-description: "Total dollar amount spent across all purchases (lifetime value)"
+description: ""
