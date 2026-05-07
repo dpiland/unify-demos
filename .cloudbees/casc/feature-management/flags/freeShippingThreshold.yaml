@@ -4,13 +4,9 @@ kind: flag
 
 flag: freeShippingThreshold
 flagType: number
-description: ""
+description: Minimum order value for free standard shipping on outdoor orders. Increase average order value. Test different thresholds for revenue optimization. Incentivize new customers with lower threshold.
 labels:
 
 availableValues:
-  - "35"
-  - "50"
-  - "75"
-  - "100"
 
 isPermanent: false
