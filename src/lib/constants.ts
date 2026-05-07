@@ -10,7 +10,7 @@ export const FEATURE_FLAG_KEYS = {
   SHOW_INVESTMENT_PORTFOLIO: 'showInvestmentPortfolio',
   DASHBOARD_LAYOUT: 'dashboardLayout',
   RECENT_TRANSACTIONS_TO_SHOW: 'recentTransactionsToShow',
-  SHOW_FRAUD_ALERTS: 'showFraudAlerts',
+  FRAUD_ALERTS: 'fraudAlerts',
   PROMOTIONAL_BANNER: 'promotionalBanner',
   ENABLE_CHAT_SUPPORT: 'enableChatSupport',
   SHOW_STUDENT_LOANS: 'showStudentLoans',
@@ -30,6 +30,7 @@ export const FEATURE_FLAG_KEYS = {
   ENABLE_INVESTMENT_ADVISORY: 'enableInvestmentAdvisory',
   ENABLE_MORTGAGE_SIMULATOR: 'enableMortgageSimulator',
   ENABLE_TOP_BANNER: 'enableTopBanner',
+  SHOW_RECURRING_SUBSCRIPTIONS: 'showRecurringSubscriptions',
 } as const;
 
 /**
@@ -44,8 +45,8 @@ export const FLAG_DESCRIPTIONS: Record<string, string> = {
     'Dashboard layout variant for A/B testing (classic, modern, or compact)',
   recentTransactionsToShow:
     'Number of recent transactions visible on the dashboard (5, 10, 25, or 50)',
-  showFraudAlerts:
-    'Display fraud detection alerts with suspicious transaction warnings on the Account Summary',
+  fraudAlerts:
+    'Display fraud detection banner with suspicious transaction warning and card freeze action on Account Summary',
   promotionalBanner:
     'Promotional banner campaign shown across the app (none, mortgage-refi, travel-rewards, savings-bonus)',
   enableChatSupport:
@@ -84,6 +85,8 @@ export const FLAG_DESCRIPTIONS: Record<string, string> = {
     'Show Mortgage Simulator page with payment calculator, term comparison, and pre-qualification (prospect engagement demo)',
   enableTopBanner:
     'Display promotional top banner — INTENTIONALLY BUGGY: discount percentage climbs out of control (kill switch demo — disable instantly when bug is noticed)',
+  showRecurringSubscriptions:
+    'Display recurring subscription tracker with monthly cost aggregation and individual subscription details (financial wellness feature)',
 };
 
 /**
@@ -91,10 +94,10 @@ export const FLAG_DESCRIPTIONS: Record<string, string> = {
  */
 export const DEFAULT_FLAG_VALUES = {
   enableInstantTransfers: false,
-  showInvestmentPortfolio: false,
+  showInvestmentPortfolio: true,
   dashboardLayout: 'classic',
   recentTransactionsToShow: 5,
-  showFraudAlerts: false,
+  fraudAlerts: false,
   promotionalBanner: 'none',
   enableChatSupport: false,
   showStudentLoans: false,
@@ -110,8 +113,9 @@ export const DEFAULT_FLAG_VALUES = {
   enableNotificationCenter: false,
   enableBillPayScheduler: false,
   enableCardControls: false,
-  enableCryptoTrading: false,
-  enableInvestmentAdvisory: false,
+  enableCryptoTrading: true,
+  enableInvestmentAdvisory: true,
   enableMortgageSimulator: false,
   enableTopBanner: false,
+  showRecurringSubscriptions: false,
 };

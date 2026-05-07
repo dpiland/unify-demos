@@ -11,11 +11,13 @@ import {
   ArrowLeftOutlined,
   BellOutlined,
   CreditCardOutlined,
+  CrownOutlined,
   DollarOutlined,
   GiftOutlined,
   GlobalOutlined,
   LockOutlined,
   PieChartOutlined,
+  SafetyCertificateOutlined,
   ShoppingOutlined,
   StarOutlined,
   TrophyOutlined,
@@ -81,9 +83,11 @@ export function Rewards() {
   const isDark = token.colorBgContainer !== '#ffffff';
   const bgSubtle = isDark ? '#262626' : '#fafafa';
   const bgMuted = isDark ? '#1f1f1f' : '#f5f5f5';
+  const borderSubtle = isDark ? '#434343' : '#f0f0f0';
 
   // Boolean flag: enable rewards redemption (regional rollout demo)
   const canRedeem = useFeatureFlag('enableRewardsRedemption');
+  const showCreditScore = useFeatureFlag('showCreditScore');
 
   const [categoryView, setCategoryView] = useState<string>('list');
   const [selectedRedeem, setSelectedRedeem] = useState<string | null>(null);
@@ -93,6 +97,76 @@ export function Rewards() {
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
       <Title level={3} style={{ marginBottom: 0 }}>Rewards & Offers</Title>
+
+      {/* Credit Score Insights - Full Detail */}
+      {showCreditScore ? (
+        <Card
+          title={
+            <Space>
+              <SafetyCertificateOutlined style={{ color: '#52c41a' }} />
+              <span>Credit Score Insights</span>
+              <Tag color="gold" style={{ fontSize: 11 }}>Premier</Tag>
+            </Space>
+          }
+        >
+          <Row gutter={[24, 16]} align="middle">
+            <Col xs={24} sm={6} style={{ textAlign: 'center' }}>
+              <div style={{
+                width: 120,
+                height: 120,
+                borderRadius: '50%',
+                border: '8px solid #52c41a',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto',
+              }}>
+                <Text strong style={{ fontSize: 32, lineHeight: 1 }}>782</Text>
+                <Text type="secondary" style={{ fontSize: 11 }}>Excellent</Text>
+              </div>
+            </Col>
+            <Col xs={24} sm={10}>
+              <Text strong style={{ marginBottom: 8, display: 'block' }}>Score Factors</Text>
+              {[
+                { label: 'Payment History', value: 'Excellent', color: '#52c41a' },
+                { label: 'Credit Utilization', value: '18%', color: '#52c41a' },
+                { label: 'Length of History', value: '7 years', color: '#1890ff' },
+                { label: 'Credit Mix', value: 'Good', color: '#1890ff' },
+                { label: 'New Inquiries', value: '1 in 6 months', color: '#52c41a' },
+              ].map(factor => (
+                <div key={factor.label} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: `1px solid ${borderSubtle}` }}>
+                  <Text type="secondary" style={{ fontSize: 13 }}>{factor.label}</Text>
+                  <Text style={{ fontSize: 13, color: factor.color }}>{factor.value}</Text>
+                </div>
+              ))}
+            </Col>
+            <Col xs={24} sm={8}>
+              <Card size="small" style={{ background: isDark ? '#0a2e0a' : '#f6ffed', border: isDark ? '1px solid #1a5a1a' : '1px solid #b7eb8f' }}>
+                <Text strong style={{ color: '#389e0d', display: 'block', marginBottom: 4 }}>Your score is up +12 pts</Text>
+                <Text type="secondary" style={{ fontSize: 12 }}>Since last month. Keep making on-time payments to maintain your excellent score.</Text>
+              </Card>
+              <Button type="link" size="small" style={{ padding: 0, marginTop: 8 }} onClick={() => message.info('Redirecting to your full credit report from Experian...')}>View Full Credit Report →</Button>
+            </Col>
+          </Row>
+        </Card>
+      ) : (
+        <Card
+          style={{ background: isDark ? 'linear-gradient(135deg, #0d1b2e 0%, #1a0a2e 100%)' : 'linear-gradient(135deg, #f0f5ff 0%, #f9f0ff 100%)', border: isDark ? '1px solid #2a3a5e' : '1px solid #d6e4ff' }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}>
+            <LockOutlined style={{ fontSize: 36, color: '#bfbfbf' }} />
+            <div style={{ flex: 1 }}>
+              <Text strong style={{ fontSize: 16 }}>Unlock Credit Score Insights</Text>
+              <br />
+              <Text type="secondary">Upgrade to Premier Banking to access your credit score, key factors, and personalized tips — updated monthly.</Text>
+            </div>
+            <Button type="primary" icon={<CrownOutlined />} onClick={() => message.info('Contact your branch to upgrade to Premier Banking.')}>
+              Upgrade to Premier
+            </Button>
+          </div>
+        </Card>
+      )}
 
       {/* Rewards Summary */}
       <Row gutter={[16, 16]}>

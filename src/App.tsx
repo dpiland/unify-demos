@@ -416,17 +416,21 @@ function App({ currentUser, userMenuItems }: AppProps) {
 
   const selectedKey = pathToKey[location.pathname] || 'accounts';
 
+  const customerSegment = currentUser.properties.strings.customerSegment || '';
+  const isFinancialPlanning = customerSegment === 'financial-planning';
+
   const menuItems: MenuProps['items'] = [
     {
       key: 'accounts',
       icon: <HomeOutlined />,
       label: 'Account Summary',
     },
-    {
+    // Hide Transfer & Pay for wealth management customers (they use wire transfers and other premier services)
+    ...(!isFinancialPlanning ? [{
       key: 'transfers',
       icon: <SwapOutlined />,
       label: 'Transfer & Pay',
-    },
+    }] : []),
     ...(showInvestmentPortfolio
       ? [
           {
@@ -477,7 +481,7 @@ function App({ currentUser, userMenuItems }: AppProps) {
   // Bottom tab bar items for mobile (core pages only, "More" opens drawer)
   const bottomTabs = [
     { key: 'accounts', icon: <HomeOutlined />, label: 'Accounts' },
-    { key: 'transfers', icon: <SwapOutlined />, label: 'Transfers' },
+    ...(!isFinancialPlanning ? [{ key: 'transfers', icon: <SwapOutlined />, label: 'Transfers' }] : []),
     ...(!isStudent ? [{ key: 'rewards', icon: <GiftOutlined />, label: 'Rewards' }] : []),
     { key: 'more', icon: <MenuUnfoldOutlined />, label: 'More' },
   ];
@@ -576,7 +580,7 @@ function App({ currentUser, userMenuItems }: AppProps) {
       )}
 
       <Layout>
-        {/* Buggy Top Banner - kill switch demo */}
+        {/* Buggy Top Banner - kill switch demo (A/B test across all user segments) */}
         {enableTopBanner && <BuggyTopBanner />}
 
         {/* System Alert - controlled by systemAlert string flag (ops demo) */}

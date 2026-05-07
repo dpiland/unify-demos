@@ -51,7 +51,7 @@ export const flags = {
    * TARGETING EXAMPLE:
    *   Show IF hasInvestmentAccount == true OR userTier == "premier"
    */
-  showInvestmentPortfolio: new Rox.Flag(),
+  showInvestmentPortfolio: new Rox.Flag(true), // Default: true for local development
 
   /**
    * String Flag - Dashboard Layout Variant
@@ -80,17 +80,17 @@ export const flags = {
   recentTransactionsToShow: new Rox.RoxNumber(5, [5, 10, 25, 50]),
 
   /**
-   * Boolean Flag - Show Fraud Alerts
+   * Boolean Flag - Fraud Alerts
    *
    * PATTERN: Conditional rendering of alert banner
-   * USE CASE: Display a fraud detection alert on the Account Summary
-   * with a suspicious transaction and "Was this you?" prompt.
-   * Toggle on during a demo for immediate visual impact.
+   * USE CASE: Display a fraud detection banner at the top of Account Summary
+   * with a suspicious transaction and card freeze action.
+   * A/B test to measure impact on fraud prevention and customer engagement.
    *
    * TARGETING EXAMPLE:
    *   Show IF accountBalance > 10000 (high-value accounts get monitoring)
    */
-  showFraudAlerts: new Rox.Flag(),
+  fraudAlerts: new Rox.Flag(),
 
   /**
    * String Flag - Promotional Banner Campaign
@@ -364,7 +364,7 @@ export const flags = {
    * TARGETING EXAMPLE:
    *   Enable IF isBetaTester == true OR (isPremiumCustomer == true AND region == "us-west")
    */
-  enableCryptoTrading: new Rox.Flag(),
+  enableCryptoTrading: new Rox.Flag(true), // Default: true for local development
 
   /**
    * Boolean Flag - Enable Investment Advisory
@@ -381,7 +381,7 @@ export const flags = {
    * TARGETING EXAMPLE:
    *   Enable IF isPremiumCustomer == true OR hasInvestmentAccount == true
    */
-  enableInvestmentAdvisory: new Rox.Flag(),
+  enableInvestmentAdvisory: new Rox.Flag(true), // Default: true for local development
 
   /**
    * Boolean Flag - Enable Mortgage Simulator
@@ -417,7 +417,27 @@ export const flags = {
    * TARGETING EXAMPLE:
    *   Enable globally, then disable instantly when the bug is noticed
    */
-  enableTopBanner: new Rox.Flag(),
+  enableTopBanner: new Rox.Flag(), // Controlled by CloudBees - no local default
+
+  /**
+   * Boolean Flag - Show Recurring Subscriptions Tracker
+   *
+   * PATTERN: Conditional rendering of financial wellness feature
+   * USE CASE: Display a subscription tracking section that identifies and
+   * aggregates all recurring charges. Helps customers manage monthly spending
+   * by surfacing subscriptions (streaming services, gym, insurance, etc.)
+   * with total monthly cost and individual breakdowns.
+   *
+   * DEMO NARRATIVE:
+   *   "We're launching a subscription tracker to help customers identify
+   *    recurring charges. Great for financial wellness and reducing surprise
+   *    overdrafts. Roll it out to engaged customers first."
+   *
+   * TARGETING EXAMPLE:
+   *   Enable IF isPremiumCustomer == true OR monthlyTransactions > 20
+   *   Enable IF customerTenureMonths > 6 (engaged customers)
+   */
+  showRecurringSubscriptions: new Rox.Flag(true), // Default: true for local development
 };
 
 /**
@@ -508,7 +528,7 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
         showInvestmentPortfolio: flags.showInvestmentPortfolio.isEnabled(),
         dashboardLayout: flags.dashboardLayout.getValue(),
         recentTransactionsToShow: flags.recentTransactionsToShow.getValue(),
-        showFraudAlerts: flags.showFraudAlerts.isEnabled(),
+        fraudAlerts: flags.fraudAlerts.isEnabled(),
         promotionalBanner: flags.promotionalBanner.getValue(),
         enableChatSupport: flags.enableChatSupport.isEnabled(),
         showStudentLoans: flags.showStudentLoans.isEnabled(),
@@ -528,6 +548,7 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
         enableInvestmentAdvisory: flags.enableInvestmentAdvisory.isEnabled(),
         enableMortgageSimulator: flags.enableMortgageSimulator.isEnabled(),
         enableTopBanner: flags.enableTopBanner.isEnabled(),
+        showRecurringSubscriptions: flags.showRecurringSubscriptions.isEnabled(),
       });
     }
   } catch (error) {

@@ -157,6 +157,35 @@ export const DEFAULT_USERS: User[] = [
     },
   },
   {
+    id: 'beta',
+    name: 'Taylor Beta (Beta Tester)',
+    email: 'taylor.beta@horizonbank.com',
+    description: 'Early adopter testing new features before general release',
+    properties: {
+      booleans: {
+        isPremiumCustomer: false,
+        isBetaTester: true,
+        isNewUser: false,
+        hasInvestmentAccount: false,
+        isStudent: false,
+        hasMortgage: false,
+      },
+      strings: {
+        accountType: 'checking',
+        customerSegment: 'checking-savings',
+        userTier: 'beta',
+        region: 'us-west',
+        userId: 'beta',
+      },
+      numbers: {
+        accountBalance: 8200,
+        customerTenureMonths: 18,
+        creditScore: 735,
+        monthlyTransactions: 45,
+      },
+    },
+  },
+  {
     id: 'admin',
     name: 'Dana Admin (Admin)',
     email: 'dana.admin@horizonbank.com',
