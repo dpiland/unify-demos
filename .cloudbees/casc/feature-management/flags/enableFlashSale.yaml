@@ -4,7 +4,7 @@ kind: flag
 
 flag: enableFlashSale
 flagType: boolean
-description: ""
+description: 'Time-limited tiered discounts with countdown timer. Discount tiers: 40% VIP, 25% Beta, 10% Basic, 5% New. Create urgency with 2-hour countdown. Reward loyal customers with higher discounts. Test conversion impact of tiered pricing.'
 labels:
 
 availableValues:
