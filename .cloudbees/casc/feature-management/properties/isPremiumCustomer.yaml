@@ -4,4 +4,4 @@ kind: flag-properties
 
 name: isPremiumCustomer
 type: Boolean
-description: "Indicates if the customer is a premium/VIP member with elevated benefits"
+description: ""
