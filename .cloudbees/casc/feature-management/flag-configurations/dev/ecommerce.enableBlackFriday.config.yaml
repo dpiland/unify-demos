@@ -1,0 +1,13 @@
+---
+apiVersion: featuremanagement.cloudbees.io/v1alpha1
+kind: flag-configuration
+
+flag: ecommerce.enableBlackFriday
+
+enabled: true
+
+stickinessProperty: rox.distinct_id
+
+defaultValue: true
+
+conditions: []
