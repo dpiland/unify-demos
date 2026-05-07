@@ -22,6 +22,8 @@ import {
   BarChartOutlined,
   CalendarOutlined,
   CheckCircleOutlined,
+  ExperimentOutlined,
+  FileTextOutlined,
   HeartOutlined,
   MedicineBoxOutlined,
   MessageOutlined,
