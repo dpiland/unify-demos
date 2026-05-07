@@ -4,4 +4,4 @@ kind: flag-properties
 
 name: shoppingPreference
 type: String
-description: "Customer shopping behavior pattern"
+description: ""
