@@ -93,7 +93,7 @@ interface Flight {
   };
   cabinClass: string;
   bookingRef: string;
-  status: 'scheduled' | 'boarding' | 'delayed' | 'departed' | 'completed';
+  status: 'scheduled' | 'boarding' | 'delayed' | 'departed' | 'completed' | 'cancelled';
   upgradeable: boolean;
   duration: string;
 }
