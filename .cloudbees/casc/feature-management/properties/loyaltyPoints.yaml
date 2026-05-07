@@ -4,4 +4,4 @@ kind: flag-properties
 
 name: loyaltyPoints
 type: Number
-description: "Current balance of Peak Rewards loyalty points"
+description: ""
