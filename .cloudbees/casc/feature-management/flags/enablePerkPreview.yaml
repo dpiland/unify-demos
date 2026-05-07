@@ -4,11 +4,11 @@ kind: flag
 
 flag: enablePerkPreview
 flagType: boolean
-description: ""
+description: Show Summit membership perks strip with tier-aware icons (locks for non-VIP, checkmarks for VIP). Drive membership upgrades by showing what basic users are missing. Reinforce value for Summit members. Visual demo impact when switching personas
 labels:
 
 availableValues:
-  - "false"
   - "true"
+  - "false"
 
 isPermanent: false
