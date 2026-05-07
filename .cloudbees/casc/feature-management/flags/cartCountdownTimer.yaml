@@ -4,13 +4,9 @@ kind: flag
 
 flag: cartCountdownTimer
 flagType: number
-description: ""
+description: Gear reservation timer to reduce cart abandonment. Create urgency for popular/limited outdoor gear. Test optimal timer duration for conversion. Personalize pressure based on customer tier.
 labels:
 
 availableValues:
-  - "5"
-  - "10"
-  - "15"
-  - "30"
 
 isPermanent: false
