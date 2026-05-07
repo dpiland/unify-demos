@@ -74,7 +74,7 @@ const { Title, Text } = Typography;
 /**
  * Flight Interface
  */
-interface Flight {
+export interface Flight {
   id: string;
   flightNumber: string;
   departure: {

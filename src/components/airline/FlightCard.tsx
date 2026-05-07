@@ -16,12 +16,14 @@ import {
   ClockCircleOutlined,
   EnvironmentOutlined,
 } from '@ant-design/icons';
+import type { Flight } from '../../App';
 
 const { Text, Title } = Typography;
 
 /**
- * Flight Interface (copied from App.tsx for type safety)
+ * Flight Interface removed - now imported from App.tsx
  */
+/*
 interface Flight {
   id: string;
   flightNumber: string;
@@ -45,6 +47,7 @@ interface Flight {
   upgradeable: boolean;
   duration: string;
 }
+*/
 
 interface FlightCardProps {
   flight: Flight;

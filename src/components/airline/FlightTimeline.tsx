@@ -1,3 +1,4 @@
+import type { Flight } from '../../App';
 /**
  * FlightTimeline Component
  *
@@ -17,30 +18,6 @@ import { FlightCard } from './FlightCard';
 /**
  * Flight Interface (must match FlightCard)
  */
-interface Flight {
-  id: string;
-  flightNumber: string;
-  departure: {
-    airport: string;
-    code: string;
-    city: string;
-    time: string;
-    gate?: string;
-  };
-  arrival: {
-    airport: string;
-    code: string;
-    city: string;
-    time: string;
-    gate?: string;
-  };
-  cabinClass: string;
-  bookingRef: string;
-  status: 'scheduled' | 'boarding' | 'delayed' | 'departed' | 'completed';
-  upgradeable: boolean;
-  duration: string;
-}
-
 interface FlightTimelineProps {
   flights: Flight[];
 }
