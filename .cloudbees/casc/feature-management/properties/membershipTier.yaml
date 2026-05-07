@@ -4,4 +4,4 @@ kind: flag-properties
 
 name: membershipTier
 type: String
-description: "Customer membership level: vip, beta, basic, or new"
+description: ""
