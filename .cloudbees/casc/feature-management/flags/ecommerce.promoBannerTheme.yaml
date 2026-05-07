@@ -1,0 +1,15 @@
+---
+apiVersion: featuremanagement.cloudbees.io/v1alpha1
+kind: flag
+
+flag: ecommerce.promoBannerTheme
+flagType: string
+description: ""
+labels:
+
+availableValues:
+  - primary
+  - bold
+  - subtle
+
+isPermanent: false
