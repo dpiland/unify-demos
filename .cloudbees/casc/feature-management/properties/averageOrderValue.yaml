@@ -4,4 +4,4 @@ kind: flag-properties
 
 name: averageOrderValue
 type: Number
-description: ""
+description: "Average dollar amount per order across purchase history"
