@@ -7,7 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button, Dropdown, Space, Typography } from 'antd';
-import { UserOutlined, LogoutOutlined, SwapOutlined } from '@ant-design/icons';
+import { LogoutOutlined, SwapOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import App from './App';
 import { LoginPage } from './components/LoginPage';

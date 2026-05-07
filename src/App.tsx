@@ -122,7 +122,8 @@ function App() {
   const showPromoBanner = useFeatureFlag('showPromoBanner');
   const enableExpressCheckout = useFeatureFlag('enableExpressCheckout');
   const enableRecommendations = useFeatureFlag('enableRecommendations');
-  const showLoyaltyProgram = useFeatureFlag('showLoyaltyProgram');
+  // Loyalty program flag - currently nav-triggered via showRewards
+  // const showLoyaltyProgram = useFeatureFlag('showLoyaltyProgram');
   const enableWishlist = useFeatureFlag('enableWishlist');
   const enableBlackFriday = useFeatureFlag('enableBlackFriday');
   const enableFlashSale = useFeatureFlag('enableFlashSale');

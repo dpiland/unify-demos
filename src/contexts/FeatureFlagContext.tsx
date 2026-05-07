@@ -63,7 +63,7 @@ export function FeatureFlagProvider({ children }: FeatureFlagProviderProps) {
     async function initialize() {
       try {
         await initializeFeatureFlags({
-          configurationFetchedHandler: (fetcherResults) => {
+          configurationFetchedHandler: (fetcherResults: any) => {
             if (mounted && fetcherResults.hasChanges) {
               console.log('Feature flags updated from CloudBees Unify');
               setConfigVersion(v => v + 1);
