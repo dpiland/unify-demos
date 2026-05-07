@@ -4,11 +4,11 @@ kind: flag
 
 flag: showLoyaltyProgram
 flagType: boolean
-description: ""
+description: Display Peak Rewards loyalty points, trail credits, and tier status. Soft launch to Pro members before full rollout. Increase customer retention and repeat gear purchases. Test loyalty mechanics with select outdoor enthusiast cohorts.
 labels:
 
 availableValues:
-  - "false"
   - "true"
+  - "false"
 
 isPermanent: false
