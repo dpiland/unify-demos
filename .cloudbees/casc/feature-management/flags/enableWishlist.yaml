@@ -4,11 +4,11 @@ kind: flag
 
 flag: enableWishlist
 flagType: boolean
-description: ""
+description: Allow users to save gear to wishlist for upcoming trips. Beta test feature before general availability. Increase engagement and return visits for trip planning. Test impact on conversion (wishlist to purchase).
 labels:
 
 availableValues:
-  - "false"
   - "true"
+  - "false"
 
 isPermanent: false
