@@ -22,8 +22,6 @@ import {
   BarChartOutlined,
   CalendarOutlined,
   CheckCircleOutlined,
-  ExperimentOutlined,
-  FileTextOutlined,
   HeartOutlined,
   MedicineBoxOutlined,
   MessageOutlined,
@@ -31,7 +29,6 @@ import {
   TeamOutlined,
   ThunderboltOutlined,
   VideoCameraOutlined,
-  WarningOutlined,
 } from '@ant-design/icons';
 import { useFeatureFlag, useFeatureFlagString, useFeatureFlagNumber } from './hooks/useFeatureFlag';
 import { loadCurrentUser } from './lib/users';
