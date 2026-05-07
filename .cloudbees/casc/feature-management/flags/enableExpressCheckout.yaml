@@ -4,11 +4,11 @@ kind: flag
 
 flag: enableExpressCheckout
 flagType: boolean
-description: ""
+description: One-click express checkout for Pro members and returning outdoor enthusiasts. Reduce friction for high-value customers. Test impact on conversion rate and cart abandonment. Reward loyalty with premium checkout experience.
 labels:
 
 availableValues:
-  - "false"
   - "true"
+  - "false"
 
 isPermanent: false
