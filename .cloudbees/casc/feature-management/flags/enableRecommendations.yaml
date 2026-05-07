@@ -4,11 +4,11 @@ kind: flag
 
 flag: enableRecommendations
 flagType: boolean
-description: ""
+description: Show "Complete Your Kit" personalized gear suggestions. Increase average order value by suggesting complementary gear. A/B test recommendation algorithm effectiveness. Gradually roll out to measure performance impact.
 labels:
 
 availableValues:
-  - "false"
   - "true"
+  - "false"
 
 isPermanent: false
