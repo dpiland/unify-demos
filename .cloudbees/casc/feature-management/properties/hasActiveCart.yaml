@@ -4,4 +4,4 @@ kind: flag-properties
 
 name: hasActiveCart
 type: Boolean
-description: "Indicates if the user currently has items in their shopping cart"
+description: ""
