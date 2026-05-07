@@ -8,16 +8,6 @@ enabled: false
 
 stickinessProperty: rox.distinct_id
 
-defaultValue: false
+defaultValue: true
 
-conditions:
-  - allOf:
-      - property:
-          name: membershipTier
-          operator: in-array
-          operands:
-            - vip
-            - beta
-            - basic
-            - ""
-    flagValue: true
+conditions: []
