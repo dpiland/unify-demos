@@ -4,12 +4,9 @@ kind: flag
 
 flag: productDisplayMode
 flagType: string
-description: ""
+description: A/B test different gear layout styles. Test which layout drives more engagement and add-to-carts. Optimize for different device types (mobile vs desktop). Personalize based on user shopping preference.
 labels:
 
 availableValues:
-  - grid
-  - list
-  - compact
 
 isPermanent: false
