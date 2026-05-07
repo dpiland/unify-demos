@@ -4,4 +4,4 @@ kind: flag-properties
 
 name: isBetaTester
 type: Boolean
-description: "Identifies beta testers who get early access to new features for testing"
+description: ""
