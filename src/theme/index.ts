@@ -1,8 +1,8 @@
 /**
- * Ant Design Theme Configuration
+ * Ant Design Theme Configuration - Ridgeline Outfitters
  *
- * Customizes Ant Design components to match CloudBees branding
- * and provide a professional enterprise appearance.
+ * Patagonia-inspired theme with deep navy, earth tones,
+ * and clean minimal styling.
  */
 
 import type { ThemeConfig } from 'antd';
@@ -29,10 +29,10 @@ export const lightTheme: ThemeConfig = {
     fontSizeHeading4: 20,
     fontSizeHeading5: 16,
 
-    // Border radius
-    borderRadius: 6,
-    borderRadiusLG: 8,
-    borderRadiusSM: 4,
+    // Border radius - minimal, clean
+    borderRadius: 4,
+    borderRadiusLG: 6,
+    borderRadiusSM: 2,
 
     // Layout
     colorBgContainer: '#ffffff',
@@ -86,7 +86,7 @@ export const lightTheme: ThemeConfig = {
     Layout: {
       headerBg: '#ffffff',
       headerColor: colors.neutral[900],
-      headerHeight: 64,
+      headerHeight: 56,
       headerPadding: '0 24px',
       siderBg: '#ffffff',
       footerBg: colors.neutral[50],
@@ -105,7 +105,7 @@ export const lightTheme: ThemeConfig = {
 
     Button: {
       primaryColor: '#ffffff',
-      borderRadius: 6,
+      borderRadius: 4,
       controlHeight: 32,
       controlHeightLG: 40,
       controlHeightSM: 24,
@@ -115,14 +115,14 @@ export const lightTheme: ThemeConfig = {
       headerBg: 'transparent',
       headerFontSize: 16,
       headerFontSizeSM: 14,
-      borderRadiusLG: 8,
+      borderRadiusLG: 6,
     },
 
     Table: {
       headerBg: colors.neutral[50],
       headerColor: colors.neutral[900],
-      borderRadius: 6,
-      borderRadiusLG: 8,
+      borderRadius: 4,
+      borderRadiusLG: 6,
     },
 
     Badge: {
@@ -132,7 +132,7 @@ export const lightTheme: ThemeConfig = {
     },
 
     Tag: {
-      borderRadiusSM: 4,
+      borderRadiusSM: 2,
       fontSize: 12,
       lineHeight: 20 / 12,
     },
@@ -147,7 +147,6 @@ export const darkTheme: ThemeConfig = {
   token: {
     ...lightTheme.token,
 
-    // Dark theme color overrides
     colorBgContainer: colors.neutral[900],
     colorBgLayout: colors.neutral[950],
     colorBgElevated: colors.neutral[800],

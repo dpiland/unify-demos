@@ -1,0 +1,9 @@
+{
+	"appId": "com.horizonbank.app",
+	"appName": "Horizon Bank",
+	"webDir": "dist",
+	"server": {
+		"androidScheme": "https"
+	},
+	"packageClassList": []
+}

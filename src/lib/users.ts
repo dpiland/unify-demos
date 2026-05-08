@@ -1,14 +1,9 @@
 /**
- * User Management System
+ * User Management System - Ridgeline Outfitters
  *
  * Provides a fake user authentication system for demos.
- * Users can "log in" by selecting a persona, which sets their properties
- * for feature flag targeting.
- *
- * This allows demos to showcase:
- * - User segmentation and targeting
- * - Different user experiences based on properties
- * - A/B testing with different user types
+ * Users can "log in" by selecting an outdoor persona, which sets their
+ * properties for feature flag targeting.
  */
 
 /**
@@ -21,113 +16,126 @@ export interface User {
   avatar?: string;
   description: string;
 
-  // Properties for feature flag targeting
   properties: {
-    // Boolean properties
     booleans: Record<string, boolean>;
-    // String properties
     strings: Record<string, string>;
-    // Number properties
     numbers: Record<string, number>;
   };
 }
 
 /**
- * Default Demo Users
+ * Default Demo Users - Outdoor Enthusiast Personas
  *
- * These users represent common personas for demonstrations.
- * Customize these for your specific demo use case.
+ * These users represent common outdoor gear customer personas.
+ * Each persona has different properties that enable targeted feature rollouts
+ * and personalized shopping experiences.
  */
 export const DEFAULT_USERS: User[] = [
   {
-    id: 'standard-user',
-    name: 'Alex Standard',
-    email: 'alex.standard@example.com',
-    description: 'Regular user with standard features',
-    properties: {
-      booleans: {
-        isPremiumCustomer: false,
-        isBetaTester: false,
-        isNewUser: false,
-      },
-      strings: {
-        accountType: 'basic',
-        userTier: 'standard',
-        region: 'us-east',
-        userId: 'standard-user',
-      },
-      numbers: {
-        accountAge: 12, // months
-        usageLevel: 5, // low usage
-      },
-    },
-  },
-  {
-    id: 'premium-user',
-    name: 'Jordan Premium',
-    email: 'jordan.premium@example.com',
-    description: 'Premium customer with access to advanced features',
+    id: 'vip-shopper',
+    name: 'Jordan Summit (VIP)',
+    email: 'jordan.summit@example.com',
+    description: 'Backcountry expert and Pro member with premium gear access',
     properties: {
       booleans: {
         isPremiumCustomer: true,
         isBetaTester: false,
         isNewUser: false,
+        hasActiveCart: true,
       },
       strings: {
-        accountType: 'premium',
-        userTier: 'premium',
+        membershipTier: 'vip',
+        shoppingPreference: 'quality-focused',
         region: 'us-west',
-        userId: 'premium-user',
+        userId: 'vip-shopper',
       },
       numbers: {
-        accountAge: 36, // months
-        usageLevel: 25, // high usage
+        lifetimeSpend: 2500,
+        loyaltyPoints: 2500,
+        memberSince: 36,
+        averageOrderValue: 225,
+        cartItemCount: 5,
       },
     },
   },
   {
     id: 'beta-tester',
-    name: 'Sam Beta',
-    email: 'sam.beta@example.com',
-    description: 'Beta tester with access to experimental features',
+    name: 'Sam Trailtest (Beta)',
+    email: 'sam.trailtest@example.com',
+    description: 'Field tester evaluating new gear and site features',
     properties: {
       booleans: {
         isPremiumCustomer: false,
         isBetaTester: true,
         isNewUser: false,
+        hasActiveCart: true,
       },
       strings: {
-        accountType: 'basic',
-        userTier: 'beta',
+        membershipTier: 'beta',
+        shoppingPreference: 'tech-savvy',
         region: 'us-west',
         userId: 'beta-tester',
       },
       numbers: {
-        accountAge: 24, // months
-        usageLevel: 15, // medium usage
+        lifetimeSpend: 1200,
+        loyaltyPoints: 350,
+        memberSince: 18,
+        averageOrderValue: 120,
+        cartItemCount: 2,
       },
     },
   },
   {
-    id: 'new-user',
-    name: 'Taylor New',
-    email: 'taylor.new@example.com',
-    description: 'New user just getting started',
+    id: 'regular-shopper',
+    name: 'Riley Dayhiker (Basic)',
+    email: 'riley.dayhiker@example.com',
+    description: 'Weekend hiker shopping for everyday trail gear',
+    properties: {
+      booleans: {
+        isPremiumCustomer: false,
+        isBetaTester: false,
+        isNewUser: false,
+        hasActiveCart: true,
+      },
+      strings: {
+        membershipTier: 'basic',
+        shoppingPreference: 'price-conscious',
+        region: 'us-east',
+        userId: 'regular-shopper',
+      },
+      numbers: {
+        lifetimeSpend: 450,
+        loyaltyPoints: 100,
+        memberSince: 12,
+        averageOrderValue: 85,
+        cartItemCount: 3,
+      },
+    },
+  },
+  {
+    id: 'new-shopper',
+    name: 'Alex Explorer (New)',
+    email: 'alex.explorer@example.com',
+    description: 'First-time visitor discovering outdoor gear',
     properties: {
       booleans: {
         isPremiumCustomer: false,
         isBetaTester: false,
         isNewUser: true,
+        hasActiveCart: false,
       },
       strings: {
-        accountType: 'basic',
-        userTier: 'new',
+        membershipTier: 'new',
+        shoppingPreference: 'browsing',
         region: 'us-east',
-        userId: 'new-user',
+        userId: 'new-shopper',
       },
       numbers: {
-        accountAge: 1, // months
-        usageLevel: 2, // very low usage
+        lifetimeSpend: 0,
+        loyaltyPoints: 0,
+        memberSince: 0,
+        averageOrderValue: 0,
+        cartItemCount: 0,
       },
     },
   },
@@ -145,6 +153,8 @@ export function getUserById(id: string): User | undefined {
  */
 export function getUserInitials(name: string): string {
   return name
+    .replace(/\(.*\)/, '')
+    .trim()
     .split(' ')
     .map(part => part[0])
     .join('')

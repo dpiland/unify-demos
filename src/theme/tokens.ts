@@ -1,86 +1,86 @@
 /**
- * Design Tokens
+ * Design Tokens - Ridgeline Outfitters
  *
- * Centralized design tokens for colors, spacing, typography, etc.
- * These can be customized per demo to match different brand identities.
+ * Patagonia-inspired earth-tone palette with deep navy, forest green,
+ * warm amber, and warm slate grays. Clean, minimal, nature-inspired.
  */
 
 /**
  * Color Palette
  *
- * CloudBees brand colors with semantic naming.
- * Customize these to match your demo's target industry.
+ * Earth-tone palette inspired by outdoor/mountain aesthetics.
+ * Deep navy primary, forest greens, warm ambers, warm grays.
  */
 export const colors = {
-  // Primary brand colors (CloudBees blue)
+  // Primary brand colors (deep navy)
   primary: {
-    50: '#e6f4ff',
-    100: '#bae7ff',
-    200: '#91d5ff',
-    300: '#69c0ff',
-    400: '#40a9ff',
-    500: '#1890ff', // Primary
-    600: '#096dd9',
-    700: '#0050b3',
-    800: '#003a8c',
-    900: '#002766',
+    50: '#eef2f7',
+    100: '#d4dde8',
+    200: '#a9bbcf',
+    300: '#7e99b7',
+    400: '#53779e',
+    500: '#1e3a5f', // Primary - deep navy
+    600: '#1a3354',
+    700: '#152b47',
+    800: '#10223a',
+    900: '#0b1a2e',
   },
 
-  // Success colors (green)
+  // Success colors (forest green)
   success: {
-    50: '#f6ffed',
-    100: '#d9f7be',
-    200: '#b7eb8f',
-    300: '#95de64',
-    400: '#73d13d',
-    500: '#52c41a', // Success
-    600: '#389e0d',
-    700: '#237804',
-    800: '#135200',
-    900: '#092b00',
+    50: '#f0f7f1',
+    100: '#d4e8d6',
+    200: '#a8d1ab',
+    300: '#7cba80',
+    400: '#50a355',
+    500: '#2f5233', // Forest green
+    600: '#28472d',
+    700: '#213c26',
+    800: '#1a3120',
+    900: '#132619',
   },
 
-  // Warning colors (orange/gold)
+  // Warning colors (warm amber)
   warning: {
-    50: '#fffbe6',
-    100: '#fff1b8',
-    200: '#ffe58f',
-    300: '#ffd666',
-    400: '#ffc53d',
-    500: '#faad14', // Warning
-    600: '#d48806',
-    700: '#ad6800',
-    800: '#874d00',
-    900: '#613400',
+    50: '#fdf6ec',
+    100: '#fae5c5',
+    200: '#f5cb8b',
+    300: '#f0b151',
+    400: '#d99a2b',
+    500: '#c17817', // Warm amber
+    600: '#a66614',
+    700: '#8b5411',
+    800: '#70420e',
+    900: '#55310a',
   },
 
-  // Error colors (red)
+  // Error colors (muted red)
   error: {
-    50: '#fff1f0',
-    100: '#ffccc7',
-    200: '#ffa39e',
-    300: '#ff7875',
-    400: '#ff4d4f',
-    500: '#f5222d', // Error
-    600: '#cf1322',
-    700: '#a8071a',
-    800: '#820014',
-    900: '#5c0011',
+    50: '#fef2f2',
+    100: '#fee2e2',
+    200: '#fecaca',
+    300: '#f87171',
+    400: '#dc2626',
+    500: '#b91c1c', // Muted red
+    600: '#991b1b',
+    700: '#7f1d1d',
+    800: '#661717',
+    900: '#4c1111',
   },
 
-  // Neutral colors (grays)
+  // Neutral colors (warm slate grays)
   neutral: {
-    50: '#fafafa',
-    100: '#f5f5f5',
-    200: '#e8e8e8',
-    300: '#d9d9d9',
-    400: '#bfbfbf',
-    500: '#8c8c8c',
-    600: '#595959',
-    700: '#434343',
-    800: '#262626',
-    900: '#1f1f1f',
-    950: '#141414',
+    50: '#faf9f7',
+    100: '#f5f3ef',
+    200: '#e8e5df',
+    300: '#d4d0c8',
+    400: '#b8b3a8',
+    500: '#8c8780',
+    600: '#5c5850',
+    700: '#434038',
+    800: '#2d2d2d',
+    900: '#1a1a2e',
+    950: '#111114',
   },
 };
 
@@ -89,8 +89,8 @@ export const colors = {
  */
 export const typography = {
   fontFamily: {
-    base: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-    heading: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+    base: '"Helvetica Neue", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif',
+    heading: '"Helvetica Neue", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif',
     mono: '"SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace',
   },
 
