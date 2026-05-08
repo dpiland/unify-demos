@@ -461,6 +461,9 @@ function App({ currentUser, userMenuItems }: AppProps) {
   // - Card controls ON on mobile (freeze card on the go)
   const enableTopBanner = useFeatureFlag('enableTopBanner');
   const topBannerFix = useFeatureFlag('topBannerFix');
+
+  // Debug logging for banner flags
+  console.log('🔍 App render - Banner flags:', { enableTopBanner, topBannerFix });
   const enableChatSupportFlag = useFeatureFlag('enableChatSupport');
   const enableChatSupport = enableChatSupportFlag && !isMobile;
   const isStudent = currentUser.properties.booleans.isStudent ?? false;
@@ -634,11 +637,19 @@ function App({ currentUser, userMenuItems }: AppProps) {
         {/* Top Banner - Progressive rollout demo:
             1. enableTopBanner (buggy) - show runaway discount bug, then kill switch it
             2. topBannerFix (fixed) - roll out the fix progressively (beta → 25% → all) */}
-        {topBannerFix ? (
-          <FixedTopBanner />
-        ) : enableTopBanner ? (
-          <BuggyTopBanner />
-        ) : null}
+        {(() => {
+          console.log('🎨 Banner render decision:', { topBannerFix, enableTopBanner });
+          if (topBannerFix) {
+            console.log('✅ Rendering FixedTopBanner');
+            return <FixedTopBanner />;
+          } else if (enableTopBanner) {
+            console.log('⚠️ Rendering BuggyTopBanner');
+            return <BuggyTopBanner />;
+          } else {
+            console.log('❌ No banner rendered');
+            return null;
+          }
+        })()}
 
         {/* System Alert - controlled by systemAlert string flag (ops demo) */}
         {systemAlert !== 'none' && (
