@@ -505,7 +505,7 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
   try {
     // Register all flags with Rox SDK
     // Empty string means default namespace (recommended for simplicity)
-    Rox.register('', flags);
+    Rox.register('horizonbank', flags);
 
     // Register custom properties so they appear in CloudBees Unify targeting UI
     // Boolean properties
