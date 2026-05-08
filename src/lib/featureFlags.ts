@@ -547,6 +547,12 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
     console.log('✅ CloudBees Feature Flags initialized successfully');
     console.log(`📊 Registered ${Object.keys(flags).length} feature flags`);
 
+    // Always log banner flags for debugging
+    console.log('🎯 Banner Flags:', {
+      enableTopBanner: flags.enableTopBanner.isEnabled(),
+      topBannerFix: flags.topBannerFix.isEnabled(),
+    });
+
     // Log current flag states in development (helpful for debugging)
     if (import.meta.env.DEV) {
       console.log('Current flag states:', {
