@@ -132,12 +132,12 @@ function BuggyTopBanner() {
 // FIXED Top Banner Component (topBannerFix flag)
 // ============================================
 /**
- * Fixed version of the promotional banner without the runaway discount bug.
- * Shows a static 10% discount instead of the incrementing bug.
+ * Fixed version of the promotional banner without the runaway amount bug.
+ * Shows a static $300 instead of the accelerating bug.
  * Used to demonstrate progressive rollout of bug fixes.
  */
 function FixedTopBanner() {
-  const discount = 10; // Fixed at 10% — no runaway bug!
+  const amount = 300; // Fixed at $300 — no runaway bug!
 
   return (
     <div
@@ -151,7 +151,8 @@ function FixedTopBanner() {
       }}
     >
       <Text strong style={{ color: '#fff', fontSize: 15 }}>
-        🎉 LIMITED TIME: Save {discount}% on all Horizon Bank services! Use code HORIZON{discount}
+        🎉 Receive ${amount.toLocaleString()} when you add any new service!{' '}
+        <span style={{ opacity: 0.9 }}>Limited time offer</span>
       </Text>
     </div>
   );
