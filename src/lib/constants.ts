@@ -1,5 +1,5 @@
 /**
- * Feature Flag Constants and Metadata - Ridgeline Outfitters
+ * Feature Flag Constants and Metadata - E-Commerce Store
  *
  * Human-readable descriptions and default values for all feature flags.
  */
@@ -40,43 +40,43 @@ export const FEATURE_FLAG_KEYS = {
 export const FLAG_DESCRIPTIONS: Record<string, string> = {
   // Boolean flags
   showPromoBanner:
-    'Toggle seasonal outdoor campaign banner. Enable for end-of-season clearance, Worn Wear events, or environmental action campaigns.',
+    'Toggle seasonal promotional banner. Enable for sales, special offers, or marketing campaigns.',
   enableExpressCheckout:
-    'Enable one-click express checkout for Pro members. Reduces friction for experienced outdoor enthusiasts.',
+    'Enable one-click express checkout for premium members. Reduces friction for returning customers.',
   enableRecommendations:
-    'Show "Complete Your Kit" gear recommendations. Suggests complementary outdoor items based on browsing.',
+    'Show personalized product recommendations. Suggests complementary items based on browsing and purchase history.',
   showLoyaltyProgram:
-    'Display Peak Rewards loyalty program with trail credits, tier status, and redeemable rewards.',
+    'Display loyalty program with points, tier status, and redeemable rewards.',
   enableWishlist:
-    'Enable gear wishlist/save-for-later feature. Let customers build wishlists for upcoming trips.',
+    'Enable wishlist/save-for-later feature. Let customers save products for future purchase.',
   enableBlackFriday:
-    'Enable Black Friday site-wide sale: 20% off all items + free shipping on every order. Enable early for VIP Summit members.',
+    'Enable Black Friday site-wide sale: 20% off all items + free shipping. Enable early for VIP members.',
   enableFlashSale:
-    'Enable tiered flash sale with 2-hour countdown: 40% off Summit, 25% Trailtest, 10% Dayhiker, 5% Explorer.',
+    'Enable tiered flash sale with countdown timer. Different discount tiers for different membership levels.',
   enableEarlyAccess:
-    'Show Early Access Collection: Summit members see exclusive new arrivals, other tiers see an upgrade teaser.',
+    'Show Early Access Collection: VIP members see exclusive products, others see upgrade teaser.',
   enablePerkPreview:
-    'Show Summit perk strip: VIP members see checkmarks, others see locks with upgrade CTA. Drives membership upgrades.',
+    'Show membership perk strip: VIP members see checkmarks, others see locks with upgrade CTA.',
   enablePersonalizedHero:
-    'Show personalized hero banner for VIP members with their name and activity-specific imagery.',
+    'Show personalized hero banner for VIP members with their name and custom imagery.',
   testBanner:
-    'Test banner with intentional UI issues — clashing colors, broken layout. Demo bad deploy + instant rollback.',
+    'Test banner with intentional UI issues — broken layout for demo purposes. Shows instant rollback capability.',
 
   // String flags
   productDisplayMode:
-    'A/B test gear display layouts: grid (visual cards), list (detailed specs), or compact (browse more gear).',
+    'A/B test product display layouts: grid (visual cards), list (detailed info), or compact (browse more).',
   checkoutFlowVariant:
-    'Test checkout experiences: standard (multi-step), express (one-click for Pro), or single-page.',
+    'Test checkout experiences: standard (multi-step), express (one-click), or single-page.',
   promoBannerTheme:
-    'A/B test banner themes: earth (forest/olive tones), alpine (navy/mountain), or sunset (warm amber).',
+    'A/B test banner themes: primary (brand colors), bold (high-contrast), or subtle (minimal).',
 
   // Number flags
   productsPerPage:
-    'Control gear listing page size: 12 (mobile), 24 (balanced), 36 (browse), or 48 (power shopper).',
+    'Control product listing page size: 12 (mobile), 24 (balanced), 36 (browse), or 48 (power shopper).',
   cartCountdownTimer:
-    'Gear reservation timer in minutes: 5 (high demand), 10, 15 (standard), or 30 (relaxed).',
+    'Product reservation timer in minutes: 5 (high urgency), 10, 15 (standard), or 30 (relaxed).',
   freeShippingThreshold:
-    'Minimum order for free standard shipping: $35 (new), $50 (standard), $75, or $100.',
+    'Minimum order for free standard shipping: $35 (promotional), $50 (standard), $75, or $100.',
 };
 
 /**
@@ -102,7 +102,7 @@ export const DEFAULT_FLAG_VALUES = {
   // String flags - first variant is default
   productDisplayMode: 'grid',
   checkoutFlowVariant: 'standard',
-  promoBannerTheme: 'earth',
+  promoBannerTheme: 'primary',
 
   // Number flags - balanced middle values as defaults
   productsPerPage: 24,

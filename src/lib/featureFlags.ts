@@ -2,7 +2,7 @@
  * CloudBees Feature Flags SDK Integration
  *
  * This module provides the CloudBees Feature Management foundation
- * for the Ridgeline Outfitters outdoor gear store demo.
+ * for the e-commerce store demo.
  *
  * HOW TO ADD NEW FLAGS:
  * 1. Add flag definition to the 'flags' object below
@@ -19,26 +19,26 @@ import type { User } from './users';
 let initialized = false;
 
 /**
- * Feature Flag Definitions - Ridgeline Outfitters
+ * Feature Flag Definitions - E-Commerce Store
  *
- * This outdoor gear store uses 11 feature flags to control various
- * aspects of the shopping experience, enabling safe rollouts, A/B testing,
+ * This e-commerce store uses feature flags to control various aspects
+ * of the shopping experience, enabling safe rollouts, A/B testing,
  * and personalized experiences based on user segmentation.
  */
 export const flags = {
   // =================================================================
-  // BOOLEAN FLAGS (5) - Enable/Disable Features
+  // BOOLEAN FLAGS - Enable/Disable Features
   // =================================================================
 
   /**
-   * 1. Show Promotional Banner
+   * Show Promotional Banner
    *
-   * USE CASE: Toggle seasonal outdoor campaign banner (end-of-season sale, Worn Wear events)
+   * USE CASE: Toggle seasonal promotional banner (sales, special offers)
    * PATTERN: if (enabled) { show banner } else { hide banner }
    *
    * BUSINESS VALUE:
-   * - Launch seasonal clearance instantly without code deploy
-   * - Test impact of outdoor campaign messaging on conversion
+   * - Launch campaigns instantly without code deploy
+   * - Test impact of promotional messaging on conversion
    * - Target campaigns to specific regions or customer segments
    *
    * HOW TO USE:
@@ -48,16 +48,16 @@ export const flags = {
    * ```
    *
    * TARGETING EXAMPLES:
-   * - Enable for all users during end-of-season clearance
+   * - Enable for all users during major sales
    * - Enable for new users only (isNewUser == true)
-   * - Disable for Pro members who already converted
+   * - Disable for premium members who already have best pricing
    */
   showPromoBanner: new Rox.Flag(),
 
   /**
-   * 2. Enable Express Checkout
+   * Enable Express Checkout
    *
-   * USE CASE: One-click express checkout for Pro members and returning outdoor enthusiasts
+   * USE CASE: One-click express checkout for premium and returning customers
    * PATTERN: Conditional rendering of express checkout button
    *
    * BUSINESS VALUE:
@@ -79,13 +79,13 @@ export const flags = {
   enableExpressCheckout: new Rox.Flag(),
 
   /**
-   * 3. Enable Product Recommendations
+   * Enable Product Recommendations
    *
-   * USE CASE: Show "Complete Your Kit" personalized gear suggestions
+   * USE CASE: Show personalized product suggestions
    * PATTERN: Conditional rendering of recommendations section
    *
    * BUSINESS VALUE:
-   * - Increase average order value by suggesting complementary gear
+   * - Increase average order value by suggesting complementary items
    * - A/B test recommendation algorithm effectiveness
    * - Gradually roll out to measure performance impact
    *
@@ -103,15 +103,15 @@ export const flags = {
   enableRecommendations: new Rox.Flag(),
 
   /**
-   * 4. Show Loyalty Program
+   * Show Loyalty Program
    *
-   * USE CASE: Display Peak Rewards loyalty points, trail credits, and tier status
+   * USE CASE: Display loyalty points, rewards, and tier status
    * PATTERN: Conditional rendering of loyalty card component
    *
    * BUSINESS VALUE:
-   * - Soft launch to Pro members before full rollout
-   * - Increase customer retention and repeat gear purchases
-   * - Test loyalty mechanics with select outdoor enthusiast cohorts
+   * - Soft launch to premium members before full rollout
+   * - Increase customer retention and repeat purchases
+   * - Test loyalty mechanics with select customer cohorts
    *
    * HOW TO USE:
    * ```typescript
@@ -122,19 +122,19 @@ export const flags = {
    * TARGETING EXAMPLES:
    * - Enable IF isPremiumCustomer == true AND memberSince > 12
    * - Enable for region == "us-west" (regional rollout)
-   * - Enable for field testers first (isBetaTester == true)
+   * - Enable for beta testers first (isBetaTester == true)
    */
   showLoyaltyProgram: new Rox.Flag(),
 
   /**
-   * 5. Enable Wishlist Feature
+   * Enable Wishlist Feature
    *
-   * USE CASE: Allow users to save gear to wishlist for upcoming trips
+   * USE CASE: Allow users to save products to wishlist for later
    * PATTERN: Conditional rendering of wishlist/save icon on product cards
    *
    * BUSINESS VALUE:
    * - Beta test feature before general availability
-   * - Increase engagement and return visits for trip planning
+   * - Increase engagement and return visits
    * - Test impact on conversion (wishlist to purchase)
    *
    * HOW TO USE:
@@ -144,22 +144,28 @@ export const flags = {
    * ```
    *
    * TARGETING EXAMPLES:
-   * - Enable for isBetaTester == true (field test)
+   * - Enable for isBetaTester == true (beta test)
    * - Enable for region == "us-west" then expand
    * - Enable for users with memberSince > 6 months
    */
   enableWishlist: new Rox.Flag(),
 
   /**
-   * 6. Enable Black Friday Deals
+   * Enable Black Friday Deals
    *
-   * USE CASE: Site-wide 20% off all items + free shipping (no minimum)
-   * PATTERN: if (enabled) { apply 20% discount + free shipping }
+   * USE CASE: Site-wide sale (e.g., 20% off all items + free shipping)
+   * PATTERN: if (enabled) { apply discount + free shipping }
    *
    * BUSINESS VALUE:
-   * - Launch Black Friday instantly without code deploy
-   * - Enable 1 week early for VIP/Summit members
+   * - Launch major sales instantly without code deploy
+   * - Enable early for VIP members
    * - Disable instantly if inventory runs low
+   *
+   * HOW TO USE:
+   * ```typescript
+   * const isBlackFriday = useFeatureFlag('enableBlackFriday');
+   * const price = isBlackFriday ? originalPrice * 0.8 : originalPrice;
+   * ```
    *
    * TARGETING EXAMPLES:
    * - Enable for membershipTier == "vip" (1 week early access)
@@ -168,16 +174,21 @@ export const flags = {
   enableBlackFriday: new Rox.Flag(),
 
   /**
-   * 7. Enable Flash Sale
+   * Enable Flash Sale
    *
    * USE CASE: Time-limited tiered discounts with countdown timer
-   * Discount tiers: 40% VIP, 25% Beta, 10% Basic, 5% New
    * PATTERN: if (enabled) { show flash sale banner + apply tier discount }
    *
    * BUSINESS VALUE:
-   * - Create urgency with 2-hour countdown
+   * - Create urgency with countdown timer
    * - Reward loyal customers with higher discounts
    * - Test conversion impact of tiered pricing
+   *
+   * HOW TO USE:
+   * ```typescript
+   * const isFlashSale = useFeatureFlag('enableFlashSale');
+   * const discount = isFlashSale ? getTierDiscount(userTier) : 0;
+   * ```
    *
    * TARGETING EXAMPLES:
    * - Enable for all users during flash sale window
@@ -186,32 +197,44 @@ export const flags = {
   enableFlashSale: new Rox.Flag(),
 
   /**
-   * 8. Enable Early Access Collection
+   * Enable Early Access Collection
    *
-   * USE CASE: Exclusive new arrivals for Summit (VIP) members
-   * PATTERN: Summit sees exclusive products, others see upgrade teaser
+   * USE CASE: Exclusive products for VIP members
+   * PATTERN: VIP sees exclusive products, others see upgrade teaser
    *
    * BUSINESS VALUE:
-   * - Reward top-tier customers with first access to new gear
-   * - Drive upgrades to Summit membership
-   * - Create exclusivity and urgency around new drops
+   * - Reward top-tier customers with first access
+   * - Drive upgrades to premium membership
+   * - Create exclusivity and urgency around new releases
+   *
+   * HOW TO USE:
+   * ```typescript
+   * const hasEarlyAccess = useFeatureFlag('enableEarlyAccess');
+   * return hasEarlyAccess ? <EarlyAccessCollection /> : null;
+   * ```
    *
    * TARGETING EXAMPLES:
-   * - Enable for membershipTier == "vip" (Summit exclusive)
-   * - Enable for all users (Summit sees products, others see teaser)
+   * - Enable for membershipTier == "vip" (exclusive access)
+   * - Enable for all users (VIP sees products, others see teaser)
    */
   enableEarlyAccess: new Rox.Flag(),
 
   /**
-   * 9. Enable Perk Preview Strip
+   * Enable Perk Preview Strip
    *
-   * USE CASE: Show Summit membership perks — locks for non-VIP, checkmarks for VIP
+   * USE CASE: Show membership perks — locks for non-VIP, checkmarks for VIP
    * PATTERN: if (enabled) { show perks strip with tier-aware icons }
    *
    * BUSINESS VALUE:
    * - Drive membership upgrades by showing what basic users are missing
-   * - Reinforce value for Summit members (checkmarks = validation)
+   * - Reinforce value for premium members (checkmarks = validation)
    * - Visual demo impact when switching personas
+   *
+   * HOW TO USE:
+   * ```typescript
+   * const showPerks = useFeatureFlag('enablePerkPreview');
+   * return showPerks ? <PerkPreview isVIP={isVIP} /> : null;
+   * ```
    *
    * TARGETING EXAMPLES:
    * - Enable for all users (different experience per tier)
@@ -220,36 +243,47 @@ export const flags = {
   enablePerkPreview: new Rox.Flag(),
 
   /**
-   * 10. Enable Personalized Hero
+   * Enable Personalized Hero
    *
-   * USE CASE: VIP members see a personalized hero with their name and
-   * activity-specific imagery instead of the generic storefront hero
+   * USE CASE: VIP members see a personalized hero with their name
    * PATTERN: if (enabled && VIP) { personalized hero } else { default hero }
    *
    * BUSINESS VALUE:
    * - Create a premium, personalized experience for top-tier members
    * - Increase engagement and emotional connection with the brand
    * - Demonstrate dynamic content personalization via feature flags
+   *
+   * HOW TO USE:
+   * ```typescript
+   * const personalizedHero = useFeatureFlag('enablePersonalizedHero');
+   * return <Hero personalized={personalizedHero && isVIP} />;
+   * ```
    */
   enablePersonalizedHero: new Rox.Flag(),
 
   /**
-   * 11. Test Banner (Intentionally Broken)
+   * Test Banner (Intentionally Broken)
    *
-   * USE CASE: Demo a bad deploy — banner with clashing colors, broken layout,
-   * overlapping text. Perfect for showing instant rollback via feature flags.
+   * USE CASE: Demo a bad deploy — banner with clashing colors, broken layout.
+   * Perfect for showing instant rollback via feature flags.
    * PATTERN: if (enabled) { show broken banner }
+   *
+   * HOW TO USE:
+   * ```typescript
+   * const showTest = useFeatureFlag('testBanner');
+   * return showTest ? <TestBanner /> : null;
+   * ```
    */
   testBanner: new Rox.Flag(),
 
   // =================================================================
-  // STRING FLAGS (3) - A/B Test Variants
+  // STRING FLAGS - A/B Test Variants
   // =================================================================
 
   /**
-   * 6. Product Display Mode
+   * Product Display Mode
    *
-   * USE CASE: A/B test different gear layout styles
+   * USE CASE: A/B test different product layout styles
    * PATTERN: switch (mode) { case 'grid': ... case 'list': ... }
    *
    * BUSINESS VALUE:
@@ -259,8 +293,8 @@ export const flags = {
    *
    * VARIANTS:
    * - 'grid': Cards in responsive grid (default, visual)
-   * - 'list': Row-based list view (detailed specs, scannable)
-   * - 'compact': Dense grid with smaller cards (browse more gear)
+   * - 'list': Row-based list view (detailed info, scannable)
+   * - 'compact': Dense grid with smaller cards (browse more items)
    *
    * HOW TO USE:
    * ```typescript
@@ -271,7 +305,7 @@ export const flags = {
   productDisplayMode: new Rox.RoxString('grid', ['grid', 'list', 'compact']),
 
   /**
-   * 7. Checkout Flow Variant
+   * Checkout Flow Variant
    *
    * USE CASE: Test different checkout user experiences
    * PATTERN: Conditional rendering based on variant string
@@ -295,20 +329,20 @@ export const flags = {
   checkoutFlowVariant: new Rox.RoxString('standard', ['standard', 'express', 'single-page']),
 
   /**
-   * 8. Promotional Banner Theme
+   * Promotional Banner Theme
    *
-   * USE CASE: A/B test different banner themes for outdoor campaigns
+   * USE CASE: A/B test different banner themes
    * PATTERN: Apply different styling/messaging based on theme string
    *
    * BUSINESS VALUE:
-   * - Test which nature-inspired theme gets more clicks
+   * - Test which theme gets more clicks
    * - Optimize promotional banner effectiveness
-   * - Match seasonal outdoor themes
+   * - Match seasonal campaigns
    *
    * VARIANTS:
-   * - 'earth': Forest/olive tones (default, end-of-season sales)
-   * - 'alpine': Deep navy/mountain theme (free shipping, new arrivals)
-   * - 'sunset': Warm amber tones (Worn Wear, trade-in programs)
+   * - 'primary': Brand primary colors (default)
+   * - 'bold': High-contrast bold design
+   * - 'subtle': Minimal, understated design
    *
    * HOW TO USE:
    * ```typescript
@@ -316,20 +350,20 @@ export const flags = {
    * <PromoBanner theme={theme} />
    * ```
    */
-  promoBannerTheme: new Rox.RoxString('earth', ['earth', 'alpine', 'sunset']),
+  promoBannerTheme: new Rox.RoxString('primary', ['primary', 'bold', 'subtle']),
 
   // =================================================================
-  // NUMBER FLAGS (3) - Numeric Configuration
+  // NUMBER FLAGS - Numeric Configuration
   // =================================================================
 
   /**
-   * 9. Products Per Page
+   * Products Per Page
    *
-   * USE CASE: Control pagination size for gear listings
+   * USE CASE: Control pagination size for product listings
    * PATTERN: Slice products array based on flag value
    *
    * BUSINESS VALUE:
-   * - Test optimal page size for browsing outdoor gear
+   * - Test optimal page size for browsing
    * - Balance performance vs. content visibility
    * - Personalize based on customer tier or device
    *
@@ -344,13 +378,13 @@ export const flags = {
   productsPerPage: new Rox.RoxNumber(24, [12, 24, 36, 48]),
 
   /**
-   * 10. Cart Countdown Timer
+   * Cart Countdown Timer
    *
-   * USE CASE: Gear reservation timer to reduce cart abandonment
+   * USE CASE: Product reservation timer to reduce cart abandonment
    * PATTERN: Display countdown with configurable duration
    *
    * BUSINESS VALUE:
-   * - Create urgency for popular/limited outdoor gear
+   * - Create urgency for popular/limited items
    * - Test optimal timer duration for conversion
    * - Personalize pressure based on customer tier
    *
@@ -365,9 +399,9 @@ export const flags = {
   cartCountdownTimer: new Rox.RoxNumber(15, [5, 10, 15, 30]),
 
   /**
-   * 11. Free Shipping Threshold
+   * Free Shipping Threshold
    *
-   * USE CASE: Minimum order value for free standard shipping on outdoor orders
+   * USE CASE: Minimum order value for free standard shipping
    * PATTERN: Calculate shipping based on threshold
    *
    * BUSINESS VALUE:
@@ -417,7 +451,7 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
 
   try {
     if (!initialized) {
-      Rox.register('', flags);
+      Rox.register('ecommerce', flags);
       initialized = true;
     }
 
@@ -432,7 +466,7 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
     console.log(`Registered ${Object.keys(flags).length} feature flags`);
 
     if (import.meta.env.DEV) {
-      console.log('Current flag states (Ridgeline Outfitters):');
+      console.log('Current flag states (E-Commerce Store):');
       console.log('  Boolean Flags:', {
         showPromoBanner: flags.showPromoBanner.isEnabled(),
         enableExpressCheckout: flags.enableExpressCheckout.isEnabled(),
