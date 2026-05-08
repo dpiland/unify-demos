@@ -75,16 +75,35 @@ const pathToKey: Record<string, string> = {
 // ============================================
 
 function BuggyTopBanner() {
-  const [discount, setDiscount] = useState(10);
+  const [amount, setAmount] = useState(300);
   const [color, setColor] = useState(0);
 
-  // "Bug": runaway setInterval that keeps incrementing the discount
+  // "Bug": runaway setInterval that rapidly accelerates the dollar amount
   useEffect(() => {
-    const interval = setInterval(() => {
-      setDiscount(prev => prev + Math.floor(Math.random() * 3) + 1);
-      setColor(prev => (prev + 1) % 360);
-    }, 150);
-    return () => clearInterval(interval);
+    let intervalTime = 150;
+    let currentAmount = 300;
+
+    const accelerate = () => {
+      const interval = setInterval(() => {
+        // Random increment between 25-75
+        currentAmount += Math.floor(Math.random() * 50) + 25;
+        setAmount(currentAmount);
+        setColor(prev => (prev + 2) % 360);
+
+        // Make it faster each time
+        intervalTime = Math.max(20, intervalTime - 5);
+        clearInterval(interval);
+
+        if (intervalTime > 20) {
+          setTimeout(accelerate, intervalTime);
+        }
+      }, intervalTime);
+    };
+
+    // Start acceleration after 500ms
+    const timeout = setTimeout(accelerate, 500);
+
+    return () => clearTimeout(timeout);
   }, []);
 
   const bgColor = `hsl(${color}, 80%, 45%)`;
@@ -102,7 +121,8 @@ function BuggyTopBanner() {
       }}
     >
       <Text strong style={{ color: '#fff', fontSize: 15 }}>
-        🎉 LIMITED TIME: Save {discount}% on all Horizon Bank services! Use code HORIZON{discount}
+        🎉 Receive ${amount.toLocaleString()} when you add any new service!{' '}
+        <span style={{ opacity: 0.9 }}>Limited time offer</span>
       </Text>
     </div>
   );
