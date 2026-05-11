@@ -21,6 +21,7 @@ const PERSONA_COLORS: Record<string, string> = {
   mortgage: '#fa8c16',
   'financial-planning': '#faad14',
   'checking-savings': '#1890ff',
+  beta: '#1890ff',
   admin: '#722ed1',
 };
 
@@ -29,6 +30,7 @@ const PERSONA_LABELS: Record<string, string> = {
   mortgage: 'Mortgage',
   'financial-planning': 'Wealth',
   'checking-savings': 'Everyday',
+  beta: 'Beta',
   admin: 'Admin',
 };
 
@@ -138,7 +140,8 @@ export function LoginPage({ onSelectUser }: LoginPageProps) {
           </Text>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
             {DEFAULT_USERS.map(user => {
-              const segment = user.properties.strings.customerSegment;
+              // Use user.id for beta user to avoid duplicate "Everyday" labels
+              const segment = user.id === 'beta' ? 'beta' : user.properties.strings.customerSegment;
               const color = PERSONA_COLORS[segment] || '#1890ff';
               const label = PERSONA_LABELS[segment] || segment;
 
