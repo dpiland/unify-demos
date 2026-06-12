@@ -464,6 +464,25 @@ export const flags = {
    *   Phase 3: Enable for all users (full rollout)
    */
   topBannerFix: new Rox.Flag(), // Controlled by CloudBees - no local default
+
+  /**
+   * Boolean Flag - Novus Demo Variant
+   *
+   * PATTERN: A/B variant switching for live demo
+   * USE CASE: Controls the active variant in the Novus UX Gap demo.
+   * - false (default): Variant A - working 3-step onboarding flow
+   * - true: Variant B - broken flow with dead-end CTA at step 2
+   *
+   * DEMO NARRATIVE:
+   *   "Feature flags tell you WHEN to release. Novus tells you WHETHER it
+   *   is safe to release. Toggle this flag in the dashboard to switch between
+   *   a working flow and a UX regression — the same regression Novus would
+   *   catch at PR review time, before any user sees it."
+   *
+   * TARGETING EXAMPLE:
+   *   Enable for demo audiences; disable to reset to working state
+   */
+  novusDemoVariant: new Rox.Flag(false),
 };
 
 /**

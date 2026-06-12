@@ -11,6 +11,7 @@ import { Badge, Button, Card, Drawer, Dropdown, FloatButton, Input, Layout, Menu
 import {
   BankOutlined,
   BellOutlined,
+  BranchesOutlined,
   CloseOutlined,
   CreditCardOutlined,
   ExclamationCircleOutlined,
@@ -37,6 +38,7 @@ import { Rewards } from './pages/Rewards';
 import { MortgageSimulator } from './pages/MortgageSimulator';
 import { Notifications } from './pages/Notifications';
 import { CardControls } from './pages/CardControls';
+import { NovusDemo } from './pages/NovusDemo';
 import { useThemeMode } from './contexts/ThemeContext';
 import './App.css';
 
@@ -68,6 +70,7 @@ const pathToKey: Record<string, string> = {
   '/notifications': 'notifications',
   '/card-controls': 'card-controls',
   '/mortgage-simulator': 'mortgage-simulator',
+  '/novus-demo': 'novus-demo',
 };
 
 // ============================================
@@ -530,6 +533,11 @@ function App({ currentUser, userMenuItems }: AppProps) {
           },
         ]
       : []),
+    {
+      key: 'novus-demo',
+      icon: <BranchesOutlined />,
+      label: 'Novus Demo',
+    },
   ];
 
   // Bottom tab bar items for mobile (core pages only, "More" opens drawer)
@@ -548,6 +556,7 @@ function App({ currentUser, userMenuItems }: AppProps) {
     notifications: '/notifications',
     'card-controls': '/card-controls',
     'mortgage-simulator': '/mortgage-simulator',
+    'novus-demo': '/novus-demo',
   };
 
   const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
@@ -748,6 +757,7 @@ function App({ currentUser, userMenuItems }: AppProps) {
               <Route path="/notifications" element={<Notifications />} />
               <Route path="/card-controls" element={<CardControls currentUser={currentUser} creditCardFrozen={creditCardFrozen} setCreditCardFrozen={setCreditCardFrozen} />} />
               <Route path="/mortgage-simulator" element={<MortgageSimulator />} />
+              <Route path="/novus-demo" element={<NovusDemo />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </div>
