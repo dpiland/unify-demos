@@ -21,11 +21,11 @@ export function OverviewView({ onNavigate }: { onNavigate: (view: AudienceView) 
       <HookBanner
         eyebrow="Drew Piland · Product Marketing"
         jtbd="One portfolio. Four audiences. Four jobs to be done."
-        hook="This is the same application showing each of you a different experience — built around how I'd add value to your function as Albert's first PMM. It's also the point: a small PMM function scales by being scrappy and AI-native. Three themes run through every view — scrappy builder, translation is the skill, and narrative as strategy."
+        hook="The same app shows each of you the strategic plan I'd own for your function — and the proof I can build it out."
         metrics={[
-          { value: 'First PMM', label: 'function built from zero — launch plan, messaging, GTM, enablement' },
-          { value: '4 views', label: 'one app — each of you sees the work built for your function' },
-          { value: '3 themes', label: 'scrappy builder · translation is the skill · narrative as strategy' },
+          { value: 'First PMM', label: 'function built from zero' },
+          { value: '4 views', label: 'one app, tailored per function' },
+          { value: '3 themes', label: 'scrappy · translation · narrative' },
         ]}
       />
 
