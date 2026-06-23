@@ -12,18 +12,18 @@
  * Customize these to match your demo's target industry.
  */
 export const colors = {
-  // Primary brand colors (Horizon Bank navy)
+  // Primary brand colors (Albert Invent — Electric Violet #7D19FE)
   primary: {
-    50: '#e8edf4',
-    100: '#c5d1e3',
-    200: '#9eb3d0',
-    300: '#7795bd',
-    400: '#5a7eaf',
-    500: '#1a3c5e', // Primary - banking navy
-    600: '#163350',
-    700: '#122a42',
-    800: '#0e2134',
-    900: '#0a1826',
+    50: '#f3eafe',
+    100: '#e4ccfe',
+    200: '#cba6fe',
+    300: '#ad73fe',
+    400: '#9445fe',
+    500: '#7D19FE', // Primary - Albert Electric Violet
+    600: '#6a0fe0',
+    700: '#5511b0',
+    800: '#3f0d82',
+    900: '#2a0856',
   },
 
   // Success colors (green)

@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Albert Invent · Product Marketing — Drew Piland</title>
+<style>
+  :root{
+    --violet:#7D19FE; --violet-dark:#5511b0; --violet-soft:#f3eafe;
+    --ink:#1a1430; --muted:#56506b; --line:#ece8f4; --bg:#faf8fe;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--ink)}
+  a{color:inherit}
+  .hidden{display:none !important}
+
+  /* Login */
+  #login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:48px 24px;
+    background:radial-gradient(1200px 600px at 80% -10%, rgba(125,25,254,.18), transparent), linear-gradient(135deg,#160a2e,#0a0518)}
+  .login-wrap{width:100%;max-width:920px}
+  .login-head{text-align:center;margin-bottom:34px;color:#fff}
+  .login-head h1{font-size:30px;margin:14px 0 6px;font-weight:800;letter-spacing:-.5px}
+  .login-head p{margin:4px 0;color:#cdbff0;font-size:16px}
+  .login-head .sub{color:#8b7bb8;font-size:13px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:16px}
+  .pcard{cursor:pointer;text-align:left;border:1px solid rgba(125,25,254,.35);background:rgba(255,255,255,.04);
+    border-radius:16px;padding:20px;color:#fff;display:flex;gap:16px;align-items:flex-start;transition:.15s}
+  .pcard:hover{transform:translateY(-3px);border-color:var(--violet);background:rgba(125,25,254,.12)}
+  .pcard .ini{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;flex-shrink:0;color:#fff}
+  .pcard .nm{font-size:17px;font-weight:700}
+  .pcard .rl{color:#b9a8e0;font-size:13px}
+  .pcard .ds{color:#9a8bc4;font-size:13px;margin-top:8px;line-height:1.5}
+  .overview-link{display:block;margin:22px auto 0;background:none;border:none;color:#b9a8e0;font-size:14px;cursor:pointer}
+
+  /* App */
+  header.bar{position:sticky;top:0;z-index:10;height:64px;display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:0 28px;background:linear-gradient(135deg,#2a0856,#1a0a38)}
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand .t{color:#fff;font-weight:700;font-size:16px;line-height:1.1}
+  .brand .s{color:#b9a8e0;font-size:11px}
+  .nav{display:flex;gap:4px;background:rgba(255,255,255,.12);border-radius:10px;padding:4px}
+  .nav button{border:none;background:transparent;color:#d8c6fb;padding:6px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600}
+  .nav button.active{background:#fff;color:var(--violet-dark)}
+  .who{display:flex;align-items:center;gap:8px;color:#fff}
+  .who .r{text-align:right;line-height:1.1}
+  .who .r .n{font-size:13px;font-weight:600}
+  .who .r .ro{font-size:11px;color:#b9a8e0}
+  .who .av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:13px}
+  .strip{background:#fff;border-bottom:1px solid #efeaf8;padding:10px 28px;color:var(--violet-dark);font-size:13px;font-weight:600}
+  main{padding:32px 28px 48px}
+  .wrap{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:40px}
+  footer{text-align:center;color:#9a8bc4;font-size:12px;padding:24px}
+
+  /* Hook */
+  .hook{border-radius:20px;padding:32px 36px;color:#fff;
+    background:radial-gradient(900px 400px at 90% -40%, rgba(173,115,254,.55), transparent), linear-gradient(135deg,#7D19FE,#4a0c95);
+    box-shadow:0 18px 40px rgba(125,25,254,.28)}
+  .hook .ey{color:#e4ccfe;font-size:13px;font-weight:600;letter-spacing:1px;text-transform:uppercase}
+  .hook h2{color:#fff;margin:8px 0 12px;font-weight:800;line-height:1.2;font-size:28px}
+  .hook .hk{color:#efe6ff;font-size:16px;max-width:820px;margin:0 0 24px;line-height:1.6}
+  .metrics{display:flex;flex-wrap:wrap;gap:36px}
+  .metrics .v{font-size:30px;font-weight:800;line-height:1}
+  .metrics .l{color:#d8c6fb;font-size:13px;margin-top:6px;max-width:220px}
+
+  /* Sections */
+  section h3{font-size:22px;margin:0 0 16px;color:var(--ink)}
+  .kicker{color:var(--violet);font-weight:700;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+  .grid{display:grid;gap:16px}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:24px;box-shadow:0 1px 3px rgba(26,20,48,.05)}
+  .panel.accent{border-color:var(--violet)}
+  .panel.green{border-color:#b7eb8f;background:#f6ffed}
+  .panel.amber{border-color:#ffd591;background:#fff7e6}
+  .panel.red{border-color:#ffccc7;background:#fff1f0}
+  .panel.warn{border-color:#ffe58f;background:#fffbe6}
+  .panel h4{margin:0 0 8px;font-size:15px;color:var(--ink)}
+  .panel p{margin:0;color:var(--muted);line-height:1.6;font-size:14px}
+  .pill{display:inline-block;border-radius:999px;padding:2px 12px;font-size:12px;background:var(--violet-soft);color:var(--violet-dark);font-weight:600}
+  .pill.solid{background:var(--violet);color:#fff}
+  .stat .v{font-size:24px;font-weight:800;color:var(--violet);line-height:1.1}
+  .stat .l{font-size:13px;color:#6b6480;margin-top:4px}
+  .statrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:20px}
+  .deliv{display:flex;gap:14px;align-items:flex-start;margin-bottom:18px}
+  .deliv .dot{width:8px;height:8px;border-radius:50%;background:var(--violet);margin-top:8px;flex-shrink:0}
+  .deliv .t{font-weight:700;color:var(--ink);font-size:15px}
+  .deliv p{margin:4px 0 0}
+  .stage{display:flex;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:12px;background:#fff}
+  .stage .sb{width:140px;flex-shrink:0;background:linear-gradient(135deg,var(--violet),var(--violet-dark));color:#fff;padding:16px 18px;display:flex;flex-direction:column;justify-content:center}
+  .stage .sb .n{font-size:12px;opacity:.8}
+  .stage .sb .nm{font-size:17px;font-weight:700}
+  .stage .sb .fr{font-size:11px;opacity:.85}
+  .stage .sc{padding:14px 18px;flex:1}
+  .stage .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .lab{font-size:11px;font-weight:700;color:var(--violet-dark);text-transform:uppercase;letter-spacing:.5px}
+  .titleline{display:flex;gap:16px;align-items:flex-start;padding:14px 0;border-bottom:1px solid #f0ecf7}
+  .titleline:last-child{border-bottom:none}
+  .titleline .num{width:32px;height:32px;border-radius:8px;background:var(--violet-soft);color:var(--violet-dark);font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .titleline .tx{color:var(--ink);font-size:15px;line-height:1.5}
+  details{border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin-bottom:10px;background:#fff}
+  details summary{font-weight:700;color:var(--ink);cursor:pointer}
+  details p{margin:10px 0 0}
+  details.speaker{background:#1a0a38;border:none}
+  details.speaker summary{color:#cdbff0;font-weight:600;font-size:13px}
+  details.speaker p{color:#e4ccfe;line-height:1.65}
+  ul.clean{margin:10px 0 0;padding-left:18px;color:var(--muted);line-height:1.7;font-size:14px}
+  .steps{list-style:none;margin:0;padding:0}
+  .steps li{position:relative;padding:0 0 16px 26px;border-left:2px solid var(--violet-soft)}
+  .steps li:last-child{border-left-color:transparent}
+  .steps li::before{content:"";position:absolute;left:-7px;top:2px;width:12px;height:12px;border-radius:50%;background:var(--violet)}
+  .steps .st{font-weight:700;color:var(--ink);font-size:14px}
+  .steps .sd{color:var(--muted);font-size:13px}
+  @media(max-width:760px){
+    .nav{display:none}.who .r{display:none}.stage{flex-direction:column}.stage .sb{width:100%}
+    .stage .cols{grid-template-columns:1fr}header.bar,main,.strip{padding-left:14px;padding-right:14px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<div id="login">
+  <div class="login-wrap">
+    <div class="login-head">
+      <svg width="56" height="56" viewBox="0 0 44 44" fill="none" style="display:inline-block">
+        <circle cx="22" cy="9" r="4" fill="#7D19FE"/><circle cx="9" cy="30" r="4" fill="#7D19FE"/>
+        <circle cx="35" cy="30" r="4" fill="#7D19FE"/><circle cx="22" cy="22" r="3" fill="#ad73fe"/>
+        <line x1="22" y1="9" x2="22" y2="22" stroke="#7D19FE" stroke-width="2"/>
+        <line x1="22" y1="22" x2="9" y2="30" stroke="#7D19FE" stroke-width="2"/>
+        <line x1="22" y1="22" x2="35" y2="30" stroke="#7D19FE" stroke-width="2"/>
+      </svg>
+      <h1>Product Marketing, built for Albert Invent</h1>
+      <p>One portfolio, tailored to each of you. Choose your name to see the work I'd own for your team.</p>
+      <p class="sub">Prepared by Drew Piland · Round 5 Panel · June 25, 2026</p>
+    </div>
+    <div class="cards" id="loginCards"></div>
+    <button class="overview-link" onclick="go('overview')">Or start with the overview — the map of all four views →</button>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="app" class="hidden">
+  <header class="bar">
+    <div class="brand">
+      <svg width="28" height="28" viewBox="0 0 44 44" fill="none">
+        <circle cx="22" cy="9" r="4" fill="#fff"/><circle cx="9" cy="30" r="4" fill="#fff"/>
+        <circle cx="35" cy="30" r="4" fill="#fff"/><circle cx="22" cy="22" r="3" fill="#fff" opacity=".7"/>
+        <line x1="22" y1="9" x2="22" y2="22" stroke="#fff" stroke-width="2"/>
+        <line x1="22" y1="22" x2="9" y2="30" stroke="#fff" stroke-width="2"/>
+        <line x1="22" y1="22" x2="35" y2="30" stroke="#fff" stroke-width="2"/>
+      </svg>
+      <div><div class="t">Albert Invent</div><div class="s">Product Marketing · Drew Piland</div></div>
+    </div>
+    <div class="nav" id="nav"></div>
+    <div class="who" onclick="backToLogin()" title="Switch panelist">
+      <div class="r"><div class="n" id="whoName"></div><div class="ro" id="whoRole"></div></div>
+      <div class="av" id="whoAv"></div>
+    </div>
+  </header>
+  <div class="strip" id="strip"></div>
+  <main><div class="wrap" id="viewWrap"></div></main>
+  <footer>One codebase · four audiences · tailored with CloudBees Feature Management — the mechanism, not the message.</footer>
+</div>
+
+<script>
+/* ---------- data ---------- */
+const PERSONAS = [
+  {id:'content', name:'Brooke Kuei', role:'Content Marketing Manager', accent:'#7D19FE',
+   desc:'Customer journey, content audit, and the gaps a first PMM closes.'},
+  {id:'panel', name:'Dana Barrett', role:'VP Marketing · Hiring Manager', accent:'#6a0fe0',
+   desc:'Case study walkthrough — the launch I led (Pt 1) and the category narrative (Pt 2).'},
+  {id:'product', name:'Oakley Reid', role:'AI/ML Product Manager', accent:'#9445fe',
+   desc:'Market awareness, testing the category message, and analyst strategy.'},
+  {id:'sales', name:'Mark Poggi', role:'SVP Commercial', accent:'#5511b0',
+   desc:'Sales progression tools, self-serve enablement, and onboarding.'},
+];
+const OVERVIEW = {id:'overview', name:'Drew Piland', role:'Product Marketing — Candidate', accent:'#2a0856'};
+const NAVS = [
+  {id:'overview',label:'Overview'},{id:'content',label:'Content · Brooke'},
+  {id:'panel',label:'Case Study · Dana'},{id:'product',label:'Product · Oakley'},{id:'sales',label:'Sales · Mark'}
+];
+const GREET = {
+  overview:'The map — one portfolio, four audiences',
+  content:'The Content Marketing experience · built for Brooke Kuei',
+  panel:'The Case Study walkthrough · built for Dana Barrett',
+  product:'The Product Meeting experience · built for Oakley Reid',
+  sales:'The Sales Meeting experience · built for Mark Poggi'
+};
+function ini(n){return n.split(' ').map(p=>p[0]).join('').toUpperCase();}
+const ROI_URL='https://albert-roi-spark.lovable.app';
+const ROI_PREVIEW='https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/088b6710-cb29-4d21-8139-cb70f714db45/id-preview-ecc4147c--49914c73-9a7a-4775-9b62-ccb48d65f9b0.lovable.app-1782220887556.png';
+function launchRoi(){
+  document.getElementById('roiEmbed').innerHTML =
+   `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <span style="color:#6b6480;font-size:12px">Live · albert-roi-spark.lovable.app</span>
+      <span style="display:flex;gap:14px">
+        <a href="${ROI_URL}" target="_blank" rel="noopener" style="color:var(--violet);font-size:13px">Open in new tab ↗</a>
+        <a onclick="renderRoiPreview()" style="color:#8c8c8c;font-size:13px;cursor:pointer">Collapse</a></span></div>
+    <iframe title="Albert ROI Calculator" src="${ROI_URL}" style="width:100%;height:760px;border:1px solid #e6ddf7;border-radius:12px;background:#fff"></iframe>
+    <div style="color:#9a8bc4;font-size:12px;margin-top:8px">Doesn't load inline? Some hosts block embedding — use "Open in new tab" above.</div>`;
+}
+function renderRoiPreview(){
+  document.getElementById('roiEmbed').innerHTML =
+   `<div onclick="launchRoi()" style="position:relative;border-radius:12px;overflow:hidden;border:1px solid #e6ddf7;cursor:pointer">
+      <img src="${ROI_PREVIEW}" alt="ROI calculator preview" style="width:100%;display:block"/>
+      <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(26,10,56,0) 35%,rgba(26,10,56,.82) 100%);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:10px;padding:24px">
+        <button onclick="event.stopPropagation();launchRoi()" style="background:var(--violet);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-weight:600;font-size:15px;cursor:pointer">Launch the ROI calculator</button>
+        <a href="${ROI_URL}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:#e4ccfe;font-size:13px">or open in a new tab ↗</a></div></div>`;
+}
+
+/* ---------- view builders ---------- */
+function hook(ey,jtbd,hk,metrics){
+  return `<div class="hook"><div class="ey">${ey}</div><h2>${jtbd}</h2><p class="hk">${hk}</p>
+    <div class="metrics">${metrics.map(m=>`<div><div class="v">${m.v}</div><div class="l">${m.l}</div></div>`).join('')}</div></div>`;
+}
+function section(kicker,title,body){return `<section><div class="kicker">${kicker}</div><h3>${title}</h3>${body}</section>`;}
+
+const VIEWS = {};
+
+VIEWS.overview = ()=>[
+  hook('Drew Piland · Product Marketing','One portfolio. Four audiences. Four jobs to be done.',
+   "This is the same application showing each of you a different experience — built around how I'd add value to your function as Albert's first PMM. It's also the point: a small PMM function scales by being scrappy and AI-native. Three themes run through every view — scrappy builder, translation is the skill, and narrative as strategy.",
+   [{v:'First PMM',l:'function built from zero — launch plan, messaging, GTM, enablement'},
+    {v:'4 views',l:'one app — each of you sees the work built for your function'},
+    {v:'3 themes',l:'scrappy builder · translation is the skill · narrative as strategy'}]),
+  section('What threads through all of it','Three themes',`<div class="grid g2">
+    <div class="panel"><span class="pill solid">Scrappy builder</span><p style="margin-top:10px">I build the function from zero — like this app.</p></div>
+    <div class="panel"><span class="pill solid">Translation is the skill</span><p style="margin-top:10px">Not domain mastery. I make technical truth legible to buyers.</p></div>
+    <div class="panel"><span class="pill solid">Narrative as strategy</span><p style="margin-top:10px">I shape how the market thinks, then arm everyone to repeat it.</p></div></div>`),
+  section('Choose a view','Built for each of you',`<div class="grid g2">${PERSONAS.map(p=>
+    `<button class="panel" style="cursor:pointer;text-align:left" onclick="go('${p.id}')">
+      <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-weight:700;font-size:16px;color:var(--ink)">${p.name}</span><span style="color:var(--violet)">→</span></div>
+      <div style="color:var(--violet-dark);font-size:13px">${p.role}</div>
+      <p style="margin-top:8px">${p.desc}</p></button>`).join('')}</div>`)
+].join('');
+
+const JOURNEY=[
+ {s:'Awareness',f:'Problem-frame',e:'Category POV / manifesto, CEO keynote cascaded into modules, exec bylines ("why AI pilots fail"), analyst-seeded content.',c:'Short video, educational webinars, "is my lab day actually broken?" content.',w:'Top-heavy — this is where the category is won'},
+ {s:'Consideration',f:'Solution-fit',e:'Platform pages, "not another ELN/LIMS" framing, ROI / business-case templates.',c:'Explainer + demo video, industry use-cases (coatings, adhesives, battery, personal care).',w:'Translate the category into a buyable solution'},
+ {s:'Decision',f:'Proof',e:'Case studies with hard numbers, security + data-isolation one-pagers, pilot/POV frameworks.',c:'Reference videos/quotes, technical deep-dives.',w:'Albert is strong here today'},
+ {s:'Adoption',f:'Make it stick',e:'Change-management playbooks, executive adoption dashboards.',c:'Enablement + training, champion enablement kits.',w:'The differentiator — barely productized today'},
+ {s:'Expansion',f:'Advocacy',e:'Expansion playbooks, ROI realized stories.',c:'User community, reference program.',w:'Turn adopters into the next proof points'},
+];
+VIEWS.content = ()=>[
+  hook('For Brooke Kuei · Content Marketing','PMM owns the argument. Content owns the reach.',
+   "My job is to hand you a point of view so strong that a quarter of content writes itself — and the discipline to retire what no longer fits. You're not downstream of PMM; you're in the room when the category story gets built, because you'll find where it breaks when it has to scale to fifty pieces.",
+   [{v:'5',l:'journey stages mapped for both the buyer and the bench chemist'},
+    {v:'2',l:'live assets that argue against the new category — retire before we write new'},
+    {v:'1',l:'messaging + naming source of truth so you never guess which term is current'}]),
+  speaker('Open with the line — "PMM owns the argument, content owns the reach." Land the number: two live assets that argue against the new category. Transition: "so before we write anything new, you and I decide what to retire." Keep it peer-to-peer, never a critique of her library.'),
+  section('Where I\'d start','The customer journey — and why Albert\'s is non-standard',
+   `<div class="grid g2" style="margin-bottom:18px">
+     <div class="panel accent"><span class="pill solid">Non-standard #1</span><p style="margin-top:10px"><b>It's a dual-audience journey at every stage.</b> The economic buyer (VP R&D / CTO / CIO) is buying transformation, ROI, and risk. The day-to-day champion (the bench chemist) is asking "does this make my lab day better?" — and that's where adoption lives.</p></div>
+     <div class="panel accent"><span class="pill solid">Non-standard #2</span><p style="margin-top:10px"><b>It's a category-creation journey, so the front is top-heavy.</b> The buyer doesn't yet know the problem is "an intelligence problem, not a search problem." Content does the heavy lifting <i>before</i> sales can engage.</p></div></div>`
+   + JOURNEY.map((s,i)=>`<div class="stage"><div class="sb"><div class="n">Stage ${i+1}</div><div class="nm">${s.s}</div><div class="fr">${s.f}</div></div>
+     <div class="sc"><div class="cols"><div><div class="lab">Economic buyer</div><p style="margin-top:2px;font-size:13.5px">${s.e}</p></div>
+     <div><div class="lab">Day-to-day champion</div><p style="margin-top:2px;font-size:13.5px">${s.c}</p></div></div>
+     <div style="margin-top:8px"><span class="pill">${s.w}</span></div></div></div>`).join('')),
+  section('What I see today','Content audit: strong from the middle down, thin at the top',`<div class="grid g2">
+    <div class="panel green"><h4 style="color:#237804">What's working</h4><p style="color:#3f5436">Strong bottom and middle of funnel: case studies (Henkel 2,800 scientists / weeks-to-hours, Applied Molecules months-to-days, Nouryon/BeautyCreations, Chemours, Solenis, Kenvue), a thought-leadership blog, webinars, and heavy press ($22.5M raise, Breakthrough launch, J.P. Morgan growth investment). The proof exists and it's good.</p></div>
+    <div class="panel amber"><h4 style="color:#ad6800">The gap (and the job)</h4><p style="color:#5c4a1f">Thin at the top: no crisp, repeated category thesis cascading across everything. There's proof the product works, but no single argument for <i>why this is a new category</i>. That top-of-funnel thesis is the first-PMM job — and it's the spine I hand you to build on.</p></div></div>`),
+  section('Two findings to raise with you','Where I\'d add value in week one',
+   `<details open><summary>1. Existing content contradicts the new category</summary><p>Albert's own resource "Why a Unified ELN and LIMS is Essential for Modern Chemical R&D" leans <i>into</i> the exact frame the new positioning rejects. This is a narrative-migration problem, not a criticism: before we produce new pieces, you and I decide what we retire or re-frame — because some of the current library argues against where we're taking the category. A peer decision, made together.</p></details>
+    <details><summary>2. The naming isn't settled</summary><p>Press says "Albert Breakthrough"; the deck says "Ask Albert." A first-PMM deliverable is a messaging + naming source of truth (plus a trained GPT) so you — and demand gen, and the field — get a reliable answer on which term is current in 30 seconds, and never have to guess.</p></details>`),
+  section('First 90 days','What I\'d ship for you',`<div class="panel">
+    ${deliv('Messaging & naming source of truth','Days 1–30','One living doc + a trained custom GPT on messaging and competitive. Anyone — content, demand gen, the field — gets a consistent, on-narrative answer in seconds. Kills the "which term do we use?" tax.')}
+    ${deliv('Category thesis cascaded into content modules','Days 30–60','The 8-title keynote argument (see Dana\'s view) broken into reusable modules: each slide title becomes a content pillar you can spin into bylines, social, webinar abstracts, and sales one-pagers.')}
+    ${deliv('Content migration plan','Days 30–60','A short retire / re-frame / keep list for the existing library, so new content doesn\'t have to fight old content for the category line.')}
+    ${deliv('Champion enablement kit','Days 60–90','The adoption-stage asset almost no one in the category produces — arming the bench chemist to sell the tool internally. This is where your reach and my narrative compound.')}
+  </div>`),
+  section('Leave-behind · live prototype','The ROI calculator — built, not just described',`<div class="panel accent">
+    <p style="margin-bottom:16px">The decision-stage "CFO-ready business case" asset — already a working first pass. Every default is labeled <span class="pill">Albert-published</span> <span class="pill">market estimate</span> or <span class="pill">illustrative</span>, so the champion can replace placeholders with their own numbers live. That source discipline is the point: it demonstrates PMM craft without asserting a stat that can't survive a CTO.</p>
+    <div class="statrow" style="margin-bottom:20px">${stat('≈ $400K/yr','modeled return on the illustrative defaults')}${stat('$2M/yr','cost of standing still, before any uplift')}${stat('3 mo → 2 days','Albert-published proof point in the model')}${stat('100%','of inputs source-tagged for credibility')}</div>
+    <div id="roiEmbed"></div></div>`),
+  questions('Brooke',[
+    'What does the content engine look like today — and where do you feel the narrative is missing or contested?',
+    'When PMM and content disagree on a story, how do you like to resolve it?',
+    'What would make me a great partner to you in the first 90 days?'])
+].join('');
+
+const TITLES=[
+ 'The organizations that define the next generation of materials science will be the ones that can learn from every experiment in real time.',
+ 'Every scientist in your organization is working with a fraction of what your organization already knows.',
+ 'This is not a search problem. It is an intelligence problem.',
+ 'Materials science needs an operating system.',
+ "This is what it looks like when your organization's chemistry finally knows what it knows.",
+ 'At scale: three months to two days. 2× speed-to-market. These organizations are not waiting.',
+ 'The window for building an irreversible advantage is open now. It will not stay open.',
+ 'The question is not whether to change. The question is whether your organization leads it.'];
+const PUSHBACK=[
+ {q:'Why no stat on slide 2?',a:'Deliberate. No primary-source figure for R&D time-waste survives a CTO audience; a challenged stat would undermine a category claim. The recommendation: Albert commissions its own study — a data point no competitor can own. That\'s judgment, not a gap.'},
+ {q:'Why no comparison slide vs. LIMS/ELN?',a:'Naming them as competitors accepts the wrong category frame. Slide 3 ("not a search problem, an intelligence problem") and Slide 4 ("not another ELN, not a LIMS with a chatbot") make the distinction felt without a table. The audience draws the conclusion themselves.'},
+ {q:'What\'s your biggest assumption?',a:'That the customer aha moment is breadth of data connection, not speed of retrieval. Speed is a feature argument; connection is a category argument. If it\'s actually answer quality, the slide-5 scenario shifts — and I\'d confirm before presenting.'},
+ {q:'Why does the deck say "Ask Albert" when the product is "Albert Breakthrough"?',a:'I\'ll own it: the deck uses a working label for the conversational layer. A first-PMM deliverable is a single messaging + naming source of truth — naming is exactly what I\'d lock down with product (Oakley) and content (Brooke) in the first 30 days so nothing ships inconsistent. I treat it as a gap to close, not interchangeable terms.'},
+ {q:'What would you cut or change?',a:'Replace the slide-5 scenario with a real verbatim customer quote, and verify the Nouryon/BeautyCreations proof points are cleared for public use. The deck is a draft pending real customer inputs, and I know which ones.'}];
+VIEWS.panel = ()=>[
+  hook('For Dana Barrett · VP Marketing & the case-study panel','The case study, delivered the way I\'d present it.',
+   "Two artifacts. Part 1 is a launch I actually led — three roadmap features reframed into one platform strategy that moved the buyer up two levels. Part 2 is the category narrative I'd build for Ask Albert: an eight-slide CEO keynote where the titles, read in sequence, are the entire argument. Impact first; I'll show how the sausage is made after the hook lands.",
+   [{v:'+90 days',l:'recovered against competitors by launching on demo-ready, not GA'},
+    {v:'3 → 1',l:'buying-center conversations collapsed into a single champion'},
+    {v:'8 titles',l:'that read in sequence as one complete category argument'}]),
+  speaker('Don\'t narrate the slides — perform the first 90 seconds as the CEO, then step out to explain the choices. Land the numbers: 3 → 1 champion, +90 days recovered. Bridge to Part 2: "read the eight titles in sequence and that IS the argument." Slow down; let the lines land.'),
+  section('Case Study · Part 1','A launch I led: enterprise policy-defined progressive delivery',
+   `<div class="panel" style="margin-bottom:16px"><span class="pill solid">BLUF</span><p style="margin-top:10px;font-size:15.5px;color:#3a3450">CloudBees was launching three of its most differentiated capabilities — release orchestration, feature flags, and a new policy engine — as <b>separate products</b>, forcing sales to win three buying centers to close one deal, and arriving 6–9 months after competitors. I reframed them as one buyer outcome: <b style="color:var(--violet-dark)">enterprise policy-defined progressive delivery</b> — and changed the launch model itself, going to market on demo-ready state instead of GA.</p></div>
+   <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr))">
+    <div class="panel"><h4>The strategic insight</h4><p>A policy engine without a workflow is an audit tool. A workflow without policy is manual governance. Flags without policy are just deployment switches. Unified, they were the first platform to <i>enforce</i> progressive delivery rather than leave teams to manage it.</p></div>
+    <div class="panel"><h4>The bet I drove</h4><p>Move the launch trigger from a July GA to a demo recorded May 1 — recovering 90 days. I de-risked it first: Gong call review surfaced the policy engine as a recurring requirement, and Wynter surveys of our ICP confirmed enterprises wanted a unified control plane without a forced migration.</p></div>
+    <div class="panel"><h4>What I'd do differently</h4><p>Run customer discovery <i>before</i> the offsite, so the reframe lands on validated customer language from day one — not instinct plus analyst signal. It holds better when you can say "three customers described this as their actual problem."</p></div></div>
+   <div class="panel accent" style="margin-top:16px"><h4>Outcomes</h4><div class="statrow" style="margin-top:12px">
+    ${stat('VP Eng + CISO','elevated from a CI/CD tool to a platform conversation')}${stat('3 → 1','one release manager with a built-in CISO escalation')}${stat('+90 days','recovered against embedded competitors')}${stat('Unify AI','the control-plane narrative became its strategic premise')}</div></div>`),
+  section('Case Study · Part 2','The category narrative for Ask Albert',
+   `<p style="color:var(--muted);line-height:1.6;margin:0 0 16px;max-width:820px">An eight-slide CEO keynote for CTOs, CIOs, and Heads of Research. The structural bet: this audience is problem-aware, so the deck opens on the vision, not four slides of diagnosis. Read the titles in sequence and you have the complete argument — which is exactly what makes it cascade into content modules.</p>
+    <div class="panel">${TITLES.map((t,i)=>`<div class="titleline"><div class="num">${i+1}</div><div class="tx">${t}</div></div>`).join('')}</div>
+    <div class="grid g2" style="margin-top:16px">
+     <div class="panel"><h4>Market bets that shaped the deck</h4><ul class="clean">
+      <li>Open on the vision — a problem-aware audience needs a reframe, not a diagnosis.</li>
+      <li>Competitor distinction belongs in the framing, never a comparison slide.</li>
+      <li>CEO-keynote register: intellectual, not commercial — no CTAs, no pricing.</li>
+      <li>The credential (chemists from Dow, BASF, PPG, Henkel) earns the claim on the proof slide — it doesn't lead.</li></ul></div>
+     <div class="panel"><h4>For Brooke's lens</h4><p>The title-as-argument structure is designed to cascade: each of the eight titles becomes a content pillar — bylines, social, webinar abstracts, sales one-pagers — so the keynote isn't a one-off, it's the spine of a quarter of content.</p><div style="margin-top:10px"><span class="pill">narrative as strategy</span></div></div></div>`),
+  section('Q&A prep','Anticipated pushback — and the crisp answer',
+   PUSHBACK.map(p=>`<details><summary>${p.q}</summary><p>${p.a}</p></details>`).join('')),
+  section('If I had the seat','How the first launch at Albert would run',`<div class="panel">
+    ${deliv('Discovery before the deck','Days 1–30','The lesson from Part 1: run customer discovery first. Ride calls, mine Gong, and validate the category language with real buyers before a single slide — so the narrative ships on customer words, not instinct.')}
+    ${deliv('Messaging + naming SSOT, then the keynote','Days 30–60','Lock the single source of truth (closing the Breakthrough vs. Ask Albert gap), then build the keynote as the argument spine the whole funnel inherits.')}
+    ${deliv('Launch on demo-ready, measured on pipeline','Days 60–90','Apply the pre-GA launch model — go to market when it\'s demoable — and instrument it against pipeline created and field adoption from day one.')}
+  </div>`),
+  questions('Dana',[
+    "Since we last talked, what's gotten sharper for you about what this first PMM needs to nail in the first six months?",
+    'Which part of this case study would you most want me to go deeper on right now?'])
+].join('');
+
+const TESTS=[
+ {m:'Wynter message testing',u:'Put the "intelligence problem, not search problem" line in front of the actual ICP (R&D leaders) and measure clarity, relevance, and differentiation before it ships in a keynote.'},
+ {m:'Gong voice-of-customer',u:'Mine sales and onboarding calls for the language customers already use for the problem. The category claim has to be built from their words, not ours.'},
+ {m:'Analyst inquiries',u:'A paid, bidirectional seat where the analyst pressure-tests the positioning and tells us what end-user clients are actually asking about. If the line survives Shanler, it survives a CTO.'},
+ {m:'End-user inquiry volume',u:'The real scoreboard: buyers calling Gartner asking "who connects all our R&D data with AI" in our words is worth more than ten vendor briefings.'}];
+VIEWS.product = ()=>[
+  hook('For Oakley Reid · AI/ML Product','You can\'t pay an analyst to invent a category.',
+   "My value here is translation, not domain mastery — and I'll own that as a strength. I make the product's hard-won technical truth legible to buyers, and I bring market signal back into your roadmap. Analysts and the category move on three signals: end-user demand in your language, data, and peer validation. The PMM job is to manufacture those signals — and keep the category claim honest enough to survive contact with the person who builds the thing.",
+   [{v:'3 signals',l:'end-user demand, data, peer validation — what actually moves analysts'},
+    {v:'No MQ yet',l:'Materials Informatics has a Market Guide but no Magic Quadrant — the opening'},
+    {v:'1 analyst',l:'Michael Shanler (Gartner) owns the shelf — the primary target'}]),
+  speaker('Lead with translation as a strength, not an apology — "I\'ve done this before; DevSecOps and zero-trust were foreign before CloudBees and IBM." Land: there\'s no Magic Quadrant yet, and that absence is the opening. Then be the first to name the weakness (the "operating system" compounding bet) — before he does.'),
+  section('Market awareness','Where Albert sits today — and the shelf to refuse',`<div class="grid g2">
+    <div class="panel red"><h4 style="color:#a8071a">The wrong frame (the market's reflex)</h4><p style="color:#5c2b28">The reflex is to shelve Albert in <b>lab/R&D informatics</b> — the LIMS + ELN + scientific data management cluster. That's the frame the case study refuses: naming those tools as competitors concedes the wrong category. "Not a search problem, an intelligence problem."</p></div>
+    <div class="panel accent"><h4 style="color:var(--violet-dark)">The real opening</h4><p>Gartner already has an emerging <b>"Materials Informatics Solutions" Market Guide</b> and a Peer Insights market — but no Magic Quadrant yet and no settled definition. We don't invent a shelf from nothing; we shape the definition of one that's forming. Covering analyst: <b>Michael Shanler, Distinguished VP Analyst</b> (authored the 2025 LIMS and ELN Market Guides).</p><div style="margin-top:10px">${tagline('verified','covering analyst confirmed Jun 2026')}</div></div></div>`),
+  section('Ways to test the message','Don\'t ship the category claim on instinct — test it',
+   `<div class="grid g2">${TESTS.map(t=>`<div class="panel"><span class="pill solid">${t.m}</span><p style="margin-top:10px">${t.u}</p></div>`).join('')}</div>`),
+  section('Analyst strategy','The flywheel that manufactures a category',
+   `<div class="grid g2" style="margin-bottom:16px">
+     <div class="panel"><h4>Briefing <span class="pill">you teach the analyst</span></h4><p>Vendor-initiated, free, ~30 min, one-directional. Purpose: plant and reinforce the category language, get on the radar, influence how they write. Run on cadence and around launches.</p></div>
+     <div class="panel"><h4>Inquiry <span class="pill">the analyst teaches you</span></h4><p>Client-initiated, paid seat, bidirectional. Purpose: test the positioning, hear what end-user clients are actually asking, get coached on MQ / Market Guide criteria. The gaps it surfaces are gold for PMM <i>and</i> product.</p></div></div>
+    <div class="panel"><ul class="steps">
+     <li><div class="st">Seed the language</div><div class="sd">Brief analysts on the category thesis on a regular cadence.</div></li>
+     <li><div class="st">Pressure-test & refine</div><div class="sd">Use paid inquiries to stress the claim and learn the real buyer questions.</div></li>
+     <li><div class="st">Arm customers & champions</div><div class="sd">Equip references to describe Albert to analysts in our terms.</div></li>
+     <li><div class="st">End-user inquiry volume rises</div><div class="sd">Buyers start calling Gartner about the problem in our words.</div></li>
+     <li><div class="st">The analyst writes it down</div><div class="sd">The framing lands in a note, Hype Cycle, or the Materials Informatics Market Guide.</div></li></ul>
+     <p style="margin-top:12px;font-style:italic;color:#6b6480;font-size:13px">Division of labor: the AR agency owns the motion (mapping, scheduling, prep, tracking). I own the narrative and strategy — and I'm in the briefings personally, because the category claim only survives if the person who built it defends it.</p></div>`),
+  section('Staying honest in the room','Where the category claim is weakest',
+   `<div class="panel warn"><div style="margin-bottom:10px">${tagline('hypothesis')}</div><p style="color:#5c4a1f">The boldest bet — and the easiest to challenge — is "operating system." It holds only if <b>every new capability makes every other capability smarter</b> (the compounding / network-effect argument). The narrative leans on that, and the proof has to be real customer data breadth, not a demo. I won't claim Albert is already "in" a category — there's no Materials Informatics MQ yet. That absence is the opportunity, not a weakness.</p></div>
+    <div class="panel" style="margin-top:16px">${deliv('How I\'d partner with you, not market over you','','Validate every external claim through product before it ships. Treat analyst inquiries as a forcing function — they catch the gap before buyers do. Bring the market\'s pull; you own the build; the customer is the tiebreaker. The questions I\'d ask your Forward Deployed Science team in week one are the same ones I asked IBM\'s engineers in 2018.')}</div>`),
+  section('First 90 days','How I\'d stand up analyst relations',`<div class="panel">
+    ${deliv('Map the analysts, brief Shanler first','Days 1–30','Confirm the analyst map (Gartner primary; Forrester, Cambashi, ARC secondary) and run the first briefing to plant the category language with the person who owns the shelf.')}
+    ${deliv('Open a paid inquiry to pressure-test','Days 30–60','Use an inquiry to stress the "AI-native OS" line and learn the real end-user questions — then feed those gaps straight back to you and the roadmap.')}
+    ${deliv('Arm references, watch inquiry volume','Days 60–90','Equip customers to describe Albert to analysts in our terms, and track end-user inquiry volume as the leading indicator the category is forming.')}
+  </div>`),
+  questions('Oakley',[
+    "Where does the 'AI-native OS, not a tool' claim feel most true on the product side — and where is it still aspirational?",
+    'What\'s the hardest thing for the market to understand about what Ask Albert actually does?',
+    'How do you want PMM to feed market signal back into your roadmap?'])
+].join('');
+
+const COWORK=[
+ {n:'Field-facing messaging GPT',t:'self-serve',b:'A custom GPT trained on the messaging house and competitive SSOT. A rep prepping a call gets the on-narrative answer — and the right objection handling — in 30 seconds, not by pinging PMM.'},
+ {n:'Battlecard generator',t:'always current',b:'Feed it a competitor or a deal context; it returns a current battlecard built from the single source of truth, so cards never go stale and never contradict the category line.'},
+ {n:'Call-prep agent',t:'discovery motion',b:'Pulls the account, the buyer role, and the stage, then drafts a discovery plan around the "intelligence problem, not search problem" reframe — turning the category claim into a repeatable discovery motion.'},
+ {n:'New-rep onboarding agent',t:'ramp',b:'Walks a new hire through the category story, the proof points, and the buyer personas, then quizzes them — compressing ramp time on a story that\'s hard precisely because the buyer doesn\'t know they have the problem.'}];
+VIEWS.sales = ()=>[
+  hook('For Mark Poggi · SVP Commercial','Make the rep\'s hardest conversation easy — and adoption inevitable.',
+   "PMM is a compounding revenue asset, not a collateral factory: narrative → enablement → pipeline velocity → win rate. Two numbers matter — pipeline created and pipeline won — and everything I build ladders to them. Category sales are hard because the buyer doesn't know they have the problem, so enablement has to arm reps to create the frame, not just pitch features.",
+   [{v:'+272% YoY',l:'revenue from win-intelligence + SDR outreach + lead scoring (Lenovo/Microsoft CSP)'},
+    {v:'2 numbers',l:'pipeline created and pipeline won — what everything ladders to'},
+    {v:'Stage 1–3',l:'velocity + field adoption: how I measure enablement that works'}]),
+  speaker('Speak revenue, not marketing craft. Open on +272% YoY. Land the two numbers: pipeline created and pipeline won. Preempt the "too brand, not commercial enough" objection before he raises it — lead with the number, then the system.'),
+  section('Tools to help sales progress','Arm reps to create the frame, not just pitch features',`<div class="grid g2">
+    <div class="panel"><h4>Unified enablement SSOT</h4><p>One source of truth for messaging, competitive, and objection handling — the same system that, at CloudBees, was measured on Stage 1–3 pipeline velocity, not page views.</p></div>
+    <div class="panel"><h4>JTBD pitch selector</h4><p>A tool that lets a rep pick the right pitch by buyer role — VP R&D / CTO / CIO vs. the bench chemist champion. (At Lenovo this ran across a 30-vendor portfolio.)</p></div>
+    <div class="panel"><h4>The reframe as a discovery motion</h4><p>"Intelligence problem, not search problem" isn't a tagline — it's a set of discovery questions that help a rep make the buyer feel the gap before a demo ever loads.</p></div>
+    <div class="panel"><h4>CFO-ready business case</h4><p>The decision-stage ROI asset (built with Brooke) that lets the champion sell internally — every input source-labeled so it survives procurement scrutiny.</p></div></div>`),
+  section('Self-serve enablement','Cowork projects: enablement reps run themselves',
+   `<p style="color:var(--muted);line-height:1.6;margin:0 0 16px;max-width:820px">The fastest way to scale a small PMM function is to make enablement self-serve and AI-native. These are concrete Cowork/agent projects I'd stand up so reps get answers on demand — and so PMM scales without becoming the bottleneck. (This portfolio app is itself a working example of the same scrappy, AI-native build.)</p>
+    <div class="grid g2">${COWORK.map(p=>`<div class="panel accent"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><b style="color:var(--ink);font-size:15px">${p.n}</b><span class="pill">${p.t}</span></div><p style="margin-top:8px">${p.b}</p></div>`).join('')}</div>`),
+  section('Onboarding','Ramping a rep to sell a brand-new category',`<div class="panel">
+    ${deliv('Ride the calls','Days 1–30','Before imposing any framework, ride sales calls and learn what reps actually get stuck on and where deals stall. Map what data exists and what reps are measured on.')}
+    ${deliv('Build around the real objection','Days 30–60','Turn the recurring objection into discovery scripts, battlecards, and the field-facing GPT. Enablement built from real friction, not a template.')}
+    ${deliv('Measure adoption, then expand','Days 60–90','Track whether reps are actually using the new narrative (field adoption) and its effect on Stage 1–3 velocity. Double down on what moves the number; cut what doesn\'t.')}
+  </div>`),
+  section('The commercial check','How I measure PMM\'s impact on revenue',`<div class="panel accent">
+    <div class="statrow">${stat('Pipeline created','leading: net-new qualified pipeline influenced by the narrative')}${stat('Pipeline won','lagging: the number the C-suite actually cares about')}${stat('Message lift','Wynter test lift + field adoption of new narratives')}${stat('Win rate','in the target segment, before vs. after enablement')}</div>
+    <p style="margin-top:16px;color:#3a3450">Bottom line: a first-PMM hire who's "too brand" is a real risk to preempt. I've carried a number — the <b style="color:var(--violet-dark)">+272% YoY</b> at Lenovo was win intelligence, SDR outreach, and lead scoring working together — and I build systems that make reps more effective, not just more collateral.</p><div style="margin-top:8px">${tagline('verified','+272% YoY · Lenovo / Microsoft CSP')}</div></div>`),
+  questions('Mark',[
+    "What's the hardest part of selling Albert today — the category, the champion, or the economic buyer?",
+    'Where do reps lose deals, and where would a PMM make the biggest dent in the next two quarters?',
+    'How do you want to measure whether this PMM hire is working, six months in?'])
+].join('');
+
+function deliv(t,tag,b){return `<div class="deliv"><div class="dot"></div><div><div class="t">${t} ${tag?`<span class="pill">${tag}</span>`:''}</div><p>${b}</p></div></div>`;}
+function stat(v,l){return `<div class="stat"><div class="v">${v}</div><div class="l">${l}</div></div>`;}
+function speaker(t){return `<details class="speaker"><summary>Presenter notes · ~30–45s (for you, not the panel)</summary><p>${t}</p></details>`;}
+function tagline(kind,txt){
+  const s = kind==='fact' ? 'background:var(--violet);color:#fff;border:none'
+    : kind==='verified' ? 'background:#f6ffed;color:#237804;border:1px solid #b7eb8f'
+    : 'background:#fff;color:var(--violet-dark);border:1px dashed var(--violet)';
+  const t = kind==='fact' ? 'Albert-published' : kind==='hypothesis' ? 'my hypothesis' : txt;
+  return `<span style="display:inline-block;border-radius:999px;padding:1px 10px;font-size:11px;${s}">${t}</span>`;
+}
+function questions(name,arr){return section('Where I\'d want your read','Questions I\'d ask you, '+name,
+  `<div class="panel" style="background:var(--violet-soft);border-color:#e0d2fb">${arr.map(q=>
+    `<div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:14px"><span style="color:var(--violet);font-weight:800;font-size:18px">?</span><span style="color:var(--ink);font-size:15px;line-height:1.55">${q}</span></div>`).join('')}</div>`);}
+
+/* ---------- routing ---------- */
+function renderLogin(){
+  document.getElementById('loginCards').innerHTML = PERSONAS.map(p=>
+   `<button class="pcard" onclick="go('${p.id}')">
+      <div class="ini" style="background:${p.accent}">${ini(p.name)}</div>
+      <div style="flex:1"><div style="display:flex;justify-content:space-between;align-items:center"><span class="nm">${p.name}</span><span style="color:#ad73fe">→</span></div>
+      <div class="rl">${p.role}</div><div class="ds">${p.desc}</div></div></button>`).join('');
+}
+function go(view){
+  const persona = PERSONAS.find(p=>p.id===view) || OVERVIEW;
+  document.getElementById('login').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('whoName').textContent = persona.name;
+  document.getElementById('whoRole').textContent = persona.role;
+  const av=document.getElementById('whoAv'); av.textContent=ini(persona.name); av.style.background=persona.accent;
+  document.getElementById('nav').innerHTML = NAVS.map(n=>`<button class="${n.id===view?'active':''}" onclick="go('${n.id}')">${n.label}</button>`).join('');
+  document.getElementById('strip').textContent = GREET[view];
+  document.getElementById('viewWrap').innerHTML = VIEWS[view]();
+  if(view==='content') renderRoiPreview();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function backToLogin(){document.getElementById('app').classList.add('hidden');document.getElementById('login').classList.remove('hidden');window.scrollTo(0,0);}
+renderLogin();
+</script>
+</body>
+</html>

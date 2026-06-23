@@ -16,7 +16,7 @@ import {
   loadCurrentUser,
   saveCurrentUser,
   clearCurrentUser,
-  DEFAULT_USERS,
+  ALL_USERS,
 } from './lib/users';
 import { setUserProperties } from './lib/featureFlags';
 
@@ -47,7 +47,7 @@ export function AppWithAuth() {
   };
 
   const handleQuickSwitch = (userId: string) => {
-    const user = DEFAULT_USERS.find(u => u.id === userId);
+    const user = ALL_USERS.find(u => u.id === userId);
     if (user) {
       handleSelectUser(user);
       window.location.reload();
@@ -64,7 +64,7 @@ export function AppWithAuth() {
               <Text strong>{currentUser.name}</Text>
               <br />
               <Text type="secondary" style={{ fontSize: 12 }}>
-                {currentUser.properties.strings.userTier} &bull; {currentUser.properties.strings.region}
+                {currentUser.role}
               </Text>
             </div>
           ),
@@ -75,7 +75,7 @@ export function AppWithAuth() {
           key: 'switch',
           label: 'Quick Switch',
           icon: <SwapOutlined />,
-          children: DEFAULT_USERS.map(user => ({
+          children: ALL_USERS.map(user => ({
             key: user.id,
             label: user.name,
             onClick: () => handleQuickSwitch(user.id),
