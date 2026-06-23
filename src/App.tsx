@@ -1,789 +1,168 @@
 /**
- * Horizon Bank - Application Shell
+ * App — Albert Invent Product Marketing Portfolio
  *
- * Layout shell with left sidebar navigation, promotional banner,
- * floating chat widget, and React Router.
+ * One application, four tailored audience experiences. The signed-in panelist's
+ * defaultView (or the CloudBees `audienceView` flag, if targeted) selects which
+ * experience renders. Feature management is the mechanism; the content is the point.
  */
 
-import { useState, useEffect } from 'react';
-import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
-import { Badge, Button, Card, Drawer, Dropdown, FloatButton, Input, Layout, Menu, Space, Switch, Tooltip, Typography } from 'antd';
-import {
-  BankOutlined,
-  BellOutlined,
-  BranchesOutlined,
-  CloseOutlined,
-  CreditCardOutlined,
-  ExclamationCircleOutlined,
-  GiftOutlined,
-  HomeOutlined,
-  FundOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  MessageOutlined,
-  SendOutlined,
-  SwapOutlined,
-  ToolOutlined,
-  UserOutlined,
-  WarningOutlined,
-} from '@ant-design/icons';
+import { useState } from 'react';
+import { Layout, Typography, Segmented, Dropdown, Avatar, Grid } from 'antd';
 import type { MenuProps } from 'antd';
-import { useFeatureFlag, useFeatureFlagString } from './hooks/useFeatureFlag';
-import { theme as antdTheme } from 'antd';
-import { getUserInitials, type User } from './lib/users';
-import { AccountSummary } from './pages/AccountSummary';
-import { TransferPay } from './pages/TransferPay';
-import { Investments } from './pages/Investments';
-import { Rewards } from './pages/Rewards';
-import { MortgageSimulator } from './pages/MortgageSimulator';
-import { Notifications } from './pages/Notifications';
-import { CardControls } from './pages/CardControls';
-import { NovusDemo } from './pages/NovusDemo';
-import { useThemeMode } from './contexts/ThemeContext';
-import './App.css';
+import { useFeatureFlagString } from './hooks/useFeatureFlag';
+import { setUserProperties } from './lib/featureFlags';
+import {
+  ALL_USERS,
+  getUserInitials,
+  type User,
+  type AudienceView,
+} from './lib/users';
+import { MolecularMark, BRAND } from './components/ui';
+import { OverviewView } from './views/OverviewView';
+import { ContentView } from './views/ContentView';
+import { PanelView } from './views/PanelView';
+import { ProductView } from './views/ProductView';
+import { SalesView } from './views/SalesView';
 
-const { Header, Sider, Content } = Layout;
+const { Header, Content, Footer } = Layout;
 const { Text } = Typography;
+const { useBreakpoint } = Grid;
+
+const VALID_VIEWS: AudienceView[] = ['overview', 'content', 'panel', 'product', 'sales'];
+
+const VIEW_LABEL: Record<AudienceView, string> = {
+  overview: 'Overview',
+  content: 'Content · Brooke',
+  panel: 'Case Study · Dana',
+  product: 'Product · Oakley',
+  sales: 'Sales · Mark',
+};
+
+const VIEW_GREETING: Record<AudienceView, string> = {
+  overview: 'The map — one portfolio, four audiences',
+  content: 'The Content Marketing experience · built for Brooke Kuei',
+  panel: 'The Case Study walkthrough · built for Dana Barrett',
+  product: 'The Product Meeting experience · built for Oakley Reid',
+  sales: 'The Sales Meeting experience · built for Mark Poggi',
+};
 
 interface AppProps {
   currentUser: User;
   userMenuItems: MenuProps['items'];
 }
 
-function useIsMobile(breakpoint = 768) {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
-  useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth < breakpoint);
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, [breakpoint]);
-  return isMobile;
-}
+export default function App({ currentUser, userMenuItems }: AppProps) {
+  const screens = useBreakpoint();
+  const flagView = useFeatureFlagString('audienceView');
 
-// Map URL paths to menu keys
-const pathToKey: Record<string, string> = {
-  '/': 'accounts',
-  '/accounts': 'accounts',
-  '/transfers': 'transfers',
-  '/investments': 'investments',
-  '/rewards': 'rewards',
-  '/notifications': 'notifications',
-  '/card-controls': 'card-controls',
-  '/mortgage-simulator': 'mortgage-simulator',
-  '/novus-demo': 'novus-demo',
-};
+  // CloudBees can force a view via the flag; otherwise defer to the persona.
+  const initialView: AudienceView =
+    flagView && flagView !== 'auto' && (VALID_VIEWS as string[]).includes(flagView)
+      ? (flagView as AudienceView)
+      : currentUser.defaultView;
 
-// ============================================
-// Buggy Top Banner (Kill Switch Demo)
-// ============================================
+  const [activeView, setActiveView] = useState<AudienceView>(initialView);
 
-function BuggyTopBanner() {
-  const [amount, setAmount] = useState(300);
-  const [color, setColor] = useState(0);
-
-  // "Bug": runaway setInterval that rapidly accelerates the dollar amount
-  useEffect(() => {
-    let intervalTime = 150;
-    let currentAmount = 300;
-
-    const accelerate = () => {
-      const interval = setInterval(() => {
-        // Random increment between 25-75
-        currentAmount += Math.floor(Math.random() * 50) + 25;
-        setAmount(currentAmount);
-        setColor(prev => (prev + 2) % 360);
-
-        // Make it faster each time
-        intervalTime = Math.max(20, intervalTime - 5);
-        clearInterval(interval);
-
-        if (intervalTime > 20) {
-          setTimeout(accelerate, intervalTime);
-        }
-      }, intervalTime);
-    };
-
-    // Start acceleration after 500ms
-    const timeout = setTimeout(accelerate, 500);
-
-    return () => clearTimeout(timeout);
-  }, []);
-
-  const bgColor = `hsl(${color}, 80%, 45%)`;
-
-  return (
-    <div
-      style={{
-        background: bgColor,
-        padding: '12px 24px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 12,
-        transition: 'background 0.1s',
-      }}
-    >
-      <Text strong style={{ color: '#fff', fontSize: 15 }}>
-        🎉 Receive ${amount.toLocaleString()} when you add any new service!{' '}
-        <span style={{ opacity: 0.9 }}>Limited time offer</span>
-      </Text>
-    </div>
-  );
-}
-
-// ============================================
-// FIXED Top Banner Component (topBannerFix flag)
-// ============================================
-/**
- * Fixed version of the promotional banner without the runaway amount bug.
- * Shows a static $300 instead of the accelerating bug.
- * Used to demonstrate progressive rollout of bug fixes.
- */
-function FixedTopBanner() {
-  const amount = 300; // Fixed at $300 — no runaway bug!
-
-  return (
-    <div
-      style={{
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        padding: '12px 24px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 12,
-      }}
-    >
-      <Text strong style={{ color: '#fff', fontSize: 15 }}>
-        🎉 Receive ${amount.toLocaleString()} when you add any new service!{' '}
-        <span style={{ opacity: 0.9 }}>Limited time offer</span>
-      </Text>
-    </div>
-  );
-}
-
-// ============================================
-// System Alert Banner Component
-// ============================================
-
-const SYSTEM_ALERT_CONTENT: Record<string, { type: 'warning' | 'error' | 'info'; icon: React.ReactNode; message: string; description: string }> = {
-  'maintenance-scheduled': {
-    type: 'warning',
-    icon: <ToolOutlined />,
-    message: 'Scheduled Maintenance Tonight',
-    description: 'Online banking will be unavailable from 2:00 AM - 4:00 AM ET for system upgrades. Please plan transactions accordingly.',
-  },
-  'zelle-degraded': {
-    type: 'error',
-    icon: <ExclamationCircleOutlined />,
-    message: 'Zelle Service Disruption',
-    description: 'Zelle transfers are experiencing delays. Sent payments may take up to 30 minutes to process. We are working to resolve this.',
-  },
-  'rate-limit-active': {
-    type: 'info',
-    icon: <WarningOutlined />,
-    message: 'High Traffic Notice',
-    description: 'We are experiencing higher than normal traffic. Some features may respond slower than usual. Thank you for your patience.',
-  },
-};
-
-function SystemAlertBanner({ alertType }: { alertType: string }) {
-  const [dismissed, setDismissed] = useState(false);
-  const alert = SYSTEM_ALERT_CONTENT[alertType];
-
-  if (!alert || dismissed) return null;
-
-  const colors = {
-    warning: { bg: '#fffbe6', border: '#ffe58f', text: '#ad6800' },
-    error: { bg: '#fff2f0', border: '#ffccc7', text: '#cf1322' },
-    info: { bg: '#e6f4ff', border: '#91caff', text: '#0958d9' },
-  };
-  const c = colors[alert.type];
-
-  return (
-    <div
-      style={{
-        background: c.bg,
-        borderBottom: `1px solid ${c.border}`,
-        padding: '10px 24px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 12,
-      }}
-    >
-      <span style={{ color: c.text, fontSize: 16 }}>{alert.icon}</span>
-      <div style={{ flex: 1 }}>
-        <Text strong style={{ color: c.text }}>{alert.message}</Text>
-        <Text style={{ color: c.text, marginLeft: 8, fontSize: 13 }}>{alert.description}</Text>
-      </div>
-      <CloseOutlined
-        style={{ color: c.text, cursor: 'pointer', fontSize: 12, opacity: 0.6 }}
-        onClick={() => setDismissed(true)}
-      />
-    </div>
-  );
-}
-
-// ============================================
-// Promotional Banner Component
-// ============================================
-
-const PROMO_CONTENT: Record<string, { bg: string; text: string; cta: string }> = {
-  'mortgage-refi': {
-    bg: 'linear-gradient(90deg, #1a3c5e 0%, #2d6a4f 100%)',
-    text: 'Refinance your mortgage — rates as low as 5.25% APR. Save up to $250/month.',
-    cta: 'Check Rates',
-  },
-  'travel-rewards': {
-    bg: 'linear-gradient(90deg, #0a1826 0%, #1a3c5e 100%)',
-    text: 'Earn 5x points on travel this summer with your Horizon Cash Rewards card.',
-    cta: 'Learn More',
-  },
-  'savings-bonus': {
-    bg: 'linear-gradient(90deg, #2d6a4f 0%, #52c41a 100%)',
-    text: 'Open a Horizon Savings account with $25,000+ and earn a $200 bonus.',
-    cta: 'Open Account',
-  },
-};
-
-function PromoBanner({ campaign }: { campaign: string }) {
-  const [dismissed, setDismissed] = useState(false);
-  const promo = PROMO_CONTENT[campaign];
-
-  if (!promo || dismissed) return null;
-
-  return (
-    <div
-      style={{
-        background: promo.bg,
-        padding: '10px 24px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 16,
-      }}
-    >
-      <Text style={{ color: '#fff', fontSize: 13 }}>{promo.text}</Text>
-      <Space>
-        <Button size="small" ghost style={{ color: '#fff', borderColor: '#fff' }}>
-          {promo.cta}
-        </Button>
-        <CloseOutlined
-          style={{ color: 'rgba(255,255,255,0.7)', cursor: 'pointer', fontSize: 12 }}
-          onClick={() => setDismissed(true)}
-        />
-      </Space>
-    </div>
-  );
-}
-
-// ============================================
-// Chat Support Widget
-// ============================================
-
-interface ChatMessage {
-  from: 'user' | 'agent';
-  text: string;
-  link?: { label: string; path: string };
-}
-
-// Keyword-to-route mapping for chatbot navigation
-const CHAT_ROUTES: { keywords: string[]; path: string; label: string; response: string }[] = [
-  { keywords: ['transfer', 'send money', 'move money', 'pay bill', 'zelle', 'payment'], path: '/transfers', label: 'Go to Transfer & Pay', response: 'I can help with that! Let me take you to Transfer & Pay.' },
-  { keywords: ['schedule', 'recurring', 'autopay', 'auto pay', 'automatic'], path: '/transfers', label: 'Go to Scheduled Payments', response: 'Sure! You can set up scheduled payments in the Transfer & Pay section.' },
-  { keywords: ['reward', 'points', 'cashback', 'cash back', 'redeem', 'offer'], path: '/rewards', label: 'Go to Rewards & Offers', response: 'Let me pull up your rewards. You can view points and redeem them here.' },
-  { keywords: ['invest', 'portfolio', 'stock', 'market', 'holding'], path: '/investments', label: 'Go to Investments', response: 'Here\'s your investment portfolio. Let me take you there.' },
-  { keywords: ['account', 'balance', 'checking', 'savings', 'summary', 'transaction'], path: '/', label: 'Go to Account Summary', response: 'Let me pull up your account details right away.' },
-  { keywords: ['notification', 'alert', 'bell', 'message'], path: '/notifications', label: 'Go to Notifications', response: 'Let me check your notifications for you.' },
-  { keywords: ['card', 'freeze', 'lock', 'unfreeze', 'spending limit', 'international', 'contactless', 'pin', 'replacement'], path: '/card-controls', label: 'Go to Card Controls', response: 'I can help with that! Let me take you to Card Controls.' },
-  { keywords: ['crypto', 'bitcoin', 'ethereum', 'coin', 'trading'], path: '/investments', label: 'Go to Crypto Trading', response: 'Let me take you to the Investments page where you can view crypto trading.' },
-  { keywords: ['advisor', 'advisory', 'financial planner', 'risk assessment', 'consultation'], path: '/investments', label: 'Go to Investment Advisory', response: 'I\'ll take you to Investment Advisory where you can review recommendations and schedule a call.' },
-  { keywords: ['mortgage', 'home loan', 'house', 'refinance', 'pre-qual', 'prequalif', 'amortization', 'home price'], path: '/mortgage-simulator', label: 'Go to Mortgage Simulator', response: 'Let me pull up the Mortgage Simulator so you can explore your options.' },
-];
-
-const FALLBACK_RESPONSES = [
-  'I can help with that! Could you tell me more about what you\'re looking for?',
-  'Great question. For security, I\'ll need to verify your identity first. Can you confirm the last 4 digits of your SSN?',
-  'I see your account information here. What specific changes would you like to make?',
-  'That\'s been updated for you. Is there anything else I can help with?',
-  'You can manage your accounts, transfers, rewards, cards, and more. Just let me know what you need!',
-];
-
-function ChatWidget() {
-  const navigate = useNavigate();
-  const { token: chatToken } = antdTheme.useToken();
-  const chatIsDark = chatToken.colorBgContainer !== '#ffffff';
-  const [open, setOpen] = useState(false);
-  const [inputValue, setInputValue] = useState('');
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    { from: 'agent', text: 'Hi! I\'m your Horizon Bank assistant. How can I help you today?' },
-  ]);
-
-  const handleSend = () => {
-    if (!inputValue.trim()) return;
-    const userMsg: ChatMessage = { from: 'user', text: inputValue };
-    setMessages(prev => [...prev, userMsg]);
-    const input = inputValue.toLowerCase();
-    setInputValue('');
-
-    setTimeout(() => {
-      // Match user input against route keywords
-      const match = CHAT_ROUTES.find(route =>
-        route.keywords.some(kw => input.includes(kw))
-      );
-
-      if (match) {
-        setMessages(prev => [...prev, {
-          from: 'agent',
-          text: match.response,
-          link: { label: match.label, path: match.path },
-        }]);
-      } else {
-        const response = FALLBACK_RESPONSES[messages.length % FALLBACK_RESPONSES.length];
-        setMessages(prev => [...prev, { from: 'agent', text: response }]);
-      }
-    }, 800);
+  const handleNavigate = (view: AudienceView) => {
+    setActiveView(view);
+    // Keep CloudBees targeting context in sync with the audience being viewed.
+    const match = ALL_USERS.find(u => u.defaultView === view);
+    if (match) setUserProperties(match);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  if (!open) {
-    return (
-      <FloatButton
-        icon={<MessageOutlined />}
-        type="primary"
-        badge={{ dot: true }}
-        onClick={() => setOpen(true)}
-        style={{ right: 24, bottom: 24, width: 56, height: 56 }}
-      />
-    );
-  }
-
-  return (
-    <Card
-      title={
-        <Space>
-          <Badge dot color="green">
-            <MessageOutlined style={{ fontSize: 16 }} />
-          </Badge>
-          <span>Horizon Bank Support</span>
-        </Space>
-      }
-      extra={<CloseOutlined onClick={() => setOpen(false)} style={{ cursor: 'pointer' }} />}
-      style={{
-        position: 'fixed',
-        bottom: 24,
-        right: 24,
-        width: 360,
-        zIndex: 1000,
-        boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
-        borderRadius: 12,
-      }}
-      styles={{
-        body: { padding: 0 },
-        header: { background: '#1a3c5e', color: '#fff', borderRadius: '12px 12px 0 0' },
-      }}
-    >
-      {/* Messages */}
-      <div style={{ height: 300, overflowY: 'auto', padding: 16 }}>
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            style={{
-              display: 'flex',
-              justifyContent: msg.from === 'user' ? 'flex-end' : 'flex-start',
-              marginBottom: 12,
-            }}
-          >
-            <div
-              style={{
-                maxWidth: '80%',
-                padding: '8px 12px',
-                borderRadius: msg.from === 'user' ? '12px 12px 0 12px' : '12px 12px 12px 0',
-                background: msg.from === 'user' ? '#1a3c5e' : (chatIsDark ? '#333' : '#f0f0f0'),
-                color: msg.from === 'user' ? '#fff' : (chatIsDark ? '#fafafa' : '#000'),
-                fontSize: 13,
-              }}
-            >
-              {msg.text}
-              {msg.link && (
-                <div style={{ marginTop: 6 }}>
-                  <Button
-                    type="link"
-                    size="small"
-                    style={{ padding: 0, color: msg.from === 'user' ? '#91caff' : '#1677ff', fontSize: 12 }}
-                    onClick={() => { navigate(msg.link!.path); setOpen(false); }}
-                  >
-                    {msg.link.label} &rarr;
-                  </Button>
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Input */}
-      <div style={{ padding: '8px 12px', borderTop: `1px solid ${chatIsDark ? '#434343' : '#f0f0f0'}`, display: 'flex', gap: 8 }}>
-        <Input
-          placeholder="Type a message..."
-          value={inputValue}
-          onChange={e => setInputValue(e.target.value)}
-          onPressEnter={handleSend}
-          size="small"
-        />
-        <Button type="primary" size="small" icon={<SendOutlined />} onClick={handleSend} />
-      </div>
-    </Card>
-  );
-}
-
-// ============================================
-// App Component
-// ============================================
-
-function App({ currentUser, userMenuItems }: AppProps) {
-  const [collapsed, setCollapsed] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [creditCardFrozen, setCreditCardFrozen] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { token } = antdTheme.useToken();
-  const { themeMode, toggleDarkMode } = useThemeMode();
-  const isMobile = useIsMobile();
-
-  // Feature flags
-  const showInvestmentPortfolio = useFeatureFlag('showInvestmentPortfolio');
-  const enableNotificationCenter = useFeatureFlag('enableNotificationCenter');
-  const enableCardControls = useFeatureFlag('enableCardControls');
-  const enableMortgageSimulator = useFeatureFlag('enableMortgageSimulator');
-  const showMortgageAccount = useFeatureFlag('showMortgageAccount');
-  const promotionalBanner = useFeatureFlagString('promotionalBanner');
-  const systemAlert = useFeatureFlagString('systemAlert');
-
-  // Mobile-aware flag defaults:
-  // - Chat support OFF on mobile (covers too much screen)
-  // - Notifications ON on mobile (push-style alerts are expected)
-  // - Card controls ON on mobile (freeze card on the go)
-  const enableTopBanner = useFeatureFlag('enableTopBanner');
-  const topBannerFix = useFeatureFlag('topBannerFix');
-
-  // Debug logging for banner flags
-  console.log('🔍 App render - Banner flags:', { enableTopBanner, topBannerFix });
-  const enableChatSupportFlag = useFeatureFlag('enableChatSupport');
-  const enableChatSupport = enableChatSupportFlag && !isMobile;
-  const isStudent = currentUser.properties.booleans.isStudent ?? false;
-
-  const selectedKey = pathToKey[location.pathname] || 'accounts';
-
-  const customerSegment = currentUser.properties.strings.customerSegment || '';
-  const isFinancialPlanning = customerSegment === 'financial-planning';
-
-  const menuItems: MenuProps['items'] = [
-    {
-      key: 'accounts',
-      icon: <HomeOutlined />,
-      label: 'Account Summary',
-    },
-    // Hide Transfer & Pay for wealth management customers (they use wire transfers and other premier services)
-    ...(!isFinancialPlanning ? [{
-      key: 'transfers',
-      icon: <SwapOutlined />,
-      label: 'Transfer & Pay',
-    }] : []),
-    ...(showInvestmentPortfolio
-      ? [
-          {
-            key: 'investments',
-            icon: <FundOutlined />,
-            label: 'Investments',
-          },
-        ]
-      : []),
-    ...(!isStudent
-      ? [
-          {
-            key: 'rewards',
-            icon: <GiftOutlined />,
-            label: 'Rewards & Offers',
-          },
-        ]
-      : []),
-    ...(enableNotificationCenter
-      ? [
-          {
-            key: 'notifications',
-            icon: <BellOutlined />,
-            label: 'Notifications',
-          },
-        ]
-      : []),
-    ...(enableCardControls
-      ? [
-          {
-            key: 'card-controls',
-            icon: <CreditCardOutlined />,
-            label: 'Card Controls',
-          },
-        ]
-      : []),
-    ...((showMortgageAccount || enableMortgageSimulator)
-      ? [
-          {
-            key: 'mortgage-simulator',
-            icon: <HomeOutlined />,
-            label: 'Mortgage',
-          },
-        ]
-      : []),
-    {
-      key: 'novus-demo',
-      icon: <BranchesOutlined />,
-      label: 'Novus Demo',
-    },
-  ];
-
-  // Bottom tab bar items for mobile (core pages only, "More" opens drawer)
-  const bottomTabs = [
-    { key: 'accounts', icon: <HomeOutlined />, label: 'Accounts' },
-    ...(!isFinancialPlanning ? [{ key: 'transfers', icon: <SwapOutlined />, label: 'Transfers' }] : []),
-    ...(!isStudent ? [{ key: 'rewards', icon: <GiftOutlined />, label: 'Rewards' }] : []),
-    { key: 'more', icon: <MenuUnfoldOutlined />, label: 'More' },
-  ];
-
-  const routes: Record<string, string> = {
-    accounts: '/',
-    transfers: '/transfers',
-    investments: '/investments',
-    rewards: '/rewards',
-    notifications: '/notifications',
-    'card-controls': '/card-controls',
-    'mortgage-simulator': '/mortgage-simulator',
-    'novus-demo': '/novus-demo',
-  };
-
-  const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
-    navigate(routes[key] || '/');
-    if (isMobile) setDrawerOpen(false);
-  };
-
-  const handleBottomTabClick = (key: string) => {
-    if (key === 'more') {
-      setDrawerOpen(true);
-    } else {
-      navigate(routes[key] || '/');
+  const renderView = () => {
+    switch (activeView) {
+      case 'content':
+        return <ContentView />;
+      case 'panel':
+        return <PanelView />;
+      case 'product':
+        return <ProductView />;
+      case 'sales':
+        return <SalesView />;
+      default:
+        return <OverviewView onNavigate={handleNavigate} />;
     }
   };
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      {/* Left Sidebar - Desktop only */}
-      {!isMobile && (
-        <Sider
-          collapsible
-          collapsed={collapsed}
-          onCollapse={setCollapsed}
-          trigger={null}
-          width={240}
-          style={{
-            background: token.colorBgContainer,
-            borderRight: `1px solid ${token.colorBorderSecondary}`,
-          }}
-          breakpoint="lg"
-          collapsedWidth={80}
-        >
-          <div className="sider-logo">
-            <BankOutlined style={{ fontSize: collapsed ? 24 : 28, color: themeMode === 'dark' ? '#ffffff' : '#1a3c5e' }} />
-            {!collapsed && (
-              <span className="sider-logo-text">Horizon Bank</span>
-            )}
+    <Layout style={{ minHeight: '100vh', background: '#faf8fe' }}>
+      <Header
+        style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 10,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 16,
+          background: 'linear-gradient(135deg, #2a0856 0%, #1a0a38 100%)',
+          padding: screens.md ? '0 28px' : '0 16px',
+          height: 64,
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+          <MolecularMark size={28} />
+          <div style={{ lineHeight: 1.1, minWidth: 0 }}>
+            <Text style={{ color: '#fff', fontWeight: 700, fontSize: 16 }}>Albert Invent</Text>
+            <div style={{ color: '#b9a8e0', fontSize: 11 }}>Product Marketing · Drew Piland</div>
           </div>
+        </div>
 
-          <Menu
-            mode="inline"
-            selectedKeys={[selectedKey]}
-            onClick={handleMenuClick}
-            items={menuItems}
-            style={{ border: 'none' }}
+        {screens.lg && (
+          <Segmented
+            value={activeView}
+            onChange={val => handleNavigate(val as AudienceView)}
+            options={VALID_VIEWS.map(v => ({ label: VIEW_LABEL[v], value: v }))}
+            style={{ background: 'rgba(255,255,255,0.12)' }}
           />
-        </Sider>
-      )}
-
-      {/* Mobile Drawer for "More" menu */}
-      {isMobile && (
-        <Drawer
-          title={
-            <Space>
-              <BankOutlined style={{ color: '#1a3c5e' }} />
-              <span>Horizon Bank</span>
-            </Space>
-          }
-          placement="left"
-          onClose={() => setDrawerOpen(false)}
-          open={drawerOpen}
-          width={280}
-          styles={{ body: { padding: 0 } }}
-        >
-          <Menu
-            mode="inline"
-            selectedKeys={[selectedKey]}
-            onClick={handleMenuClick}
-            items={menuItems}
-            style={{ border: 'none' }}
-          />
-          <div style={{ padding: '16px 24px', borderTop: `1px solid ${token.colorBorderSecondary}` }}>
-            <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-              <Text type="secondary">Dark Mode</Text>
-              <Switch
-                checked={themeMode === 'dark'}
-                onChange={() => toggleDarkMode()}
-                checkedChildren="🌙"
-                unCheckedChildren="☀️"
-              />
-            </Space>
-          </div>
-        </Drawer>
-      )}
-
-      <Layout>
-        {/* Top Banner - Progressive rollout demo:
-            1. enableTopBanner (buggy) - show runaway discount bug, then kill switch it
-            2. topBannerFix (fixed) - roll out the fix progressively (beta → 25% → all) */}
-        {(() => {
-          console.log('🎨 Banner render decision:', { topBannerFix, enableTopBanner });
-          if (topBannerFix) {
-            console.log('✅ Rendering FixedTopBanner');
-            return <FixedTopBanner />;
-          } else if (enableTopBanner) {
-            console.log('⚠️ Rendering BuggyTopBanner');
-            return <BuggyTopBanner />;
-          } else {
-            console.log('❌ No banner rendered');
-            return null;
-          }
-        })()}
-
-        {/* System Alert - controlled by systemAlert string flag (ops demo) */}
-        {systemAlert !== 'none' && (
-          <SystemAlertBanner alertType={systemAlert} />
         )}
 
-        {/* Promotional Banner - controlled by promotionalBanner string flag */}
-        {promotionalBanner !== 'none' && (
-          <PromoBanner campaign={promotionalBanner} />
-        )}
-
-        {/* Top Header */}
-        <Header
-          style={{
-            background: token.colorBgContainer,
-            padding: isMobile ? '0 12px' : '0 24px',
-            paddingTop: isMobile ? 'env(safe-area-inset-top)' : 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            borderBottom: `1px solid ${token.colorBorderSecondary}`,
-            height: isMobile ? 'auto' : 64,
-            minHeight: isMobile ? 52 : 64,
-          }}
-        >
-          {isMobile ? (
-            <Space>
-              <BankOutlined style={{ fontSize: 20, color: themeMode === 'dark' ? '#ffffff' : '#1a3c5e' }} />
-              <Text strong style={{ fontSize: 16 }}>Horizon Bank</Text>
-            </Space>
-          ) : (
-            <Button
-              type="text"
-              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-              onClick={() => setCollapsed(!collapsed)}
-              style={{ fontSize: 16 }}
-            />
-          )}
-
-          <Space size={isMobile ? 'small' : 'middle'}>
-            {!isMobile && (
-              <Tooltip title={themeMode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
-                <Switch
-                  checked={themeMode === 'dark'}
-                  onChange={() => toggleDarkMode()}
-                  checkedChildren="🌙"
-                  unCheckedChildren="☀️"
-                  style={{ marginTop: 2 }}
-                />
-              </Tooltip>
+        <Dropdown menu={{ items: userMenuItems }} trigger={['click']} placement="bottomRight">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+            {screens.md && (
+              <div style={{ textAlign: 'right', lineHeight: 1.1 }}>
+                <Text style={{ color: '#fff', fontSize: 13, fontWeight: 600 }}>{currentUser.name}</Text>
+                <div style={{ color: '#b9a8e0', fontSize: 11 }}>{currentUser.role}</div>
+              </div>
             )}
-
-            <Dropdown menu={{ items: userMenuItems }} trigger={['click']} placement="bottomRight">
-              <Button type="text" size={isMobile ? 'middle' : 'large'}>
-                <Space>
-                  <div
-                    style={{
-                      width: 28,
-                      height: 28,
-                      borderRadius: '50%',
-                      background: '#1a3c5e',
-                      color: '#fff',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: 12,
-                      fontWeight: 600,
-                    }}
-                  >
-                    {getUserInitials(currentUser.name)}
-                  </div>
-                  {!isMobile && <Text>{currentUser.name}</Text>}
-                  <UserOutlined />
-                </Space>
-              </Button>
-            </Dropdown>
-          </Space>
-        </Header>
-
-        {/* Page Content */}
-        <Content
-          style={{
-            padding: isMobile ? 12 : 24,
-            paddingBottom: isMobile ? 72 : 24,
-            background: token.colorBgLayout,
-            overflow: 'auto',
-          }}
-        >
-          <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-            <Routes>
-              <Route path="/" element={<AccountSummary currentUser={currentUser} onLockCard={() => setCreditCardFrozen(true)} />} />
-              <Route path="/accounts" element={<AccountSummary currentUser={currentUser} onLockCard={() => setCreditCardFrozen(true)} />} />
-              <Route path="/transfers" element={<TransferPay />} />
-              <Route path="/investments" element={<Investments />} />
-              <Route path="/rewards" element={<Rewards />} />
-              <Route path="/notifications" element={<Notifications />} />
-              <Route path="/card-controls" element={<CardControls currentUser={currentUser} creditCardFrozen={creditCardFrozen} setCreditCardFrozen={setCreditCardFrozen} />} />
-              <Route path="/mortgage-simulator" element={<MortgageSimulator />} />
-              <Route path="/novus-demo" element={<NovusDemo />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
+            <Avatar style={{ background: currentUser.accent, fontWeight: 700 }}>
+              {getUserInitials(currentUser.name)}
+            </Avatar>
           </div>
-        </Content>
-      </Layout>
+        </Dropdown>
+      </Header>
 
-      {/* Mobile Bottom Tab Bar */}
-      {isMobile && (
-        <div className="mobile-bottom-tabs">
-          {bottomTabs.map(tab => (
-            <div
-              key={tab.key}
-              className={`mobile-tab ${selectedKey === tab.key ? 'mobile-tab-active' : ''}`}
-              onClick={() => handleBottomTabClick(tab.key)}
-            >
-              <span className="mobile-tab-icon">{tab.icon}</span>
-              <span className="mobile-tab-label">{tab.label}</span>
-            </div>
-          ))}
+      {/* Greeting / context strip */}
+      <div
+        style={{
+          background: '#fff',
+          borderBottom: '1px solid #efeaf8',
+          padding: screens.md ? '10px 28px' : '10px 16px',
+        }}
+      >
+        <Text style={{ color: BRAND.violetDark, fontSize: 13, fontWeight: 600 }}>{VIEW_GREETING[activeView]}</Text>
+      </div>
+
+      {/* Mobile / tablet segmented */}
+      {!screens.lg && (
+        <div style={{ background: '#fff', padding: '10px 16px', borderBottom: '1px solid #efeaf8', overflowX: 'auto' }}>
+          <Segmented
+            value={activeView}
+            onChange={val => handleNavigate(val as AudienceView)}
+            options={VALID_VIEWS.map(v => ({ label: VIEW_LABEL[v], value: v }))}
+          />
         </div>
       )}
 
-      {/* Chat Support Widget - controlled by enableChatSupport boolean flag */}
-      {enableChatSupport && <ChatWidget />}
+      <Content style={{ padding: screens.md ? '32px 28px 48px' : '20px 14px 32px' }}>
+        <div style={{ maxWidth: 1080, margin: '0 auto' }}>{renderView()}</div>
+      </Content>
+
+      <Footer style={{ textAlign: 'center', background: 'transparent', color: '#9a8bc4', fontSize: 12 }}>
+        One codebase · four audiences · tailored with CloudBees Feature Management — the mechanism, not the message.
+      </Footer>
     </Layout>
   );
 }
-
-export default App;

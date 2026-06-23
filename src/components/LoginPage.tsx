@@ -1,14 +1,14 @@
 /**
- * LoginPage Component
+ * LoginPage — Albert Invent PMM Portfolio
  *
- * Realistic bank login screen with email/password fields and
- * quick-select persona buttons for demo purposes.
+ * The entry point to the portfolio. Each panelist selects their name and is taken
+ * to the experience built for their function. The selection sets CloudBees custom
+ * properties (panelistId / audience) that route the audienceView flag.
  */
 
-import { useState } from 'react';
-import { Button, Input, Typography, Space, Tag } from 'antd';
-import { BankOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
-import { DEFAULT_USERS, type User } from '../lib/users';
+import { Typography } from 'antd';
+import { ArrowRightOutlined } from '@ant-design/icons';
+import { OVERVIEW_USER, DEFAULT_USERS, getUserInitials, type User } from '../lib/users';
 
 const { Title, Text } = Typography;
 
@@ -16,154 +16,133 @@ interface LoginPageProps {
   onSelectUser: (user: User) => void;
 }
 
-const PERSONA_COLORS: Record<string, string> = {
-  student: '#52c41a',
-  mortgage: '#fa8c16',
-  'financial-planning': '#faad14',
-  'checking-savings': '#1890ff',
-  beta: '#1890ff',
-  admin: '#722ed1',
-};
-
-const PERSONA_LABELS: Record<string, string> = {
-  student: 'Student',
-  mortgage: 'Mortgage',
-  'financial-planning': 'Wealth',
-  'checking-savings': 'Everyday',
-  beta: 'Beta',
-  admin: 'Admin',
-};
+function MolecularMark({ size = 44 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 44 44" fill="none" aria-hidden>
+      <circle cx="22" cy="9" r="4" fill="#7D19FE" />
+      <circle cx="9" cy="30" r="4" fill="#7D19FE" />
+      <circle cx="35" cy="30" r="4" fill="#7D19FE" />
+      <circle cx="22" cy="22" r="3" fill="#ad73fe" />
+      <line x1="22" y1="9" x2="22" y2="22" stroke="#7D19FE" strokeWidth="2" />
+      <line x1="22" y1="22" x2="9" y2="30" stroke="#7D19FE" strokeWidth="2" />
+      <line x1="22" y1="22" x2="35" y2="30" stroke="#7D19FE" strokeWidth="2" />
+    </svg>
+  );
+}
 
 export function LoginPage({ onSelectUser }: LoginPageProps) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
-  const handleLogin = () => {
-    // Match email to a persona, or default to first user
-    const matched = DEFAULT_USERS.find(u => u.email === email);
-    onSelectUser(matched || DEFAULT_USERS[0]);
-  };
-
-  const handleQuickSelect = (user: User) => {
-    setEmail(user.email);
-    setPassword('••••••');
-    // Brief delay so user sees the fields fill in
-    setTimeout(() => onSelectUser(user), 300);
-  };
-
   return (
     <div
       style={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #1a3c5e 0%, #0a1826 100%)',
+        background:
+          'radial-gradient(1200px 600px at 80% -10%, rgba(125,25,254,0.18), transparent), linear-gradient(135deg, #160a2e 0%, #0a0518 100%)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 24,
+        padding: '48px 24px',
       }}
     >
-      <div
-        style={{
-          width: '100%',
-          maxWidth: 420,
-          background: '#fff',
-          borderRadius: 16,
-          padding: '48px 40px 40px',
-          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
-        }}
-      >
-        {/* Bank Branding */}
-        <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          <BankOutlined style={{ fontSize: 40, color: '#1a3c5e', marginBottom: 12 }} />
-          <Title level={2} style={{ color: '#1a3c5e', marginBottom: 4, fontWeight: 700 }}>
-            Horizon Bank
+      <div style={{ width: '100%', maxWidth: 920 }}>
+        {/* Header */}
+        <div style={{ textAlign: 'center', marginBottom: 36 }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+            <MolecularMark size={56} />
+          </div>
+          <Title level={2} style={{ color: '#fff', margin: 0, fontWeight: 700, letterSpacing: -0.5 }}>
+            Product Marketing, built for Albert Invent
           </Title>
-          <Text type="secondary">Your trusted banking partner</Text>
+          <Text style={{ color: '#cdbff0', fontSize: 16, display: 'block', marginTop: 8 }}>
+            One portfolio, tailored to each of you. Choose your name to see the work I'd own for your team.
+          </Text>
+          <Text style={{ color: '#8b7bb8', fontSize: 13, display: 'block', marginTop: 6 }}>
+            Prepared by Drew Piland · Round 5 Panel · June 25, 2026
+          </Text>
         </div>
 
-        {/* Login Form */}
-        <Space direction="vertical" size="large" style={{ width: '100%' }}>
-          <div>
-            <Input
-              size="large"
-              placeholder="Email"
-              prefix={<MailOutlined style={{ color: '#bfbfbf' }} />}
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              onPressEnter={handleLogin}
-              style={{ borderRadius: 8 }}
-            />
-          </div>
-
-          <div>
-            <Input.Password
-              size="large"
-              placeholder="Password"
-              prefix={<LockOutlined style={{ color: '#bfbfbf' }} />}
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              onPressEnter={handleLogin}
-              style={{ borderRadius: 8 }}
-            />
-          </div>
-
-          <Button
-            type="primary"
-            size="large"
-            block
-            onClick={handleLogin}
-            style={{
-              height: 48,
-              borderRadius: 8,
-              fontSize: 16,
-              fontWeight: 600,
-              background: '#1a3c5e',
-              borderColor: '#1a3c5e',
-            }}
-          >
-            Login
-          </Button>
-        </Space>
-
-        {/* Demo Quick-Select */}
+        {/* Panelist cards */}
         <div
           style={{
-            marginTop: 32,
-            padding: 20,
-            border: '2px solid #52c41a',
-            borderRadius: 12,
-            textAlign: 'center',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))',
+            gap: 16,
           }}
         >
-          <Text type="secondary" style={{ fontSize: 13, display: 'block', marginBottom: 12 }}>
-            Demo accounts:
-          </Text>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
-            {DEFAULT_USERS.map(user => {
-              // Use user.id for beta user to avoid duplicate "Everyday" labels
-              const segment = user.id === 'beta' ? 'beta' : user.properties.strings.customerSegment;
-              const color = PERSONA_COLORS[segment] || '#1890ff';
-              const label = PERSONA_LABELS[segment] || segment;
+          {DEFAULT_USERS.map(user => (
+            <button
+              key={user.id}
+              onClick={() => onSelectUser(user)}
+              style={{
+                textAlign: 'left',
+                cursor: 'pointer',
+                border: '1px solid rgba(125,25,254,0.35)',
+                background: 'rgba(255,255,255,0.04)',
+                backdropFilter: 'blur(6px)',
+                borderRadius: 16,
+                padding: 20,
+                color: '#fff',
+                display: 'flex',
+                gap: 16,
+                alignItems: 'flex-start',
+                transition: 'transform 0.15s ease, border-color 0.15s ease, background 0.15s ease',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.borderColor = '#7D19FE';
+                e.currentTarget.style.background = 'rgba(125,25,254,0.12)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.borderColor = 'rgba(125,25,254,0.35)';
+                e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
+              }}
+            >
+              <div
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 12,
+                  background: user.accent,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 700,
+                  fontSize: 16,
+                  flexShrink: 0,
+                }}
+              >
+                {getUserInitials(user.name)}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Text strong style={{ color: '#fff', fontSize: 17 }}>
+                    {user.name}
+                  </Text>
+                  <ArrowRightOutlined style={{ color: '#ad73fe' }} />
+                </div>
+                <Text style={{ color: '#b9a8e0', fontSize: 13, display: 'block' }}>{user.role}</Text>
+                <Text style={{ color: '#9a8bc4', fontSize: 13, display: 'block', marginTop: 8, lineHeight: 1.5 }}>
+                  {user.description}
+                </Text>
+              </div>
+            </button>
+          ))}
+        </div>
 
-              return (
-                <Tag
-                  key={user.id}
-                  color={color}
-                  onClick={() => handleQuickSelect(user)}
-                  style={{
-                    cursor: 'pointer',
-                    fontSize: 14,
-                    padding: '4px 16px',
-                    borderRadius: 20,
-                    fontWeight: 600,
-                    margin: 0,
-                  }}
-                >
-                  {label}
-                </Tag>
-              );
-            })}
-          </div>
+        {/* Overview link */}
+        <div style={{ textAlign: 'center', marginTop: 24 }}>
+          <button
+            onClick={() => onSelectUser(OVERVIEW_USER)}
+            style={{
+              cursor: 'pointer',
+              background: 'transparent',
+              border: 'none',
+              color: '#b9a8e0',
+              fontSize: 14,
+            }}
+          >
+            Or start with the overview — the map of all four views &rarr;
+          </button>
         </div>
       </div>
     </div>
