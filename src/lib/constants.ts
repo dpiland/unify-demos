@@ -8,6 +8,7 @@ export const FEATURE_FLAG_KEYS = {
   SHOW_ANALYST_STRATEGY: 'showAnalystStrategy',
   SHOW_COWORK_ENABLEMENT: 'showCoworkEnablement',
   SHOW_PUSHBACK_PREP: 'showPushbackPrep',
+  SHOW_PRESENTER_NOTES: 'showPresenterNotes',
   THEME_MODE: 'themeMode',
 } as const;
 
@@ -22,6 +23,8 @@ export const FLAG_DESCRIPTIONS: Record<string, string> = {
     'Sales view: show the Cowork projects for self-serve enablement and onboarding.',
   showPushbackPrep:
     'Panel view: show the anticipated case-study pushback and crisp responses.',
+  showPresenterNotes:
+    'Show or hide all SpeakerTrack presenter-note panels across every view (toggle off when the panel is driving).',
   themeMode:
     'App visual theme: light, dark, or high-contrast.',
 };
@@ -32,5 +35,6 @@ export const DEFAULT_FLAG_VALUES = {
   showAnalystStrategy: true,
   showCoworkEnablement: true,
   showPushbackPrep: true,
+  showPresenterNotes: true,
   themeMode: 'light',
 };

@@ -8,6 +8,7 @@
 
 import type { ReactNode } from 'react';
 import { Typography, Tag, Collapse } from 'antd';
+import { useFeatureFlag } from '../hooks/useFeatureFlag';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -161,6 +162,8 @@ export function Pill({ children, color }: { children: ReactNode; color?: string 
 
 /** Discreet, collapsed-by-default presenter note (the 30–45s talk track). */
 export function SpeakerTrack({ children }: { children: ReactNode }) {
+  const show = useFeatureFlag('showPresenterNotes');
+  if (!show) return null;
   return (
     <Collapse
       ghost

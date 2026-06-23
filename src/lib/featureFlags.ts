@@ -51,6 +51,9 @@ export const flags = {
   /** Boolean — Panel view: show the anticipated-pushback Q&A prep */
   showPushbackPrep: new Rox.Flag(true),
 
+  /** Boolean — Show/hide all SpeakerTrack presenter notes across every view */
+  showPresenterNotes: new Rox.Flag(true),
+
   /**
    * String Flag — Theme Mode (consumed by main.tsx)
    * Kept for the theming system; defaults to light.
@@ -109,6 +112,7 @@ export async function initializeFeatureFlags(options: RoxSetupOptions = {}): Pro
         showAnalystStrategy: flags.showAnalystStrategy.isEnabled(),
         showCoworkEnablement: flags.showCoworkEnablement.isEnabled(),
         showPushbackPrep: flags.showPushbackPrep.isEnabled(),
+        showPresenterNotes: flags.showPresenterNotes.isEnabled(),
         themeMode: flags.themeMode.getValue(),
       });
     }
